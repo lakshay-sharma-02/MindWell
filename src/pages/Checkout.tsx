@@ -1,0 +1,344 @@
+
+import { useState, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { Layout } from "@/components/layout/Layout";
+import { SEOHead } from "@/components/seo/SEOHead";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { toast } from "sonner";
+import { Loader2, Lock, CreditCard, ArrowRight, QrCode } from "lucide-react";
+import { motion } from "framer-motion";
+import { sendBookingForm } from "@/lib/email";
+
+export default function Checkout() {
+    const location = useLocation();
+    const navigate = useNavigate();
+    const [isProcessing, setIsProcessing] = useState(false);
+    const [paymentMethod, setPaymentMethod] = useState<"card" | "qr">("card");
+    const [transactionId, setTransactionId] = useState("");
+    const [formData, setFormData] = useState({
+        cardNumber: "",
+        expiryDate: "",
+        cvc: "",
+        nameOnCard: ""
+    });
+
+    // Get booking data from location state or redirect if missing
+    const bookingData = location.state?.bookingData;
+
+    useEffect(() => {
+        if (!bookingData) {
+            toast.error("No booking selected. Redirecting to booking page.");
+            navigate("/book");
+        }
+    }, [bookingData, navigate]);
+
+    if (!bookingData) return null;
+
+    const validateCard = () => {
+        const { cardNumber, expiryDate, cvc, nameOnCard } = formData;
+
+        if (cardNumber.replace(/\s/g, "").length < 15) {
+            toast.error("Please enter a valid card number");
+            return false;
+        }
+
+        if (!/^\d{2}\/\d{2}$/.test(expiryDate)) {
+            toast.error("Expiry date must be in MM/YY format");
+            return false;
+        }
+
+        // Basic expiry check
+        const [month, year] = expiryDate.split('/').map(num => parseInt(num, 10));
+        const currentYear = new Date().getFullYear() % 100;
+        const currentMonth = new Date().getMonth() + 1;
+
+        if (month < 1 || month > 12) {
+            toast.error("Invalid expiry month");
+            return false;
+        }
+
+        if (year < currentYear || (year === currentYear && month < currentMonth)) {
+            toast.error("Card has expired");
+            return false;
+        }
+
+        if (cvc.length < 3) {
+            toast.error("Please enter a valid CVC");
+            return false;
+        }
+
+        if (!nameOnCard.trim()) {
+            toast.error("Please enter name on card");
+            return false;
+        }
+
+        return true;
+    };
+
+    const handlePayment = async (e: React.FormEvent) => {
+        e.preventDefault();
+
+        if (paymentMethod === "card" && !validateCard()) {
+            return;
+        }
+
+        if (paymentMethod === "qr" && !transactionId.trim()) {
+            toast.error("Please enter the Transaction ID / UTR Number to verify your payment");
+            return;
+        }
+
+        setIsProcessing(true);
+
+        try {
+            // Simulate payment processing/verification
+            await new Promise(resolve => setTimeout(resolve, 2000));
+
+            // Send booking email to admin
+            const emailResult = await sendBookingForm({
+                name: bookingData.name,
+                email: bookingData.email,
+                phone: bookingData.phone,
+                sessionType: bookingData.sessionType,
+                format: bookingData.format,
+                date: bookingData.date,
+                time: bookingData.time,
+                notes: bookingData.notes,
+                paymentDetails: {
+                    method: paymentMethod,
+                    transactionId: paymentMethod === 'qr' ? transactionId : undefined
+                }
+            });
+
+            if (!emailResult.success) {
+                throw new Error("Payment processed but failed to send confirmation email. Please contact support.");
+            }
+
+            toast.success(
+                paymentMethod === "card"
+                    ? "Payment successful! Your booking is confirmed."
+                    : "Payment details submitted! We will verify the transaction and confirm your booking."
+            );
+
+            // Redirect to home or success page
+            navigate("/");
+
+        } catch (error) {
+            console.error("Checkout error:", error);
+            toast.error(error instanceof Error ? error.message : "An error occurred. Please try again.");
+        } finally {
+            setIsProcessing(false);
+        }
+    };
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { id, value } = e.target;
+        if (id === "cardNumber") {
+            const v = value.replace(/\s+/g, "").replace(/[^0-9]/gi, "").substr(0, 16);
+            const parts = [];
+            for (let i = 0; i < v.length; i += 4) {
+                parts.push(v.substr(i, 4));
+            }
+            setFormData(prev => ({ ...prev, [id]: parts.join(" ") }));
+        } else if (id === "expiryDate") {
+            let v = value.replace(/[^0-9]/gi, "");
+            if (v.length >= 2) {
+                v = v.substr(0, 2) + "/" + v.substr(2, 2);
+            }
+            setFormData(prev => ({ ...prev, [id]: v }));
+        } else {
+            setFormData(prev => ({ ...prev, [id]: value }));
+        }
+    };
+
+    return (
+        <Layout>
+            <SEOHead title="Checkout - Unheard Pages" description="Secure payment for your session." />
+
+            <div className="container-wide py-12 md:py-20">
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8"
+                >
+                    {/* Order Summary */}
+                    <div className="space-y-6">
+                        <div>
+                            <h1 className="text-3xl font-bold font-display mb-2">Checkout</h1>
+                            <p className="text-muted-foreground">Complete your payment to secure your session.</p>
+                        </div>
+
+                        <Card className="bg-secondary/20 border-border/60">
+                            <CardHeader>
+                                <CardTitle>Order Summary</CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-4">
+                                <div className="flex justify-between items-start pb-4 border-b border-border/50">
+                                    <div>
+                                        <h3 className="font-semibold text-lg">{bookingData.sessionType}</h3>
+                                        <div className="text-sm text-muted-foreground mt-1">
+                                            <p>{bookingData.date} at {bookingData.time}</p>
+                                            <p className="capitalize">{bookingData.format} Session</p>
+                                        </div>
+                                    </div>
+                                    <span className="font-bold text-lg text-primary">$150.00</span>
+                                </div>
+                                <div className="flex justify-between font-medium">
+                                    <span>Subtotal</span>
+                                    <span>$150.00</span>
+                                </div>
+                                <div className="flex justify-between font-medium">
+                                    <span>Tax (Estimated)</span>
+                                    <span>$0.00</span>
+                                </div>
+                                <div className="flex justify-between font-bold text-xl pt-4 border-t border-border/50">
+                                    <span>Total</span>
+                                    <span>$150.00</span>
+                                </div>
+                            </CardContent>
+                        </Card>
+
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground bg-primary/5 p-4 rounded-lg border border-primary/10">
+                            <Lock className="w-4 h-4 text-primary" />
+                            <p>Transactions are secure and encrypted.</p>
+                        </div>
+                    </div>
+
+                    {/* Payment Form */}
+                    <div className="space-y-6">
+                        <Tabs defaultValue="card" onValueChange={(v) => setPaymentMethod(v as "card" | "qr")} className="w-full">
+                            <TabsList className="grid w-full grid-cols-2 mb-4">
+                                <TabsTrigger value="card" className="flex items-center gap-2">
+                                    <CreditCard className="w-4 h-4" />
+                                    Card
+                                </TabsTrigger>
+                                <TabsTrigger value="qr" className="flex items-center gap-2">
+                                    <QrCode className="w-4 h-4" />
+                                    UPI / QR
+                                </TabsTrigger>
+                            </TabsList>
+
+                            <Card className="h-fit overflow-hidden">
+                                <form onSubmit={handlePayment}>
+                                    <TabsContent value="card" className="mt-0 space-y-4">
+                                        <CardHeader>
+                                            <CardTitle>Card Details</CardTitle>
+                                            <CardDescription>Enter your card information used for payment</CardDescription>
+                                        </CardHeader>
+                                        <CardContent className="space-y-4">
+                                            <div className="space-y-2">
+                                                <Label htmlFor="cardNumber">Card Number</Label>
+                                                <Input
+                                                    id="cardNumber"
+                                                    placeholder="0000 0000 0000 0000"
+                                                    value={formData.cardNumber}
+                                                    onChange={handleInputChange}
+                                                    maxLength={19}
+                                                    required={paymentMethod === "card"}
+                                                />
+                                            </div>
+
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <div className="space-y-2">
+                                                    <Label htmlFor="expiryDate">Expiry Date</Label>
+                                                    <Input
+                                                        id="expiryDate"
+                                                        placeholder="MM/YY"
+                                                        value={formData.expiryDate}
+                                                        onChange={handleInputChange}
+                                                        maxLength={5}
+                                                        required={paymentMethod === "card"}
+                                                    />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <Label htmlFor="cvc">CVC</Label>
+                                                    <Input
+                                                        id="cvc"
+                                                        placeholder="123"
+                                                        maxLength={4}
+                                                        value={formData.cvc}
+                                                        onChange={handleInputChange}
+                                                        required={paymentMethod === "card"}
+                                                    />
+                                                </div>
+                                            </div>
+
+                                            <div className="space-y-2">
+                                                <Label htmlFor="nameOnCard">Name on Card</Label>
+                                                <Input
+                                                    id="nameOnCard"
+                                                    placeholder="John Doe"
+                                                    value={formData.nameOnCard}
+                                                    onChange={handleInputChange}
+                                                    required={paymentMethod === "card"}
+                                                />
+                                            </div>
+                                        </CardContent>
+                                    </TabsContent>
+
+                                    <TabsContent value="qr" className="mt-0">
+                                        <CardHeader>
+                                            <CardTitle>Scan to Pay</CardTitle>
+                                            <CardDescription>Use any UPI app to scan and pay</CardDescription>
+                                        </CardHeader>
+                                        <CardContent className="flex flex-col items-center space-y-6 pb-6">
+                                            <div className="relative w-64 h-64 bg-white/5 rounded-xl border border-border flex items-center justify-center p-4">
+                                                <div className="absolute inset-0 bg-white/5 blur-xl -z-10" />
+                                                <img
+                                                    src="/payment-qr.jpg"
+                                                    alt="Payment QR Code"
+                                                    className="w-full h-full object-contain rounded-lg shadow-lg"
+                                                />
+                                            </div>
+                                            <div className="text-center space-y-1">
+                                                <p className="font-medium">Lakshay Sharma</p>
+                                                <p className="text-sm text-muted-foreground font-mono bg-secondary/50 px-2 py-1 rounded">
+                                                    sharmalakshay0208@oksbi
+                                                </p>
+                                            </div>
+                                            <div className="text-sm text-muted-foreground text-center max-w-xs">
+                                                <p>1. Scan the QR code with your UPI app</p>
+                                                <p>2. Complete the payment of <span className="text-primary font-bold">$150.00</span></p>
+                                                <p>3. Enter the transaction ID below</p>
+                                            </div>
+
+                                            <div className="w-full space-y-2">
+                                                <Label htmlFor="transactionId">Transaction ID / UTR Number</Label>
+                                                <Input
+                                                    id="transactionId"
+                                                    placeholder="e.g. 123456789012"
+                                                    value={transactionId}
+                                                    onChange={(e) => setTransactionId(e.target.value)}
+                                                    required={paymentMethod === "qr"}
+                                                />
+                                            </div>
+                                        </CardContent>
+                                    </TabsContent>
+
+                                    <CardFooter>
+                                        <Button type="submit" className="w-full btn-glow" disabled={isProcessing}>
+                                            {isProcessing ? (
+                                                <>
+                                                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                                    {paymentMethod === "card" ? "Processing..." : "Verifying..."}
+                                                </>
+                                            ) : (
+                                                <>
+                                                    {paymentMethod === "card" ? "Pay $150.00" : "Confirm Payment"}
+                                                    <ArrowRight className="w-4 h-4 ml-2" />
+                                                </>
+                                            )}
+                                        </Button>
+                                    </CardFooter>
+                                </form>
+                            </Card>
+                        </Tabs>
+                    </div>
+                </motion.div>
+            </div>
+        </Layout>
+    );
+}
