@@ -1,6 +1,14 @@
 import { createClient } from '@supabase/supabase-js';
 
-const SUPABASE_URL = "https://xnydaleepkwciwzlnxqf.supabase.co";
-const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_cmZkj5HjONVgrSws-vCt-A_8wh2Xpa7";
+// Access Environment Variables securely
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-export const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
+    console.error("Missing Supabase Environment Variables!");
+}
+
+export const supabase = createClient(
+    SUPABASE_URL || "",
+    SUPABASE_PUBLISHABLE_KEY || ""
+);

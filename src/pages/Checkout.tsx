@@ -113,8 +113,12 @@ export default function Checkout() {
                 }
             });
 
+            console.log("Booking Email Result:", emailResult);
+
             if (!emailResult.success) {
-                throw new Error("Payment processed but failed to send confirmation email. Please contact support.");
+                // Determine specific error message
+                const errorMsg = emailResult.error || "Unknown email error";
+                throw new Error(`Payment recorded, but email failed: ${errorMsg}`);
             }
 
             toast.success(
@@ -128,7 +132,8 @@ export default function Checkout() {
 
         } catch (error) {
             console.error("Checkout error:", error);
-            toast.error(error instanceof Error ? error.message : "An error occurred. Please try again.");
+            const msg = error instanceof Error ? error.message : "An error occurred. Please try again.";
+            toast.error(msg);
         } finally {
             setIsProcessing(false);
         }
