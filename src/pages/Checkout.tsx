@@ -94,8 +94,8 @@ export default function Checkout() {
         setIsProcessing(true);
 
         try {
-            // Simulate payment processing/verification
-            await new Promise(resolve => setTimeout(resolve, 2000));
+            // Artificial delay removed for production speed
+            // await new Promise(resolve => setTimeout(resolve, 2000));
 
             // Send booking email to admin
             const emailResult = await sendBookingForm({
