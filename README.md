@@ -1,73 +1,103 @@
-# Welcome to your Lovable project
+# Unheard Pages (MindWell)
 
-## Project info
+**A digital sanctuary for mental wellness, anonymous storytelling, and community support.**
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+"Unheard Pages" is a comprehensive mental health platform designed to provide a safe space for individuals to share their stories, access professional resources, and track their emotional well-being.
 
-## How can I edit this code?
+![Project Banner](https://images.unsplash.com/photo-1544027993-37dbfe43562a?q=80&w=2070&auto=format&fit=crop)
 
-There are several ways of editing your application.
+## 🌟 Key Features
 
-**Use Lovable**
+###For Users
+*   **Anonymous Storytelling:** Share personal experiences without judgment. Stories are vetted by admins before publication to ensure a safe environment.
+*   **Resource Library:** A curated collection of mental health articles, guided meditations, and downloadable guides.
+*   **Expert Podcasts:** Listen to interviews and insights from mental health professionals.
+*   **Interactive Tools:**
+    *   **Mood Tracker:** Log daily moods and view emotional trends.
+    *   **Breathing Exercises:** Guided visual tools for anxiety relief (4-7-8 technique).
+    *   **Daily Affirmations:** Positive reinforcement to start the day.
+*   **Secure Authentication:** User profiles with bookmarking and history capabilities.
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+### For Admins
+*   **Comprehensive Dashboard:** Real-time overview of platform statistics (Users, Blogs, Resources).
+*   **Content Management:** Tools to approve/reject stories and manage blog posts.
+*   **User Management:** detailed user list with search, ban/unban, and delete capabilities.
+*   **Analytics:** Visual insights into platform growth and engagement.
 
-Changes made via Lovable will be committed automatically to this repo.
+## 🛠️ Technology Stack
 
-**Use your preferred IDE**
+*   **Frontend:** [React](https://react.dev/) (Vite), [TypeScript](https://www.typescriptlang.org/)
+*   **Styling:** [Tailwind CSS](https://tailwindcss.com/)
+*   **UI Components:** [Shadcn UI](https://ui.shadcn.com/)
+*   **Animations:** [Framer Motion](https://www.framer.com/motion/)
+*   **Backend & Auth:** [Supabase](https://supabase.com/)
+*   **State Management:** [TanStack Query](https://tanstack.com/query/latest)
+*   **Icons:** [Lucide React](https://lucide.dev/)
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+## 🚀 Getting Started
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+Follow these steps to set up the project locally.
 
-Follow these steps:
+### Prerequisites
+*   Node.js (v18 or higher)
+*   npm or bun
+*   A [Supabase](https://supabase.com/) project
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+### Installation
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+1.  **Clone the repository:**
+    ```bash
+    git clone https://github.com/lakshay-sharma-02/MindWell.git
+    cd MindWell
+    ```
 
-# Step 3: Install the necessary dependencies.
-npm i
+2.  **Install dependencies:**
+    ```bash
+    npm install
+    # or
+    bun install
+    ```
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+3.  **Configure Environment:**
+    Create a `.env` file in the root directory and add your Supabase credentials:
+    ```env
+    VITE_SUPABASE_URL=your_supabase_project_url
+    VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+    ```
+
+4.  **Database Setup:**
+    Navigate to the `database/migrations` folder and run the SQL scripts in your Supabase SQL Editor in the following order:
+    1.  `migration_auth.sql` (Profiles & Triggers)
+    2.  `migration_dashboard.sql` (Dashboard tables)
+    3.  `migration_interactions.sql` (Likes & Shares)
+    4.  `migration_tools.sql` (Mood Tracker)
+    5.  `migration_admin.sql` (Admin Dashboard & RPCs)
+
+5.  **Run the Development Server:**
+    ```bash
+    npm run dev
+    ```
+
+## 📂 Project Structure
+
+```
+src/
+├── components/     # Reusable UI components
+│   ├── admin/      # Admin-specific components (Overview, UsersManager)
+│   ├── layout/     # Header, Footer, Sidebar
+│   ├── tools/      # Interactive tools (Breathing, MoodTracker)
+│   └── ui/         # Shadcn UI primitives
+├── hooks/          # Custom React hooks (useAuth, useToast)
+├── lib/            # Utilities (Supabase client, email service)
+├── pages/          # Main route pages (Home, Auth, Profile, Admin)
+└── types/          # TypeScript definitions
+database/           # SQL migration files
 ```
 
-**Edit a file directly in GitHub**
+## 🤝 Contributing
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+Contributions are welcome! Please feel free to submit a Pull Request.
 
-**Use GitHub Codespaces**
+## 📄 License
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+This project is open-source and available under the [MIT License](LICENSE).
