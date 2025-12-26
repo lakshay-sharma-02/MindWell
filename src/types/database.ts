@@ -94,6 +94,8 @@ export interface Database {
           type: string | null
           image: string | null
           download_url: string | null
+          is_premium: boolean
+          price: number | null
           published: boolean
           created_at: string
         }
@@ -105,6 +107,8 @@ export interface Database {
           type?: string | null
           image?: string | null
           download_url?: string | null
+          is_premium?: boolean
+          price?: number | null
           published?: boolean
           created_at?: string
         }
@@ -116,6 +120,8 @@ export interface Database {
           type?: string | null
           image?: string | null
           download_url?: string | null
+          is_premium?: boolean
+          price?: number | null
           published?: boolean
           created_at?: string
         }

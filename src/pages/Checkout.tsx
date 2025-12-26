@@ -1,5 +1,6 @@
 
 import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Layout } from "@/components/layout/Layout";
 import { SEOHead } from "@/components/seo/SEOHead";
@@ -26,17 +27,20 @@ export default function Checkout() {
         nameOnCard: ""
     });
 
-    // Get booking data from location state or redirect if missing
+    // Get booking data or resource data from location state
     const bookingData = location.state?.bookingData;
+    const resourceData = location.state?.resourceData;
 
     useEffect(() => {
-        if (!bookingData) {
-            toast.error("No booking selected. Redirecting to booking page.");
-            navigate("/book");
+        if (!bookingData && !resourceData) {
+            toast.error("No item selected for checkout.");
+            navigate("/");
         }
-    }, [bookingData, navigate]);
+    }, [bookingData, resourceData, navigate]);
 
-    if (!bookingData) return null;
+    if (!bookingData && !resourceData) return null;
+
+    const amount = bookingData ? 150 : (resourceData?.price || 0);
 
     const validateCard = () => {
         const { cardNumber, expiryDate, cvc, nameOnCard } = formData;
@@ -94,41 +98,57 @@ export default function Checkout() {
         setIsProcessing(true);
 
         try {
-            // Artificial delay removed for production speed
+            // Artificial delay removed
             // await new Promise(resolve => setTimeout(resolve, 2000));
 
-            // Send booking email to admin
-            const emailResult = await sendBookingForm({
-                name: bookingData.name,
-                email: bookingData.email,
-                phone: bookingData.phone,
-                sessionType: bookingData.sessionType,
-                format: bookingData.format,
-                date: bookingData.date,
-                time: bookingData.time,
-                notes: bookingData.notes,
-                paymentDetails: {
-                    method: paymentMethod,
-                    transactionId: paymentMethod === 'qr' ? transactionId : undefined
+            if (bookingData) {
+                // Send booking email to admin
+                const emailResult = await sendBookingForm({
+                    name: bookingData.name,
+                    email: bookingData.email,
+                    phone: bookingData.phone,
+                    sessionType: bookingData.sessionType,
+                    format: bookingData.format,
+                    date: bookingData.date,
+                    time: bookingData.time,
+                    notes: bookingData.notes,
+                    paymentDetails: {
+                        method: paymentMethod,
+                        transactionId: paymentMethod === 'qr' ? transactionId : undefined
+                    }
+                });
+
+                if (!emailResult.success) {
+                    const errorMsg = emailResult.error || "Unknown email error";
+                    throw new Error(`Payment recorded, but email failed: ${errorMsg}`);
                 }
-            });
+            } else if (resourceData) {
+                // Insert into purchased_resources
+                // We need a user ID for this. Assuming user is logged in if they got here (Resource page checks rights? No, ResourceCard checks rights but not Auth for navigation, but purchase needs auth usually)
+                // But wait, Resource page logic:
+                // "isAccessible" check includes "isPurchased" which checks "purchased_resources" by user_id.
+                // So we need to ensure we have a user here.
+                // We can get user from supabase or context.
+                const { data: { user } } = await supabase.auth.getUser();
+                if (!user) throw new Error("You must be logged in to purchase resources.");
 
-            console.log("Booking Email Result:", emailResult);
+                const { error } = await supabase.from("purchased_resources").insert({
+                    user_id: user.id,
+                    resource_id: resourceData.id,
+                    transaction_id: paymentMethod === 'qr' ? transactionId : 'CARD_PAYMENT_MOCK'
+                });
 
-            if (!emailResult.success) {
-                // Determine specific error message
-                const errorMsg = emailResult.error || "Unknown email error";
-                throw new Error(`Payment recorded, but email failed: ${errorMsg}`);
+                if (error) throw error;
             }
 
             toast.success(
                 paymentMethod === "card"
-                    ? "Payment successful! Your booking is confirmed."
-                    : "Payment details submitted! We will verify the transaction and confirm your booking."
+                    ? "Payment successful!"
+                    : "Payment details submitted for verification."
             );
 
-            // Redirect to home or success page
-            navigate("/");
+            // Redirect
+            navigate(resourceData ? "/resources" : "/");
 
         } catch (error) {
             console.error("Checkout error:", error);
@@ -181,19 +201,31 @@ export default function Checkout() {
                                 <CardTitle>Order Summary</CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-4">
-                                <div className="flex justify-between items-start pb-4 border-b border-border/50">
-                                    <div>
-                                        <h3 className="font-semibold text-lg">{bookingData.sessionType}</h3>
-                                        <div className="text-sm text-muted-foreground mt-1">
-                                            <p>{bookingData.date} at {bookingData.time}</p>
-                                            <p className="capitalize">{bookingData.format} Session</p>
+                                {bookingData ? (
+                                    <div className="flex justify-between items-start pb-4 border-b border-border/50">
+                                        <div>
+                                            <h3 className="font-semibold text-lg">{bookingData.sessionType}</h3>
+                                            <div className="text-sm text-muted-foreground mt-1">
+                                                <p>{bookingData.date} at {bookingData.time}</p>
+                                                <p className="capitalize">{bookingData.format} Session</p>
+                                            </div>
                                         </div>
+                                        <span className="font-bold text-lg text-primary">$150.00</span>
                                     </div>
-                                    <span className="font-bold text-lg text-primary">$150.00</span>
-                                </div>
+                                ) : (
+                                    <div className="flex justify-between items-start pb-4 border-b border-border/50">
+                                        <div>
+                                            <h3 className="font-semibold text-lg">{resourceData?.title}</h3>
+                                            <div className="text-sm text-muted-foreground mt-1">
+                                                <p className="capitalize">{resourceData?.type} Resource</p>
+                                            </div>
+                                        </div>
+                                        <span className="font-bold text-lg text-primary">${resourceData?.price?.toFixed(2)}</span>
+                                    </div>
+                                )}
                                 <div className="flex justify-between font-medium">
                                     <span>Subtotal</span>
-                                    <span>$150.00</span>
+                                    <span>${amount.toFixed(2)}</span>
                                 </div>
                                 <div className="flex justify-between font-medium">
                                     <span>Tax (Estimated)</span>
@@ -201,7 +233,7 @@ export default function Checkout() {
                                 </div>
                                 <div className="flex justify-between font-bold text-xl pt-4 border-t border-border/50">
                                     <span>Total</span>
-                                    <span>$150.00</span>
+                                    <span>${amount.toFixed(2)}</span>
                                 </div>
                             </CardContent>
                         </Card>
@@ -306,7 +338,7 @@ export default function Checkout() {
                                             </div>
                                             <div className="text-sm text-muted-foreground text-center max-w-xs">
                                                 <p>1. Scan the QR code with your UPI app</p>
-                                                <p>2. Complete the payment of <span className="text-primary font-bold">$150.00</span></p>
+                                                <p>2. Complete the payment of <span className="text-primary font-bold">${amount.toFixed(2)}</span></p>
                                                 <p>3. Enter the transaction ID below</p>
                                             </div>
 
@@ -332,7 +364,7 @@ export default function Checkout() {
                                                 </>
                                             ) : (
                                                 <>
-                                                    {paymentMethod === "card" ? "Pay $150.00" : "Confirm Payment"}
+                                                    {paymentMethod === "card" ? `Pay $${amount.toFixed(2)}` : "Confirm Payment"}
                                                     <ArrowRight className="w-4 h-4 ml-2" />
                                                 </>
                                             )}

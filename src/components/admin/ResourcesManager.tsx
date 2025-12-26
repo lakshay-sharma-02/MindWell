@@ -28,6 +28,8 @@ export function ResourcesManager() {
     type: "",
     image: "",
     download_url: "",
+    is_premium: false,
+    price: "",
     published: false,
   });
 
@@ -67,6 +69,8 @@ export function ResourcesManager() {
       type: form.type || null,
       image: form.image || null,
       download_url: form.download_url || null,
+      is_premium: form.is_premium,
+      price: form.is_premium && form.price ? parseFloat(form.price) : null,
       published: form.published,
     };
 
@@ -88,10 +92,10 @@ export function ResourcesManager() {
     setSaving(false);
 
     if (error) {
-      toast({ 
-        title: editingResource ? "Error updating resource" : "Error creating resource", 
-        description: error.message, 
-        variant: "destructive" 
+      toast({
+        title: editingResource ? "Error updating resource" : "Error creating resource",
+        description: error.message,
+        variant: "destructive"
       });
       return;
     }
@@ -137,6 +141,8 @@ export function ResourcesManager() {
       type: "",
       image: "",
       download_url: "",
+      is_premium: false,
+      price: "",
       published: false,
     });
     setEditingResource(null);
@@ -151,6 +157,8 @@ export function ResourcesManager() {
       type: resource.type || "",
       image: resource.image || "",
       download_url: resource.download_url || "",
+      is_premium: resource.is_premium || false,
+      price: resource.price ? resource.price.toString() : "",
       published: resource.published,
     });
     setIsOpen(true);
@@ -202,7 +210,7 @@ export function ResourcesManager() {
                   onChange={(e) => setForm({ ...form, download_url: e.target.value })}
                 />
               </div>
-              
+
               <ImageUpload
                 value={form.image}
                 onChange={(url) => setForm({ ...form, image: url })}
@@ -219,6 +227,30 @@ export function ResourcesManager() {
                   rows={4}
                 />
               </div>
+
+              <div className="flex items-center space-x-2 border p-3 rounded-md">
+                <Switch
+                  id="is_premium"
+                  checked={form.is_premium}
+                  onCheckedChange={(checked) => setForm({ ...form, is_premium: checked })}
+                />
+                <Label htmlFor="is_premium">Premium Resource (Paid)</Label>
+              </div>
+
+              {form.is_premium && (
+                <div className="space-y-2">
+                  <Label htmlFor="price">Price ($)</Label>
+                  <Input
+                    id="price"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={form.price}
+                    onChange={(e) => setForm({ ...form, price: e.target.value })}
+                    required
+                  />
+                </div>
+              )}
               <div className="flex items-center space-x-2">
                 <Switch
                   id="published"
@@ -246,9 +278,9 @@ export function ResourcesManager() {
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <div className="flex items-center gap-4">
                 {resource.image && (
-                  <img 
-                    src={resource.image} 
-                    alt={resource.title} 
+                  <img
+                    src={resource.image}
+                    alt={resource.title}
                     className="w-16 h-16 object-cover rounded-lg"
                   />
                 )}

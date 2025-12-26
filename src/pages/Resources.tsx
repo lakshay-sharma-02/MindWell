@@ -17,7 +17,10 @@ interface Resource {
   description: string;
   type: string;
   image: string;
+
   downloadUrl: string;
+  isPremium: boolean;
+  price: number | null;
 }
 
 const transformDbResource = (resource: DbResource): Resource => ({
@@ -27,12 +30,16 @@ const transformDbResource = (resource: DbResource): Resource => ({
   type: resource.type || "PDF",
   image: resource.image || "/placeholder.svg",
   downloadUrl: resource.download_url || "",
+  isPremium: resource.is_premium || false,
+  price: resource.price,
 });
 
 const Resources = () => {
   const [resources, setResources] = useState<Resource[]>([]);
   const [loading, setLoading] = useState(true);
+  const [purchasedIds, setPurchasedIds] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const { user } = useAuth();
 
   const fetchResources = async () => {
     // Some DBs use `published` (boolean), others use `published_at` (timestamp).
@@ -62,6 +69,21 @@ const Resources = () => {
 
     setLoading(false);
   };
+
+  useEffect(() => {
+    const fetchPurchased = async () => {
+      if (!user) return;
+      const { data } = await supabase
+        .from("purchased_resources")
+        .select("resource_id")
+        .eq("user_id", user.id);
+
+      if (data) {
+        setPurchasedIds(data.map(p => p.resource_id));
+      }
+    };
+    fetchPurchased();
+  }, [user]);
 
   useEffect(() => {
     fetchResources();
@@ -138,6 +160,7 @@ const Resources = () => {
                   resource={resource}
                   index={index}
                   onUpdate={fetchResources}
+                  isPurchased={purchasedIds.includes(resource.id)}
                 />
               ))}
             </div>
@@ -152,24 +175,30 @@ const Resources = () => {
   );
 };
 
+
+
 interface ResourceCardProps {
   resource: Resource;
   index: number;
   onUpdate: () => void;
+  isPurchased: boolean;
 }
 
-const ResourceCard = ({ resource, index, onUpdate }: ResourceCardProps) => {
+const ResourceCard = ({ resource, index, onUpdate, isPurchased }: ResourceCardProps) => {
   const { user, isAdmin } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
-  const [likeLoading, setLikeLoading] = useState(false);
   const [editData, setEditData] = useState({
     title: resource.title,
     description: resource.description,
     type: resource.type,
   });
+
+  // Check if resource is accessible (Free OR Purchased OR Admin)
+  const isAccessible = !resource.isPremium || isPurchased || isAdmin;
 
   useEffect(() => {
     const checkLikeStatus = async () => {
@@ -190,7 +219,6 @@ const ResourceCard = ({ resource, index, onUpdate }: ResourceCardProps) => {
       toast({ title: "Sign in required", description: "Please sign in to save resources.", variant: "destructive" });
       return;
     }
-    setLikeLoading(true);
     try {
       if (isLiked) {
         const { error } = await supabase.from("resource_likes").delete().eq("user_id", user.id).eq("resource_id", resource.id);
@@ -206,14 +234,7 @@ const ResourceCard = ({ resource, index, onUpdate }: ResourceCardProps) => {
     } catch (error) {
       console.error("Error like:", error);
       toast({ title: "Error", description: "Failed to update like status.", variant: "destructive" });
-    } finally {
-      setLikeLoading(false);
     }
-  };
-
-  const handleShare = () => {
-    navigator.clipboard.writeText(window.location.href);
-    toast({ title: "Link copied", description: "Resource page link copied to clipboard." });
   };
 
   const handleSave = async () => {
@@ -265,6 +286,21 @@ const ResourceCard = ({ resource, index, onUpdate }: ResourceCardProps) => {
     setIsEditing(false);
   };
 
+  const handleAction = () => {
+    if (isAccessible) {
+      if (resource.downloadUrl) window.open(resource.downloadUrl, '_blank');
+      else toast({ title: "Error", description: "Download link not found.", variant: "destructive" });
+    } else {
+      // Go to checkout
+      navigate("/checkout", {
+        state: {
+          bookingData: null, // It's not a booking
+          resourceData: resource
+        }
+      });
+    }
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -273,7 +309,6 @@ const ResourceCard = ({ resource, index, onUpdate }: ResourceCardProps) => {
       whileHover={{ y: -8 }}
       className={`group relative bg-card rounded-2xl overflow-hidden shadow-soft hover:shadow-elevated transition-all border border-border/50 ${isEditing ? 'ring-2 ring-primary' : ''}`}
     >
-      {/* Admin Edit Controls: Pass logic here which is fine but component structure was modified above so I will restructure this fully in the replacement block */}
       {/* Admin Edit Controls */}
       {isAdmin && !isEditing && (
         <div className="absolute top-4 right-4 z-20 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
@@ -329,8 +364,17 @@ const ResourceCard = ({ resource, index, onUpdate }: ResourceCardProps) => {
             <span className="text-foreground/90 font-medium">{resource.type}</span>
           )}
         </div>
-        <div className="absolute top-4 left-4 px-3 py-1 rounded-full bg-background text-primary text-xs font-semibold flex items-center gap-1">
-          <Sparkles className="w-3 h-3" /> Free
+        <div className={`absolute top-4 left-4 px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1 ${resource.isPremium ? 'bg-amber-100 text-amber-800' : 'bg-background text-primary'}`}>
+          {resource.isPremium ? (
+            <>
+              {isAccessible ? <Check className="w-3 h-3" /> : <Lock className="w-3 h-3" />}
+              {isAccessible ? 'Purchased' : `$${resource.price}`}
+            </>
+          ) : (
+            <>
+              <Sparkles className="w-3 h-3" /> Free
+            </>
+          )}
         </div>
       </div>
       <div className="p-6">
@@ -359,15 +403,24 @@ const ResourceCard = ({ resource, index, onUpdate }: ResourceCardProps) => {
         )}
 
         <div className="flex items-center justify-between">
-          <span className="text-sm font-semibold text-primary">Free Download</span>
+          <span className="text-sm font-semibold text-primary">
+            {isAccessible ? 'Ready to Download' : 'Premium Resource'}
+          </span>
           <Button
             size="sm"
-            variant="outline"
-            onClick={() => resource.downloadUrl && window.open(resource.downloadUrl, '_blank')}
+            variant={isAccessible ? "outline" : "default"}
+            onClick={handleAction}
             disabled={isEditing}
           >
-            <Download className="w-4 h-4 mr-1" />
-            Download
+            {isAccessible ? (
+              <>
+                <Download className="w-4 h-4 mr-1" /> Download
+              </>
+            ) : (
+              <>
+                Buy for ${resource.price}
+              </>
+            )}
           </Button>
         </div>
       </div>
