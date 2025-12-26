@@ -89,6 +89,7 @@ export interface Database {
         Row: {
           id: string
           title: string
+          slug: string
           description: string | null
           type: string | null
           image: string | null
@@ -99,6 +100,7 @@ export interface Database {
         Insert: {
           id?: string
           title: string
+          slug: string
           description?: string | null
           type?: string | null
           image?: string | null
@@ -109,6 +111,7 @@ export interface Database {
         Update: {
           id?: string
           title?: string
+          slug?: string
           description?: string | null
           type?: string | null
           image?: string | null

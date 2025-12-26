@@ -53,8 +53,16 @@ export function ResourcesManager() {
     e.preventDefault();
     setSaving(true);
 
+    const generateSlug = (title: string) => {
+      return title
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/(^-|-$)+/g, '');
+    };
+
     const payload = {
       title: form.title,
+      slug: generateSlug(form.title),
       description: form.description || null,
       type: form.type || null,
       image: form.image || null,
