@@ -56,11 +56,18 @@ export function Header({ onSearchClick }: HeaderProps) {
 
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
+      const isScrolled = window.scrollY > 20;
+      if (isScrolled !== scrolled) {
+        setScrolled(isScrolled);
+      }
     };
-    window.addEventListener("scroll", handleScroll);
+    
+    // Initial check
+    handleScroll();
+    
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [scrolled]);
 
   useEffect(() => {
     setMobileMenuOpen(false);

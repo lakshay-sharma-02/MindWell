@@ -1,4 +1,4 @@
-
+import { lazy, Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { AuthPopup } from "@/components/auth/AuthPopup";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -10,23 +10,25 @@ import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { AuthProvider } from "@/hooks/useAuth";
 import { AnimatePresence, motion } from "framer-motion";
 import ScrollToTop from "@/components/utils/ScrollToTop";
-import Index from "./pages/Index";
-import Blog from "./pages/Blog";
-import BlogPost from "./pages/BlogPost";
-import Podcasts from "./pages/Podcasts";
-import Resources from "./pages/Resources";
-import About from "./pages/About";
-import Book from "./pages/Book";
-import Contact from "./pages/Contact";
-import Quiz from "./pages/Quiz";
-import Services from "./pages/Services";
-import Auth from "./pages/Auth";
-import Admin from "./pages/Admin";
-import NotFound from "./pages/NotFound";
-import Checkout from "./pages/Checkout";
-import Stories from "./pages/Stories";
-import Profile from "./pages/Profile";
-import CommunitySupport from "./pages/CommunitySupport";
+
+// Lazy load pages for performance
+const Index = lazy(() => import("./pages/Index"));
+const Blog = lazy(() => import("./pages/Blog"));
+const BlogPost = lazy(() => import("./pages/BlogPost"));
+const Podcasts = lazy(() => import("./pages/Podcasts"));
+const Resources = lazy(() => import("./pages/Resources"));
+const About = lazy(() => import("./pages/About"));
+const Book = lazy(() => import("./pages/Book"));
+const Contact = lazy(() => import("./pages/Contact"));
+const Quiz = lazy(() => import("./pages/Quiz"));
+const Services = lazy(() => import("./pages/Services"));
+const Auth = lazy(() => import("./pages/Auth"));
+const Admin = lazy(() => import("./pages/Admin"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+const Checkout = lazy(() => import("./pages/Checkout"));
+const Stories = lazy(() => import("./pages/Stories"));
+const Profile = lazy(() => import("./pages/Profile"));
+const CommunitySupport = lazy(() => import("./pages/CommunitySupport"));
 
 const queryClient = new QueryClient();
 
@@ -42,25 +44,27 @@ function AnimatedRoutes() {
         exit={{ opacity: 0, y: -6 }}
         transition={{ duration: 0.3 }}
       >
-        <Routes location={location}>
-          <Route path="/" element={<Index />} />
-          <Route path="/auth" element={<Auth />} />
-          <Route path="/admin" element={<Admin />} />
-          <Route path="/blog" element={<Blog />} />
-          <Route path="/blog/:slug" element={<BlogPost />} />
-          <Route path="/podcasts" element={<Podcasts />} />
-          <Route path="/resources" element={<Resources />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/book" element={<Book />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/quiz" element={<Quiz />} />
-          <Route path="/services" element={<Services />} />
-          <Route path="/checkout" element={<Checkout />} />
-          <Route path="/stories" element={<Stories />} />
-          <Route path="/community" element={<CommunitySupport />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-background"><div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div></div>}>
+          <Routes location={location}>
+            <Route path="/" element={<Index />} />
+            <Route path="/auth" element={<Auth />} />
+            <Route path="/admin" element={<Admin />} />
+            <Route path="/blog" element={<Blog />} />
+            <Route path="/blog/:slug" element={<BlogPost />} />
+            <Route path="/podcasts" element={<Podcasts />} />
+            <Route path="/resources" element={<Resources />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/book" element={<Book />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/quiz" element={<Quiz />} />
+            <Route path="/services" element={<Services />} />
+            <Route path="/checkout" element={<Checkout />} />
+            <Route path="/stories" element={<Stories />} />
+            <Route path="/community" element={<CommunitySupport />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </Suspense>
       </motion.div>
     </AnimatePresence>
   );
