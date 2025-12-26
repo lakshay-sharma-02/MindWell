@@ -8,6 +8,7 @@ import { FileText, Download, Sparkles, Pencil, Check, X, Trash2, Lock } from "lu
 import { motion } from "framer-motion";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
 
 type DbResource = Tables<"resources">;
 
@@ -17,165 +18,10 @@ interface Resource {
   description: string;
   type: string;
   image: string;
-
   downloadUrl: string;
   isPremium: boolean;
   price: number | null;
 }
-
-const transformDbResource = (resource: DbResource): Resource => ({
-  id: resource.id,
-  title: resource.title,
-  description: resource.description || "",
-  type: resource.type || "PDF",
-  image: resource.image || "/placeholder.svg",
-  downloadUrl: resource.download_url || "",
-  isPremium: resource.is_premium || false,
-  price: resource.price,
-});
-
-const Resources = () => {
-  const [resources, setResources] = useState<Resource[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [purchasedIds, setPurchasedIds] = useState<string[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState("All");
-  const { user } = useAuth();
-
-  const fetchResources = async () => {
-    // Some DBs use `published` (boolean), others use `published_at` (timestamp).
-    // We'll try `published` first, then fall back to `published_at`.
-    const { data, error } = await supabase
-      .from("resources")
-      .select("*")
-      .eq("published", true)
-      .order("created_at", { ascending: false });
-
-    if (error) {
-      const msg = error.message || "";
-      if (/column\s+"published"\s+does\s+not\s+exist/i.test(msg)) {
-        const { data: fallbackData, error: fallbackError } = await supabase
-          .from("resources")
-          .select("*")
-          .not("published_at", "is", null)
-          .order("created_at", { ascending: false });
-
-        if (!fallbackError && fallbackData) {
-          setResources(fallbackData.map(transformDbResource));
-        }
-      }
-    } else if (data) {
-      setResources(data.map(transformDbResource));
-    }
-
-    setLoading(false);
-  };
-
-  useEffect(() => {
-    const fetchPurchased = async () => {
-      if (!user) return;
-      const { data } = await supabase
-        .from("purchased_resources")
-        .select("resource_id")
-        .eq("user_id", user.id);
-
-      if (data) {
-        setPurchasedIds(data.map(p => p.resource_id));
-      }
-    };
-    fetchPurchased();
-  }, [user]);
-
-  useEffect(() => {
-    fetchResources();
-  }, []);
-
-  const resourceCategories = useMemo(() => {
-    const types = ["All", ...new Set(resources.map((r) => r.type))];
-    return types;
-  }, [resources]);
-
-  const filteredResources = resources.filter((resource) => {
-    return selectedCategory === "All" || resource.type === selectedCategory;
-  });
-
-  if (loading) {
-    return (
-      <Layout>
-        <div className="min-h-screen flex items-center justify-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-        </div>
-      </Layout>
-    );
-  }
-
-  return (
-    <Layout>
-      <SEOHead
-        title="Resources"
-        description="Download professional PDF guides, workbooks, and toolkits for mental health. Free and premium resources crafted by licensed psychologists."
-        keywords="mental health PDF, psychology workbook, anxiety guide, self-care toolkit, therapy resources"
-      />
-
-      <section className="bg-gradient-hero py-20 md:py-28">
-        <div className="container-wide">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="max-w-2xl">
-            <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-terracotta/10 text-terracotta text-sm font-semibold mb-4">
-              <FileText className="w-4 h-4" />
-              Downloadable Resources
-            </span>
-            <h1 className="font-display text-4xl md:text-5xl font-bold text-foreground mb-4">
-              PDF Guides & <span className="text-terracotta">Workbooks</span>
-            </h1>
-            <p className="text-xl text-muted-foreground">
-              Professional-grade resources to support your mental health journey.
-            </p>
-          </motion.div>
-        </div>
-      </section>
-
-      <section className="py-8 border-b border-border bg-background sticky top-16 lg:top-20 z-40">
-        <div className="container-wide flex flex-wrap gap-4 items-center justify-between">
-          <div className="flex flex-wrap gap-2">
-            {resourceCategories.map((category) => (
-              <button
-                key={category}
-                onClick={() => setSelectedCategory(category)}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${selectedCategory === category ? "bg-primary text-primary-foreground" : "bg-secondary hover:bg-sage-light"
-                  }`}
-              >
-                {category}
-              </button>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="section-padding bg-background">
-        <div className="container-wide">
-          {filteredResources.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {filteredResources.map((resource, index) => (
-                <ResourceCard
-                  key={resource.id}
-                  resource={resource}
-                  index={index}
-                  onUpdate={fetchResources}
-                  isPurchased={purchasedIds.includes(resource.id)}
-                />
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-20">
-              <p className="text-muted-foreground">No resources available yet.</p>
-            </div>
-          )}
-        </div>
-      </section>
-    </Layout>
-  );
-};
-
-
 
 interface ResourceCardProps {
   resource: Resource;
@@ -198,7 +44,6 @@ function ResourceCard({ resource, index, onUpdate, isPurchased }: ResourceCardPr
 
   // Check if resource is accessible (Free OR Purchased OR Admin)
   const isAccessible = !resource.isPremium || isPurchased || isAdmin;
-
 
   const handleSave = async () => {
     setIsSaving(true);
@@ -390,5 +235,157 @@ function ResourceCard({ resource, index, onUpdate, isPurchased }: ResourceCardPr
     </motion.div>
   );
 }
+
+const transformDbResource = (resource: DbResource): Resource => ({
+  id: resource.id,
+  title: resource.title,
+  description: resource.description || "",
+  type: resource.type || "PDF",
+  image: resource.image || "/placeholder.svg",
+  downloadUrl: resource.download_url || "",
+  isPremium: resource.is_premium || false,
+  price: resource.price,
+});
+
+const Resources = () => {
+  const [resources, setResources] = useState<Resource[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [purchasedIds, setPurchasedIds] = useState<string[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState("All");
+  const { user } = useAuth();
+
+  const fetchResources = async () => {
+    // Some DBs use `published` (boolean), others use `published_at` (timestamp).
+    // We'll try `published` first, then fall back to `published_at`.
+    const { data, error } = await supabase
+      .from("resources")
+      .select("*")
+      .eq("published", true)
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      const msg = error.message || "";
+      if (/column\s+"published"\s+does\s+not\s+exist/i.test(msg)) {
+        const { data: fallbackData, error: fallbackError } = await supabase
+          .from("resources")
+          .select("*")
+          .not("published_at", "is", null)
+          .order("created_at", { ascending: false });
+
+        if (!fallbackError && fallbackData) {
+          setResources(fallbackData.map(transformDbResource));
+        }
+      }
+    } else if (data) {
+      setResources(data.map(transformDbResource));
+    }
+
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    const fetchPurchased = async () => {
+      if (!user) return;
+      const { data } = await supabase
+        .from("purchased_resources")
+        .select("resource_id")
+        .eq("user_id", user.id);
+
+      if (data) {
+        setPurchasedIds(data.map(p => p.resource_id));
+      }
+    };
+    fetchPurchased();
+  }, [user]);
+
+  useEffect(() => {
+    fetchResources();
+  }, []);
+
+  const resourceCategories = useMemo(() => {
+    const types = ["All", ...new Set(resources.map((r) => r.type))];
+    return types;
+  }, [resources]);
+
+  const filteredResources = resources.filter((resource) => {
+    return selectedCategory === "All" || resource.type === selectedCategory;
+  });
+
+  if (loading) {
+    return (
+      <Layout>
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        </div>
+      </Layout>
+    );
+  }
+
+  return (
+    <Layout>
+      <SEOHead
+        title="Resources"
+        description="Download professional PDF guides, workbooks, and toolkits for mental health. Free and premium resources crafted by licensed psychologists."
+        keywords="mental health PDF, psychology workbook, anxiety guide, self-care toolkit, therapy resources"
+      />
+
+      <section className="bg-gradient-hero py-20 md:py-28">
+        <div className="container-wide">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="max-w-2xl">
+            <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-terracotta/10 text-terracotta text-sm font-semibold mb-4">
+              <FileText className="w-4 h-4" />
+              Downloadable Resources
+            </span>
+            <h1 className="font-display text-4xl md:text-5xl font-bold text-foreground mb-4">
+              PDF Guides & <span className="text-terracotta">Workbooks</span>
+            </h1>
+            <p className="text-xl text-muted-foreground">
+              Professional-grade resources to support your mental health journey.
+            </p>
+          </motion.div>
+        </div>
+      </section>
+
+      <section className="py-8 border-b border-border bg-background sticky top-16 lg:top-20 z-40">
+        <div className="container-wide flex flex-wrap gap-4 items-center justify-between">
+          <div className="flex flex-wrap gap-2">
+            {resourceCategories.map((category) => (
+              <button
+                key={category}
+                onClick={() => setSelectedCategory(category)}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${selectedCategory === category ? "bg-primary text-primary-foreground" : "bg-secondary hover:bg-sage-light"
+                  }`}
+              >
+                {category}
+              </button>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="section-padding bg-background">
+        <div className="container-wide">
+          {filteredResources.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {filteredResources.map((resource, index) => (
+                <ResourceCard
+                  key={resource.id}
+                  resource={resource}
+                  index={index}
+                  onUpdate={fetchResources}
+                  isPurchased={purchasedIds.includes(resource.id)}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-20">
+              <p className="text-muted-foreground">No resources available yet.</p>
+            </div>
+          )}
+        </div>
+      </section>
+    </Layout>
+  );
+};
 
 export default Resources;
