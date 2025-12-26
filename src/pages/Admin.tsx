@@ -14,7 +14,8 @@ import {
   LayoutDashboard,
   Users,
   Menu,
-  X
+  X,
+  ShieldCheck
 } from "lucide-react";
 import { BlogsManager } from "@/components/admin/BlogsManager";
 import { PodcastsManager } from "@/components/admin/PodcastsManager";
@@ -25,6 +26,7 @@ import { ServicesManager } from "@/components/admin/ServicesManager";
 import { StoriesManager } from "@/components/admin/StoriesManager";
 import { AdminOverview } from "@/components/admin/AdminOverview";
 import { UsersManager } from "@/components/admin/UsersManager";
+import { CommunityManager } from "@/components/admin/CommunityManager";
 import { motion, AnimatePresence } from "framer-motion";
 
 const Admin = () => {
@@ -50,6 +52,7 @@ const Admin = () => {
     { id: "blogs", label: "Blogs", icon: FileText },
     { id: "stories", label: "Stories", icon: MessageSquare },
     { id: "resources", label: "Resources", icon: Download },
+    { id: "community", label: "Community", icon: ShieldCheck },
     { id: "podcasts", label: "Podcasts", icon: Headphones },
     { id: "services", label: "Services", icon: Briefcase },
     { id: "testimonials", label: "Testimonials", icon: MessageSquare }, // Reusing icon or change if needed
@@ -63,6 +66,7 @@ const Admin = () => {
       case "blogs": return <BlogsManager />;
       case "stories": return <StoriesManager />;
       case "resources": return <ResourcesManager />;
+      case "community": return <CommunityManager />;
       case "podcasts": return <PodcastsManager />;
       case "services": return <ServicesManager />;
       case "testimonials": return <TestimonialsManager />;
@@ -110,8 +114,8 @@ const Admin = () => {
                   setMobileMenuOpen(false);
                 }}
                 className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${activeTab === item.id
-                    ? "bg-primary text-primary-foreground shadow-md"
-                    : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+                  ? "bg-primary text-primary-foreground shadow-md"
+                  : "text-muted-foreground hover:bg-secondary hover:text-foreground"
                   }`}
               >
                 <item.icon className="w-4 h-4" />
