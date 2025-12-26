@@ -209,25 +209,30 @@
   .animated-gradient {
     background-size: 200% 200%;
     animation: gradient-flow 12s ease infinite;
+    will-change: background-position;
   }
 
   /* Gentle float animation */
   .float {
     animation: float 8s ease-in-out infinite;
+    will-change: transform;
   }
 
   .float-delayed {
     animation: float 8s ease-in-out 3s infinite;
+    will-change: transform;
   }
 
   /* Soft glow pulse */
   .pulse-glow {
     animation: pulse-glow 5s ease-in-out infinite;
+    will-change: box-shadow;
   }
 
   /* Card hover effect - subtle */
   .card-hover {
     @apply transition-all duration-500 hover:shadow-card hover:-translate-y-0.5;
+    will-change: transform, box-shadow;
   }
 
   /* Shine effect */
@@ -319,6 +324,7 @@
     background-clip: text;
     -webkit-text-fill-color: transparent;
     animation: text-shimmer 8s ease-in-out infinite;
+    will-change: background-position;
   }
 
   /* Soft glow effects */
@@ -333,6 +339,7 @@
   /* Morphing blob */
   .morph {
     animation: morph 15s ease-in-out infinite;
+    will-change: border-radius;
   }
 
   /* Stagger children */
