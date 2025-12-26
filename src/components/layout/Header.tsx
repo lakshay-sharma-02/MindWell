@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Heart, Search, User, ChevronRight } from "lucide-react";
+import { Menu, X, Heart, Search, User, ChevronRight, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { useAuth } from "@/hooks/useAuth";
@@ -15,6 +15,11 @@ import {
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import { cn } from "@/lib/utils";
 
 const navigation = [
@@ -240,24 +245,27 @@ export function Header({ onSearchClick }: HeaderProps) {
                 {navigation.map((item, index) => {
                   if (item.items) {
                     return (
-                      <div key={item.name} className="space-y-1">
-                        <div className="px-4 py-2 text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+                      <Collapsible key={item.name} className="w-full">
+                        <CollapsibleTrigger className="flex w-full items-center justify-between px-4 py-3 text-base font-medium text-muted-foreground hover:text-foreground hover:bg-secondary/60 rounded-xl transition-colors [&[data-state=open]>svg]:rotate-180">
                           {item.name}
-                        </div>
-                        {item.items.map((subItem) => (
-                          <Link
-                            key={subItem.name}
-                            to={subItem.href}
-                            onClick={() => setMobileMenuOpen(false)}
-                            className={`block px-4 py-2.5 mx-2 rounded-xl text-base font-medium transition-colors pl-8 ${isActive(subItem.href)
+                          <ChevronDown className="h-4 w-4 transition-transform duration-200" />
+                        </CollapsibleTrigger>
+                        <CollapsibleContent className="space-y-1">
+                          {item.items.map((subItem) => (
+                            <Link
+                              key={subItem.name}
+                              to={subItem.href}
+                              onClick={() => setMobileMenuOpen(false)}
+                              className={`block px-4 py-2.5 mx-2 rounded-xl text-sm font-medium transition-colors pl-8 ${isActive(subItem.href)
                                 ? "bg-primary/10 text-primary"
                                 : "text-muted-foreground hover:text-foreground hover:bg-secondary/60"
-                              }`}
-                          >
-                            {subItem.name}
-                          </Link>
-                        ))}
-                      </div>
+                                }`}
+                            >
+                              {subItem.name}
+                            </Link>
+                          ))}
+                        </CollapsibleContent>
+                      </Collapsible>
                     );
                   }
 
@@ -271,9 +279,9 @@ export function Header({ onSearchClick }: HeaderProps) {
                       <Link
                         to={item.href}
                         onClick={() => setMobileMenuOpen(false)}
-                        className={`block px-4 py-3 mx-2 rounded-xl text-base font-medium transition-colors ${isActive(item.href)
-                            ? "bg-primary/10 text-primary"
-                            : "text-muted-foreground hover:text-foreground hover:bg-secondary/60"
+                        className={`block px-4 py-3 rounded-xl text-base font-medium transition-colors ${isActive(item.href)
+                          ? "bg-primary/10 text-primary"
+                          : "text-muted-foreground hover:text-foreground hover:bg-secondary/60"
                           }`}
                       >
                         {item.name}
