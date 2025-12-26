@@ -1,23 +1,43 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Heart, Search, ChevronDown, User, ArrowRight } from "lucide-react";
+import { Menu, X, Heart, Search, User, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { useAuth } from "@/hooks/useAuth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+  navigationMenuTriggerStyle,
+} from "@/components/ui/navigation-menu";
+import { cn } from "@/lib/utils";
 
 const navigation = [
   { name: "Home", href: "/" },
   { name: "Services", href: "/services" },
-  { name: "Blog", href: "/blog" },
-  { name: "Podcasts", href: "/podcasts" },
-  { name: "Resources", href: "/resources" },
-  { name: "Stories", href: "/stories" },
+  {
+    name: "Resources",
+    items: [
+      { name: "Library", href: "/resources", description: "Access our collection of mental health resources." },
+      { name: "Blog", href: "/blog", description: "Read the latest articles and insights." },
+      { name: "Podcasts", href: "/podcasts", description: "Listen to our curated podcasts." },
+      { name: "Stories", href: "/stories", description: "Real stories from our community." },
+      { name: "Quiz", href: "/quiz", description: "Check your mental well-being." },
+    ]
+  },
   { name: "Community", href: "/community" },
-  { name: "Quiz", href: "/quiz" },
-  { name: "About", href: "/about" },
-  { name: "Contact", href: "/contact" },
+  {
+    name: "Company",
+    items: [
+      { name: "About", href: "/about", description: "Learn more about our mission." },
+      { name: "Contact", href: "/contact", description: "Get in touch with us." },
+    ]
+  },
 ];
 
 interface HeaderProps {
@@ -37,7 +57,6 @@ export function Header({ onSearchClick }: HeaderProps) {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Close mobile menu on route change
   useEffect(() => {
     setMobileMenuOpen(false);
   }, [location.pathname]);
@@ -46,6 +65,11 @@ export function Header({ onSearchClick }: HeaderProps) {
     if (href === "/") return location.pathname === "/";
     return location.pathname.startsWith(href);
   };
+
+  const isGroupActive = (items: { href: string }[]) => {
+    return items.some(item => isActive(item.href));
+  };
+
   const { user } = useAuth();
 
   return (
@@ -73,26 +97,58 @@ export function Header({ onSearchClick }: HeaderProps) {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden lg:flex lg:items-center lg:gap-0.5">
-            {navigation.map((item) => (
-              <Link
-                key={item.name}
-                to={item.href}
-                className={`relative px-3.5 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${isActive(item.href)
-                  ? "text-primary"
-                  : "text-muted-foreground hover:text-foreground"
-                  }`}
-              >
-                {isActive(item.href) && (
-                  <motion.span
-                    layoutId="navbar-active"
-                    className="absolute inset-0 bg-primary/10 rounded-lg"
-                    transition={{ type: "spring", stiffness: 500, damping: 35 }}
-                  />
-                )}
-                <span className="relative z-10">{item.name}</span>
-              </Link>
-            ))}
+          <div className="hidden lg:flex lg:items-center lg:gap-1">
+            <NavigationMenu>
+              <NavigationMenuList>
+                {navigation.map((item) => {
+                  if (item.items) {
+                    return (
+                      <NavigationMenuItem key={item.name}>
+                        <NavigationMenuTrigger
+                          className={cn(
+                            "bg-transparent hover:bg-secondary/50 data-[state=open]:bg-secondary/50",
+                            isGroupActive(item.items) && "text-primary bg-primary/5"
+                          )}
+                        >
+                          {item.name}
+                        </NavigationMenuTrigger>
+                        <NavigationMenuContent>
+                          <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
+                            {item.items.map((subItem) => (
+                              <ListItem
+                                key={subItem.name}
+                                title={subItem.name}
+                                href={subItem.href}
+                                active={isActive(subItem.href)}
+                              >
+                                {subItem.description}
+                              </ListItem>
+                            ))}
+                          </ul>
+                        </NavigationMenuContent>
+                      </NavigationMenuItem>
+                    );
+                  }
+
+                  return (
+                    <NavigationMenuItem key={item.name}>
+                      <NavigationMenuLink asChild>
+                        <Link
+                          to={item.href}
+                          className={cn(
+                            navigationMenuTriggerStyle(),
+                            "bg-transparent hover:bg-secondary/50",
+                            isActive(item.href) && "text-primary bg-primary/5"
+                          )}
+                        >
+                          {item.name}
+                        </Link>
+                      </NavigationMenuLink>
+                    </NavigationMenuItem>
+                  );
+                })}
+              </NavigationMenuList>
+            </NavigationMenu>
           </div>
 
           {/* CTA Button & Theme Toggle */}
@@ -181,31 +237,52 @@ export function Header({ onSearchClick }: HeaderProps) {
                 animate={{ y: 0 }}
                 exit={{ y: -10 }}
               >
-                {navigation.map((item, index) => (
-                  <motion.div
-                    key={item.name}
-                    initial={{ opacity: 0, x: -15 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.05 }}
-                  >
-                    <Link
-                      to={item.href}
-                      onClick={() => setMobileMenuOpen(false)}
-                      className={`block px-4 py-3 rounded-xl text-base font-medium transition-colors ${isActive(item.href)
-                        ? "bg-primary/10 text-primary"
-                        : "text-muted-foreground hover:text-foreground hover:bg-secondary/60"
-                        }`}
+                {navigation.map((item, index) => {
+                  if (item.items) {
+                    return (
+                      <div key={item.name} className="space-y-1">
+                        <div className="px-4 py-2 text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+                          {item.name}
+                        </div>
+                        {item.items.map((subItem) => (
+                          <Link
+                            key={subItem.name}
+                            to={subItem.href}
+                            onClick={() => setMobileMenuOpen(false)}
+                            className={`block px-4 py-2.5 mx-2 rounded-xl text-base font-medium transition-colors pl-8 ${isActive(subItem.href)
+                                ? "bg-primary/10 text-primary"
+                                : "text-muted-foreground hover:text-foreground hover:bg-secondary/60"
+                              }`}
+                          >
+                            {subItem.name}
+                          </Link>
+                        ))}
+                      </div>
+                    );
+                  }
+
+                  return (
+                    <motion.div
+                      key={item.name}
+                      initial={{ opacity: 0, x: -15 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.05 }}
                     >
-                      {item.name}
-                    </Link>
-                  </motion.div>
-                ))}
-                <motion.div
-                  className="pt-4 px-4 space-y-3"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.3 }}
-                >
+                      <Link
+                        to={item.href}
+                        onClick={() => setMobileMenuOpen(false)}
+                        className={`block px-4 py-3 mx-2 rounded-xl text-base font-medium transition-colors ${isActive(item.href)
+                            ? "bg-primary/10 text-primary"
+                            : "text-muted-foreground hover:text-foreground hover:bg-secondary/60"
+                          }`}
+                      >
+                        {item.name}
+                      </Link>
+                    </motion.div>
+                  );
+                })}
+
+                <div className="border-t border-border/50 my-4 pt-4 mx-4">
                   {user ? (
                     <Button
                       variant="ghost"
@@ -226,12 +303,12 @@ export function Header({ onSearchClick }: HeaderProps) {
                     </Button>
                   )}
 
-                  <Button variant="default" className="w-full btn-glow" asChild>
+                  <Button variant="default" className="w-full btn-glow mt-3" asChild>
                     <Link to="/book" onClick={() => setMobileMenuOpen(false)}>
                       Book a Session
                     </Link>
                   </Button>
-                </motion.div>
+                </div>
               </motion.div>
             </motion.div>
           )}
@@ -240,3 +317,26 @@ export function Header({ onSearchClick }: HeaderProps) {
     </header>
   );
 }
+
+const ListItem = ({ className, title, children, href, active, ...props }: any) => {
+  return (
+    <li>
+      <NavigationMenuLink asChild>
+        <Link
+          to={href}
+          className={cn(
+            "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
+            active && "bg-accent/50 text-accent-foreground",
+            className
+          )}
+          {...props}
+        >
+          <div className="text-sm font-medium leading-none">{title}</div>
+          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+            {children}
+          </p>
+        </Link>
+      </NavigationMenuLink>
+    </li>
+  );
+};
