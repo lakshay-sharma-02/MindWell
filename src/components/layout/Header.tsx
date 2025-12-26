@@ -14,6 +14,7 @@ const navigation = [
   { name: "Podcasts", href: "/podcasts" },
   { name: "Resources", href: "/resources" },
   { name: "Stories", href: "/stories" },
+  { name: "Community", href: "/community" },
   { name: "Quiz", href: "/quiz" },
   { name: "About", href: "/about" },
   { name: "Contact", href: "/contact" },

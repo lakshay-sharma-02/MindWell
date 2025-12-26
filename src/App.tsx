@@ -26,6 +26,7 @@ import NotFound from "./pages/NotFound";
 import Checkout from "./pages/Checkout";
 import Stories from "./pages/Stories";
 import Profile from "./pages/Profile";
+import CommunitySupport from "./pages/CommunitySupport";
 
 const queryClient = new QueryClient();
 
@@ -56,6 +57,7 @@ function AnimatedRoutes() {
           <Route path="/services" element={<Services />} />
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/stories" element={<Stories />} />
+          <Route path="/community" element={<CommunitySupport />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
