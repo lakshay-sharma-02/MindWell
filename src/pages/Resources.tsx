@@ -4,7 +4,7 @@ import { SEOHead } from "@/components/seo/SEOHead";
 import { supabase } from "@/integrations/supabase/client";
 import { Tables } from "@/types/database";
 import { Button } from "@/components/ui/button";
-import { FileText, Download, Sparkles, Pencil, Check, X, Trash2, Heart, Share2 } from "lucide-react";
+import { FileText, Download, Sparkles, Pencil, Check, X, Trash2, Lock } from "lucide-react";
 import { motion } from "framer-motion";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
@@ -184,13 +184,12 @@ interface ResourceCardProps {
   isPurchased: boolean;
 }
 
-const ResourceCard = ({ resource, index, onUpdate, isPurchased }: ResourceCardProps) => {
+function ResourceCard({ resource, index, onUpdate, isPurchased }: ResourceCardProps) {
   const { user, isAdmin } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [isLiked, setIsLiked] = useState(false);
   const [editData, setEditData] = useState({
     title: resource.title,
     description: resource.description,
@@ -200,42 +199,6 @@ const ResourceCard = ({ resource, index, onUpdate, isPurchased }: ResourceCardPr
   // Check if resource is accessible (Free OR Purchased OR Admin)
   const isAccessible = !resource.isPremium || isPurchased || isAdmin;
 
-  useEffect(() => {
-    const checkLikeStatus = async () => {
-      if (!user) return;
-      const { data } = await supabase
-        .from("resource_likes")
-        .select("id")
-        .eq("user_id", user.id)
-        .eq("resource_id", resource.id)
-        .maybeSingle();
-      setIsLiked(!!data);
-    };
-    checkLikeStatus();
-  }, [user, resource.id]);
-
-  const handleLike = async () => {
-    if (!user) {
-      toast({ title: "Sign in required", description: "Please sign in to save resources.", variant: "destructive" });
-      return;
-    }
-    try {
-      if (isLiked) {
-        const { error } = await supabase.from("resource_likes").delete().eq("user_id", user.id).eq("resource_id", resource.id);
-        if (error) throw error;
-        setIsLiked(false);
-        toast({ title: "Removed", description: "Removed from your collection." });
-      } else {
-        const { error } = await supabase.from("resource_likes").insert({ user_id: user.id, resource_id: resource.id });
-        if (error) throw error;
-        setIsLiked(true);
-        toast({ title: "Saved", description: "Added to your collection." });
-      }
-    } catch (error) {
-      console.error("Error like:", error);
-      toast({ title: "Error", description: "Failed to update like status.", variant: "destructive" });
-    }
-  };
 
   const handleSave = async () => {
     setIsSaving(true);
