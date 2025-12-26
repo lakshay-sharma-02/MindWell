@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, FileText, Download, Lock, Sparkles, Users } from "lucide-react";
 import { motion } from "framer-motion";
@@ -21,6 +21,7 @@ interface FeaturedResource {
 export function FeaturedResources() {
   const [featured, setFeatured] = useState<FeaturedResource[]>([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchResources = async () => {
@@ -44,9 +45,8 @@ export function FeaturedResources() {
             description: res.description || '',
             type: res.type || 'PDF',
             image: res.image || '/placeholder.svg',
-            // Mocking these fields as they don't exist in DB schema yet
-            isPaid: false,
-            price: 0,
+            isPaid: res.is_premium || false,
+            price: res.price || 0,
             pages: 15 + index * 5,
             coverColor: index % 4 === 0 ? "from-violet/20 to-fuchsia/20" :
               index % 4 === 1 ? "from-blue/20 to-cyan/20" :
@@ -64,6 +64,27 @@ export function FeaturedResources() {
 
     fetchResources();
   }, []);
+
+  const handleResourceAction = (resource: FeaturedResource) => {
+    if (resource.isPaid) {
+      navigate("/checkout", {
+        state: {
+          resourceData: {
+            id: resource.id,
+            title: resource.title,
+            description: resource.description,
+            type: resource.type,
+            price: resource.price,
+            isPremium: resource.isPaid
+          }
+        }
+      });
+    } else {
+      if (resource.downloadUrl && resource.downloadUrl !== '#') {
+        window.open(resource.downloadUrl, '_blank');
+      }
+    }
+  };
 
   if (loading) return null; // Or skeleton
 
@@ -162,10 +183,10 @@ export function FeaturedResources() {
                       size="sm"
                       variant={resource.isPaid ? "outline" : "default"}
                       className="h-9 px-4 text-xs group/btn"
-                      onClick={() => resource.downloadUrl && window.open(resource.downloadUrl, '_blank')}
+                      onClick={() => handleResourceAction(resource)}
                     >
                       <Download className="w-3.5 h-3.5 mr-1.5 group-hover/btn:animate-bounce" />
-                      {resource.isPaid ? "Get" : "Download"}
+                      {resource.isPaid ? "Buy Now" : "Download"}
                     </Button>
                   </div>
                 </div>
