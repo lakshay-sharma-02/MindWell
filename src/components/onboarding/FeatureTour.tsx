@@ -75,28 +75,19 @@ export function FeatureTour({ isOpen, onComplete, onSkip }: FeatureTourProps) {
     };
 
     return (
+
         <AnimatePresence mode="wait">
             <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.5 }}
-                className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+                key="tour-card"
+                initial={{ opacity: 0, y: 50, scale: 0.9 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 20, scale: 0.9 }}
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                className="fixed bottom-4 left-4 right-4 md:left-auto md:right-6 md:bottom-6 z-[100] w-auto md:w-full md:max-w-sm"
             >
-                <motion.div
-                    key={currentStep} // Key changes to trigger re-animation on step change
-                    initial={{ scale: 0.95, opacity: 0, y: 10 }}
-                    animate={{ scale: 1, opacity: 1, y: 0 }}
-                    exit={{ scale: 0.95, opacity: 0, y: -10 }}
-                    transition={{
-                        type: "spring",
-                        stiffness: 300,
-                        damping: 30
-                    }}
-                    className="bg-card w-full max-w-md rounded-3xl shadow-2xl border border-border overflow-hidden"
-                >
+                <div className="bg-card rounded-2xl shadow-xl border border-border overflow-hidden">
                     {/* Progress Bar */}
-                    <div className="h-1.5 bg-secondary w-full">
+                    <div className="h-1 bg-secondary w-full">
                         <motion.div
                             className="h-full bg-primary"
                             initial={{ width: `${(currentStep / steps.length) * 100}%` }}
@@ -105,62 +96,63 @@ export function FeatureTour({ isOpen, onComplete, onSkip }: FeatureTourProps) {
                         />
                     </div>
 
-                    <div className="p-8 text-center space-y-6">
-                        <div className="flex justify-end">
-                            <Button variant="ghost" size="sm" onClick={onSkip} className="text-muted-foreground hover:text-foreground">
-                                Skip Tour
-                            </Button>
-                        </div>
+                    <div className="p-6 relative">
+                        <button
+                            onClick={onSkip}
+                            className="absolute top-4 right-4 text-muted-foreground/50 hover:text-foreground transition-colors"
+                            aria-label="Close tour"
+                        >
+                            <X className="w-4 h-4" />
+                        </button>
 
-                        <div className="space-y-6 min-h-[220px] flex flex-col justify-center">
-                            <div className="flex justify-center">
-                                <motion.div
-                                    initial={{ scale: 0 }}
-                                    animate={{ scale: 1, rotate: [0, 10, -10, 0] }}
-                                    transition={{ delay: 0.2, duration: 0.5 }}
-                                    className="p-4 bg-secondary/30 rounded-full"
-                                >
-                                    {steps[currentStep].icon}
-                                </motion.div>
-                            </div>
+                        <AnimatePresence mode="wait">
+                            <motion.div
+                                key={currentStep}
+                                initial={{ opacity: 0, x: 10 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                exit={{ opacity: 0, x: -10 }}
+                                transition={{ duration: 0.2 }}
+                                className="space-y-4"
+                            >
+                                <div className="flex items-center gap-4">
+                                    <div className="p-2 bg-primary/10 rounded-xl">
+                                        {steps[currentStep].icon}
+                                    </div>
+                                    <h2 className="text-lg font-bold font-display leading-tight">
+                                        {steps[currentStep].title}
+                                    </h2>
+                                </div>
 
-                            <div>
-                                <motion.h2
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: 0.1 }}
-                                    className="text-2xl font-display font-bold text-foreground mb-3"
-                                >
-                                    {steps[currentStep].title}
-                                </motion.h2>
-                                <motion.p
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    transition={{ delay: 0.2 }}
-                                    className="text-muted-foreground leading-relaxed"
-                                >
+                                <p className="text-muted-foreground text-sm leading-relaxed">
                                     {steps[currentStep].description}
-                                </motion.p>
-                            </div>
-                        </div>
+                                </p>
+                            </motion.div>
+                        </AnimatePresence>
 
-                        <div className="pt-4 flex items-center justify-between">
-                            <div className="flex gap-1">
+                        <div className="pt-6 flex items-center justify-between mt-2">
+                            <div className="flex gap-1.5">
                                 {steps.map((_, idx) => (
                                     <div
                                         key={idx}
-                                        className={`w-2 h-2 rounded-full transition-colors duration-300 ${idx === currentStep ? "bg-primary" : "bg-border"}`}
+                                        className={`w-1.5 h-1.5 rounded-full transition-colors duration-300 ${idx === currentStep ? "bg-primary" : "bg-muted"}`}
                                     />
                                 ))}
                             </div>
 
-                            <Button onClick={handleNext} className="gap-2 group">
-                                {currentStep === steps.length - 1 ? "Get Started" : "Next"}
-                                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                            </Button>
+                            <div className="flex gap-2">
+                                {currentStep > 0 && (
+                                    <Button variant="ghost" size="sm" onClick={() => setCurrentStep(prev => prev - 1)} className="text-xs h-8">
+                                        Back
+                                    </Button>
+                                )}
+                                <Button onClick={handleNext} size="sm" className="gap-2 h-8 text-xs font-semibold shadow-lg shadow-primary/20">
+                                    {currentStep === steps.length - 1 ? "Finish" : "Next"}
+                                    <ArrowRight className="w-3 h-3" />
+                                </Button>
+                            </div>
                         </div>
                     </div>
-                </motion.div>
+                </div>
             </motion.div>
         </AnimatePresence>
     );
