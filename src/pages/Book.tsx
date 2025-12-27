@@ -6,7 +6,7 @@ import { SEOHead } from "@/components/seo/SEOHead";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Calendar, Clock, Video, MapPin, Check, ArrowRight, Shield, Star, Heart } from "lucide-react";
+import { Calendar, Clock, Video, MapPin, Check, CheckCircle, ArrowRight, Shield, Star, Heart } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -51,7 +51,7 @@ const timeSlots = [
   "9:00 AM", "10:00 AM", "11:00 AM", "1:00 PM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM"
 ];
 
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { QuizFlow, QuizResultValues } from "@/components/quiz/QuizFlow";
 
 const Book = () => {
@@ -281,6 +281,12 @@ ${quizResult.report.map((r, i) => `${i + 1}. ${r.question}\n   Answer: ${r.answe
                     </Button>
                   </DialogTrigger>
                   <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                    <DialogHeader>
+                      <DialogTitle>Mental Health Assessment</DialogTitle>
+                      <DialogDescription>
+                        Complete this brief check-in to help us personalize your session. Your results are private and will be sent directly to your provider.
+                      </DialogDescription>
+                    </DialogHeader>
                     <QuizFlow
                       onComplete={(result) => {
                         setQuizResult(result);
