@@ -218,7 +218,7 @@ export default function Checkout() {
                                                     <p className="capitalize">{bookingData.format} Session</p>
                                                 </div>
                                             </div>
-                                            <span className="font-bold text-lg text-primary">$150.00</span>
+                                            <span className="font-bold text-lg text-primary">${amount.toFixed(2)}</span>
                                         </div>
                                         {bookingData.quizResult && (
                                             <div className="py-2 px-3 bg-green-500/10 border border-green-500/20 rounded-lg flex items-center justify-between text-sm">
