@@ -5,7 +5,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-medium font-body transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-medium font-body transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 active:scale-95",
   {
     variants: {
       variant: {
@@ -17,12 +17,12 @@ const buttonVariants = cva(
           "border border-border bg-transparent text-foreground hover:bg-secondary hover:border-primary/30",
         secondary:
           "bg-secondary text-secondary-foreground shadow-soft hover:bg-cream-dark",
-        ghost: 
+        ghost:
           "text-foreground hover:bg-secondary hover:text-foreground",
-        link: 
+        link:
           "text-primary underline-offset-4 hover:underline",
         // Custom psychology theme variants
-        hero: 
+        hero:
           "bg-terracotta text-accent-foreground shadow-card hover:bg-terracotta/90 hover:shadow-elevated text-base px-8 py-3",
         calm:
           "bg-sage-light text-sage-dark border border-sage/20 hover:bg-primary hover:text-primary-foreground",
@@ -46,7 +46,7 @@ const buttonVariants = cva(
 
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof buttonVariants> {
+  VariantProps<typeof buttonVariants> {
   asChild?: boolean;
 }
 

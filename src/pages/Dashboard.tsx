@@ -8,7 +8,7 @@ import { MoodSummaryWidget } from "@/components/dashboard/MoodSummaryWidget";
 import { QuickActionsWidget } from "@/components/dashboard/QuickActionsWidget";
 import { RecommendedWidget } from "@/components/dashboard/RecommendedWidget";
 import { useNavigate } from "react-router-dom";
-import { Loader2 } from "lucide-react";
+import { PageSkeleton } from "@/components/layout/PageSkeleton";
 import { supabase } from "@/integrations/supabase/client";
 
 export default function Dashboard() {
@@ -35,11 +35,7 @@ export default function Dashboard() {
     };
 
     if (loading || !user) {
-        return (
-            <div className="min-h-screen flex items-center justify-center bg-background">
-                <Loader2 className="w-8 h-8 animate-spin text-primary" />
-            </div>
-        );
+        return <PageSkeleton />;
     }
 
     return (

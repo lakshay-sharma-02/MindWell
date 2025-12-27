@@ -10,6 +10,7 @@ import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { AuthProvider, useAuth } from "@/hooks/useAuth";
 import { AnimatePresence, motion } from "framer-motion";
 import ScrollToTop from "@/components/utils/ScrollToTop";
+import { PageSkeleton } from "@/components/layout/PageSkeleton";
 
 // Lazy load pages for performance
 const Index = lazy(() => import("./pages/Index"));
@@ -41,12 +42,12 @@ function AnimatedRoutes() {
     <AnimatePresence mode="wait" initial={false}>
       <motion.div
         key={location.pathname}
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -6 }}
-        transition={{ duration: 0.3 }}
+        initial={{ opacity: 0, scale: 0.98, filter: "blur(4px)" }}
+        animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+        exit={{ opacity: 0, scale: 0.98, filter: "blur(4px)" }}
+        transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
       >
-        <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-background"><div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div></div>}>
+        <Suspense fallback={<PageSkeleton />}>
           <Routes location={location}>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
