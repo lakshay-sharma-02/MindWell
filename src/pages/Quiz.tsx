@@ -4,45 +4,16 @@ import { Layout } from "@/components/layout/Layout";
 import { SEOHead } from "@/components/seo/SEOHead";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { ArrowRight, ArrowLeft, CheckCircle, Heart, Sparkles } from "lucide-react";
-import { quizQuestions, getQuizResult } from "@/data/quizQuestions";
+import { ArrowRight, CheckCircle, Heart, Sparkles } from "lucide-react";
 import { Confetti } from "@/components/effects/Confetti";
+import { QuizFlow, QuizResultValues } from "@/components/quiz/QuizFlow";
 
 const Quiz = () => {
-  const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [answers, setAnswers] = useState<number[]>([]);
-  const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [isComplete, setIsComplete] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
+  const [resultData, setResultData] = useState<QuizResultValues | null>(null);
 
-  const progress = ((currentQuestion + 1) / quizQuestions.length) * 100;
-  const question = quizQuestions[currentQuestion];
-
-  const handleNext = () => {
-    if (selectedOption === null) return;
-
-    const newAnswers = [...answers, selectedOption];
-    setAnswers(newAnswers);
-    setSelectedOption(null);
-
-    if (currentQuestion < quizQuestions.length - 1) {
-      setCurrentQuestion(currentQuestion + 1);
-    } else {
-      setIsComplete(true);
-      setShowConfetti(true);
-    }
-  };
-
-  const handleBack = () => {
-    if (currentQuestion > 0) {
-      setCurrentQuestion(currentQuestion - 1);
-      setSelectedOption(answers[currentQuestion - 1] ?? null);
-      setAnswers(answers.slice(0, -1));
-    }
-  };
-
-  const totalScore = answers.reduce((sum, val) => sum + val, 0);
-  const result = isComplete ? getQuizResult(totalScore) : null;
+  const result = resultData;
 
   return (
     <Layout>
@@ -65,103 +36,17 @@ const Quiz = () => {
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.4 }}
               >
-                {/* Header */}
-                <div className="text-center mb-8">
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-4"
-                  >
-                    <Heart className="w-4 h-4" />
-                    Mental Wellness Check-In
-                  </motion.div>
-                  <h1 className="font-display text-3xl md:text-4xl font-semibold text-foreground mb-2">
-                    How Are You Really Feeling?
-                  </h1>
-                  <p className="text-muted-foreground">
-                    Answer honestly - there are no right or wrong answers.
-                  </p>
-                </div>
-
-                {/* Progress Bar */}
-                <div className="mb-8">
-                  <div className="flex justify-between text-sm text-muted-foreground mb-2">
-                    <span>Question {currentQuestion + 1} of {quizQuestions.length}</span>
-                    <span>{Math.round(progress)}% complete</span>
-                  </div>
-                  <div className="h-2 bg-muted rounded-full overflow-hidden">
-                    <motion.div
-                      className="h-full bg-primary rounded-full"
-                      initial={{ width: 0 }}
-                      animate={{ width: `${progress}%` }}
-                      transition={{ duration: 0.3 }}
-                    />
-                  </div>
-                </div>
-
-                {/* Question Card */}
-                <motion.div
-                  key={currentQuestion}
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  className="bg-card border border-border rounded-3xl p-6 md:p-8 shadow-soft mb-8"
-                >
-                  <h2 className="font-display text-xl md:text-2xl font-medium text-foreground mb-6">
-                    {question.question}
-                  </h2>
-
-                  <div className="space-y-3">
-                    {question.options.map((option, index) => (
-                      <button
-                        key={index}
-                        onClick={() => setSelectedOption(option.value)}
-                        className={`w-full p-4 rounded-xl text-left transition-all ${
-                          selectedOption === option.value
-                            ? "bg-primary text-primary-foreground ring-2 ring-primary ring-offset-2 ring-offset-card"
-                            : "bg-muted hover:bg-muted/80 text-foreground"
-                        }`}
-                      >
-                        <span className="flex items-center gap-3">
-                          <span
-                            className={`w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
-                              selectedOption === option.value
-                                ? "border-primary-foreground bg-primary-foreground/20"
-                                : "border-muted-foreground/40"
-                            }`}
-                          >
-                            {selectedOption === option.value && (
-                              <CheckCircle className="w-4 h-4" />
-                            )}
-                          </span>
-                          {option.text}
-                        </span>
-                      </button>
-                    ))}
-                  </div>
-                </motion.div>
-
-                {/* Navigation */}
-                <div className="flex justify-between">
-                  <Button
-                    variant="outline"
-                    onClick={handleBack}
-                    disabled={currentQuestion === 0}
-                    className="gap-2"
-                  >
-                    <ArrowLeft className="w-4 h-4" />
-                    Back
-                  </Button>
-                  <Button
-                    variant="hero"
-                    onClick={handleNext}
-                    disabled={selectedOption === null}
-                    className="gap-2"
-                  >
-                    {currentQuestion === quizQuestions.length - 1 ? "Get Results" : "Next"}
-                    <ArrowRight className="w-4 h-4" />
-                  </Button>
-                </div>
+                <QuizFlow
+                  onComplete={(data) => {
+                    // We need to reconstruct the result object expected by the existing UI or update the UI
+                    // The existing UI uses 'getQuizResult(totalScore)' which returns { level, title, description, ... }
+                    // Our QuizFlow returns this same data structure in 'data'
+                    // So we just need to set state to show results
+                    setIsComplete(true);
+                    setShowConfetti(true);
+                    setResultData(data); // We need a new state for this or just rely on 'result' variable if refactored enough
+                  }}
+                />
               </motion.div>
             ) : (
               <motion.div
@@ -183,13 +68,12 @@ const Quiz = () => {
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
                       transition={{ type: "spring", delay: 0.2 }}
-                      className={`w-20 h-20 rounded-3xl mx-auto mb-6 flex items-center justify-center ${
-                        result?.level === "low"
-                          ? "bg-green-500/10 text-green-500"
-                          : result?.level === "moderate"
+                      className={`w-20 h-20 rounded-3xl mx-auto mb-6 flex items-center justify-center ${result?.level === "low"
+                        ? "bg-green-500/10 text-green-500"
+                        : result?.level === "moderate"
                           ? "bg-yellow-500/10 text-yellow-500"
                           : "bg-primary/10 text-primary"
-                      }`}
+                        }`}
                     >
                       <Sparkles className="w-10 h-10" />
                     </motion.div>
@@ -232,9 +116,9 @@ const Quiz = () => {
 
                 {/* Disclaimer */}
                 <p className="text-xs text-muted-foreground max-w-lg mx-auto">
-                  This assessment is for informational purposes only and is not a 
-                  substitute for professional diagnosis or treatment. If you're 
-                  experiencing a mental health crisis, please contact a healthcare 
+                  This assessment is for informational purposes only and is not a
+                  substitute for professional diagnosis or treatment. If you're
+                  experiencing a mental health crisis, please contact a healthcare
                   provider or crisis helpline immediately.
                 </p>
               </motion.div>

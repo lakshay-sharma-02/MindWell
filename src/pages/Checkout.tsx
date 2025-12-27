@@ -202,16 +202,29 @@ export default function Checkout() {
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 {bookingData ? (
-                                    <div className="flex justify-between items-start pb-4 border-b border-border/50">
-                                        <div>
-                                            <h3 className="font-semibold text-lg">{bookingData.sessionType}</h3>
-                                            <div className="text-sm text-muted-foreground mt-1">
-                                                <p>{bookingData.date} at {bookingData.time}</p>
-                                                <p className="capitalize">{bookingData.format} Session</p>
+                                    <>
+                                        <div className="flex justify-between items-start pb-4 border-b border-border/50">
+                                            <div>
+                                                <h3 className="font-semibold text-lg">{bookingData.sessionType}</h3>
+                                                <div className="text-sm text-muted-foreground mt-1">
+                                                    <p>{bookingData.date} at {bookingData.time}</p>
+                                                    <p className="capitalize">{bookingData.format} Session</p>
+                                                </div>
                                             </div>
+                                            <span className="font-bold text-lg text-primary">$150.00</span>
                                         </div>
-                                        <span className="font-bold text-lg text-primary">$150.00</span>
-                                    </div>
+                                        {bookingData.quizResult && (
+                                            <div className="py-2 px-3 bg-green-500/10 border border-green-500/20 rounded-lg flex items-center justify-between text-sm">
+                                                <span className="flex items-center gap-2 text-green-600 dark:text-green-400 font-medium">
+                                                    <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                                                    Assessment Attached
+                                                </span>
+                                                <span className="text-xs text-muted-foreground">
+                                                    Score: {bookingData.quizResult.score} ({bookingData.quizResult.level})
+                                                </span>
+                                            </div>
+                                        )}
+                                    </>
                                 ) : (
                                     <div className="flex justify-between items-start pb-4 border-b border-border/50">
                                         <div>

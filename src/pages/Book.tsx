@@ -51,6 +51,9 @@ const timeSlots = [
   "9:00 AM", "10:00 AM", "11:00 AM", "1:00 PM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM"
 ];
 
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { QuizFlow, QuizResultValues } from "@/components/quiz/QuizFlow";
+
 const Book = () => {
   const navigate = useNavigate();
   const [services, setServices] = useState<Service[]>([]);
@@ -66,6 +69,10 @@ const Book = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoadingServices, setIsLoadingServices] = useState(true);
+
+  // Quiz State
+  const [showQuiz, setShowQuiz] = useState(false);
+  const [quizResult, setQuizResult] = useState<QuizResultValues | null>(null);
 
   useEffect(() => {
     const fetchServices = async () => {
@@ -105,6 +112,19 @@ const Book = () => {
     try {
       const sessionType = services.find(s => s.id === selectedSession)?.title || selectedSession;
 
+      // Format quiz report if available
+      let quizReportString = "";
+      if (quizResult) {
+        quizReportString = `
+Mental Wellness Assessment Result:
+Level: ${quizResult.level.toUpperCase()}
+Score: ${quizResult.score}
+
+Detailed Responses:
+${quizResult.report.map((r, i) => `${i + 1}. ${r.question}\n   Answer: ${r.answer}`).join('\n')}
+          `.trim();
+      }
+
       const bookingData = {
         name: formData.name,
         email: formData.email,
@@ -113,7 +133,10 @@ const Book = () => {
         format: selectedFormat,
         date: selectedDate,
         time: selectedTime,
-        notes: formData.notes
+        notes: formData.notes + (quizReportString ? `\n\n--- Assessment ---\n${quizReportString}` : ""),
+        // We append the quiz result to notes for now to ensure it gets sent even if email template isn't updated,
+        // but we can also pass it as a separate field if we update the checkout flow properly.
+        quizResult: quizResult // Pass the object too for Checkout.tsx to handle
       };
 
       navigate("/checkout", { state: { bookingData } });
@@ -231,7 +254,67 @@ const Book = () => {
       {/* Booking Form */}
       <section className="py-20 md:py-24 bg-secondary/30">
         <div className="container-wide">
-          <div className="max-w-4xl mx-auto">
+          <div className="max-w-4xl mx-auto space-y-8">
+
+            {/* Optional Quiz Section */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="p-8 rounded-3xl bg-primary/5 border border-primary/20 shadow-sm"
+            >
+              <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+                <div>
+                  <h3 className="font-display text-xl font-bold text-foreground flex items-center gap-2">
+                    <Heart className="w-5 h-5 text-primary" />
+                    Mental Health Assessment (Optional)
+                  </h3>
+                  <p className="text-muted-foreground mt-2 max-w-lg">
+                    Take a quick 2-minute assessment to help Dr. Sarah understand your needs better before your session.
+                  </p>
+                </div>
+
+                <Dialog open={showQuiz} onOpenChange={setShowQuiz}>
+                  <DialogTrigger asChild>
+                    <Button variant={quizResult ? "outline" : "hero"} className="shrink-0">
+                      {quizResult ? "Retake Assessment" : "Take Assessment"}
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                    <QuizFlow
+                      onComplete={(result) => {
+                        setQuizResult(result);
+                        setShowQuiz(false);
+                        toast.success("Assessment attached to your booking!");
+                      }}
+                      onCancel={() => setShowQuiz(false)}
+                    />
+                  </DialogContent>
+                </Dialog>
+              </div>
+
+              {quizResult && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  className="mt-6 p-4 rounded-xl bg-background border border-border"
+                >
+                  <div className="flex items-start gap-3">
+                    <CheckCircle className="w-5 h-5 text-green-500 mt-0.5" />
+                    <div>
+                      <p className="font-medium text-foreground">Assessment Complete</p>
+                      <p className="text-sm text-muted-foreground">
+                        Result: <span className="font-semibold text-primary">{quizResult.title}</span>
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Your detailed responses will be sent securely to the doctor.
+                      </p>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </motion.div>
+
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
