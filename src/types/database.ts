@@ -306,18 +306,21 @@ export interface Database {
           full_name: string | null
           avatar_url: string | null
           updated_at: string | null
+          has_seen_tour: boolean
         }
         Insert: {
           id: string
           full_name?: string | null
           avatar_url?: string | null
           updated_at?: string | null
+          has_seen_tour?: boolean
         }
         Update: {
           id?: string
           full_name?: string | null
           avatar_url?: string | null
           updated_at?: string | null
+          has_seen_tour?: boolean
         }
       }
       blog_likes: {

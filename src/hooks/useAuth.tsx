@@ -7,6 +7,8 @@ interface AuthContextType {
   session: Session | null;
   loading: boolean;
   isAdmin: boolean;
+  hasSeenTour: boolean;
+  completeTour: () => Promise<void>;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signUp: (email: string, password: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
@@ -20,11 +22,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [hasSeenTour, setHasSeenTour] = useState(true); // Default to true to prevent flash for existing users until loaded
 
   const checkIsAdmin = async (userId?: string): Promise<boolean> => {
     const checkId = userId || user?.id;
     if (!checkId) return false;
-    
+
     try {
       const { data, error } = await supabase
         .from('user_roles')
@@ -32,18 +35,55 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .eq('user_id', checkId)
         .eq('role', 'admin')
         .maybeSingle();
-      
+
       if (error) {
         console.error('Error checking admin status:', error);
         return false;
       }
-      
+
       const hasAdmin = !!data;
       setIsAdmin(hasAdmin);
       return hasAdmin;
     } catch (err) {
       console.error('Error checking admin status:', err);
       return false;
+    }
+  };
+
+  const checkTourStatus = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('has_seen_tour')
+        .eq('id', userId)
+        .maybeSingle();
+
+      if (!error && data) {
+        // If data exists, use value. If column missing (old schema), default to true to avoid crash? 
+        // Actually if column missing, it might error. We should handle that.
+        // For now, assume migration runs.
+        setHasSeenTour(!!data.has_seen_tour);
+      } else {
+        // If profile missing, maybe creating? Default true to be safe?
+        // Or false if we want to show it. Let's assume false for new users.
+        setHasSeenTour(false);
+      }
+    } catch (e) {
+      console.error("Error checking tour status:", e);
+    }
+  };
+
+  const completeTour = async () => {
+    setHasSeenTour(true);
+    if (user) {
+      try {
+        await supabase
+          .from('profiles')
+          .update({ has_seen_tour: true })
+          .eq('id', user.id);
+      } catch (e) {
+        console.error("Failed to update tour status", e);
+      }
     }
   };
 
@@ -54,20 +94,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         if (!mounted) return;
-        
+
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
-        
-        // Defer admin check with setTimeout to avoid deadlock
+
+        // Defer extra checks
         if (session?.user) {
           setTimeout(() => {
             if (mounted) {
               checkIsAdmin(session.user.id);
+              checkTourStatus(session.user.id);
             }
           }, 0);
         } else {
           setIsAdmin(false);
+          setHasSeenTour(true); // Don't show to guests
         }
       }
     );
@@ -75,15 +117,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // THEN check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (!mounted) return;
-      
+
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
-      
+
       if (session?.user) {
         setTimeout(() => {
           if (mounted) {
             checkIsAdmin(session.user.id);
+            checkTourStatus(session.user.id);
           }
         }, 0);
       }
@@ -105,7 +148,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signUp = async (email: string, password: string) => {
     const redirectUrl = `${window.location.origin}/`;
-    
+
     const { error } = await supabase.auth.signUp({
       email,
       password,
@@ -119,6 +162,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signOut = async () => {
     await supabase.auth.signOut();
     setIsAdmin(false);
+    setHasSeenTour(true);
   };
 
   return (
@@ -128,6 +172,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         session,
         loading,
         isAdmin,
+        hasSeenTour,
+        completeTour,
         signIn,
         signUp,
         signOut,
@@ -148,9 +194,11 @@ export function useAuth() {
       session: null,
       loading: false,
       isAdmin: false,
+      hasSeenTour: true,
+      completeTour: async () => { },
       signIn: async () => ({ error: new Error('AuthProvider not found') }),
       signUp: async () => ({ error: new Error('AuthProvider not found') }),
-      signOut: async () => {},
+      signOut: async () => { },
       checkIsAdmin: async () => false,
     };
   }
