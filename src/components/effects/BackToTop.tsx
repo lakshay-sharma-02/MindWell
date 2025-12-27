@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowUp } from "lucide-react";
 
+import { createPortal } from "react-dom";
+
 export function BackToTop() {
   const [isVisible, setIsVisible] = useState(false);
 
@@ -21,7 +23,7 @@ export function BackToTop() {
     });
   };
 
-  return (
+  return createPortal(
     <AnimatePresence>
       {isVisible && (
         <motion.button
@@ -35,6 +37,7 @@ export function BackToTop() {
           <ArrowUp className="w-5 h-5" />
         </motion.button>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 }

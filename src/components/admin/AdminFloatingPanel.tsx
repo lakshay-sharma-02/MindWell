@@ -203,7 +203,8 @@ export function AdminFloatingPanel() {
         initial={{ scale: 0, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ delay: 0.5, type: "spring" }}
-        className="fixed bottom-6 right-6 z-[100]" // Increased z-index
+        className="fixed z-[100]"
+        style={{ position: 'fixed', bottom: '24px', right: '24px', zIndex: 99999 }}
       >
         <AnimatePresence>
           {isExpanded && (
