@@ -67,6 +67,8 @@ export default function Tools() {
                             </TabsTrigger>
                         </TabsList>
 
+                        {/* Tab Content Areas */}
+
                         <TabsContent value="breathing" className="focus-visible:outline-none animate-in fade-in slide-in-from-bottom-4 duration-500">
                             <div className="max-w-2xl mx-auto">
                                 <div className="text-center mb-8">
