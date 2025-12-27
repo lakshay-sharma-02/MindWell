@@ -110,7 +110,9 @@ const Book = () => {
     setIsSubmitting(true);
 
     try {
-      const sessionType = services.find(s => s.id === selectedSession)?.title || selectedSession;
+      const selectedService = services.find(s => s.id === selectedSession);
+      const sessionType = selectedService?.title || selectedSession;
+      const price = selectedService?.price || "$150"; // Fallback default
 
       // Format quiz report if available
       let quizReportString = "";
@@ -130,6 +132,7 @@ ${quizResult.report.map((r, i) => `${i + 1}. ${r.question}\n   Answer: ${r.answe
         email: formData.email,
         phone: formData.phone,
         sessionType,
+        price, // Pass the price!
         format: selectedFormat,
         date: selectedDate,
         time: selectedTime,

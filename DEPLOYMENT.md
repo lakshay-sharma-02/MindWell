@@ -90,6 +90,29 @@ To put the website on the internet:
 
 ---
 
+## ⚡ Step 4: Deploying Edge Functions (Email Service)
+
+The email service runs on Supabase Edge Functions. If you make changes to `src/lib/email.ts` or the function itself in `supabase/functions/`, you must redeploy it.
+
+1.  **Login to Supabase CLI**:
+    ```bash
+    npx supabase login
+    ```
+2.  **Deploy the Function**:
+    ```bash
+    npx supabase functions deploy send-email --project-ref <your-project-ref>
+    ```
+    *   *Note*: You can find your Project Ref in Supabase Settings -> General (it's the string part of your URL, e.g., `abcdefghijklm`).
+    *   If you don't use `--project-ref`, it may ask you to link the project.
+
+3.  **Set Secrets (One-time)**:
+    Ensure your `RESEND_API_KEY` is set in the function environment:
+    ```bash
+    npx supabase secrets set RESEND_API_KEY=your_resend_api_key_here
+    ```
+
+---
+
 ## 🔒 Admin Setup (Optional)
 
 If you need Admin access (to manage blogs, resources):

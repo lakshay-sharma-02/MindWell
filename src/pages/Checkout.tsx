@@ -40,7 +40,14 @@ export default function Checkout() {
 
     if (!bookingData && !resourceData) return null;
 
-    const amount = bookingData ? 150 : (resourceData?.price || 0);
+    // Parse price string (e.g. "$150") to number
+    const parsePrice = (priceStr?: string | number) => {
+        if (!priceStr) return 0;
+        if (typeof priceStr === 'number') return priceStr;
+        return parseFloat(priceStr.replace(/[^0-9.]/g, '')) || 0;
+    };
+
+    const amount = bookingData ? parsePrice(bookingData.price) : (resourceData?.price || 0);
 
     const validateCard = () => {
         const { cardNumber, expiryDate, cvc, nameOnCard } = formData;

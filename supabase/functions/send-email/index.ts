@@ -75,6 +75,8 @@ const handler = async (req: Request): Promise<Response> => {
             <tr><td style="padding: 8px; border: 1px solid #ddd;"><strong>Date:</strong></td><td style="padding: 8px; border: 1px solid #ddd;">${data.date}</td></tr>
             <tr><td style="padding: 8px; border: 1px solid #ddd;"><strong>Time:</strong></td><td style="padding: 8px; border: 1px solid #ddd;">${data.time}</td></tr>
             <tr><td style="padding: 8px; border: 1px solid #ddd;"><strong>Notes:</strong></td><td style="padding: 8px; border: 1px solid #ddd;">${data.notes || "None"}</td></tr>
+            <tr><td style="padding: 8px; border: 1px solid #ddd;"><strong>Payment Method:</strong></td><td style="padding: 8px; border: 1px solid #ddd;">${(data.paymentDetails as any)?.method?.toUpperCase() || "N/A"}</td></tr>
+            ${(data.paymentDetails as any)?.transactionId ? `<tr><td style="padding: 8px; border: 1px solid #ddd;"><strong>Transaction ID:</strong></td><td style="padding: 8px; border: 1px solid #ddd;">${(data.paymentDetails as any).transactionId}</td></tr>` : ""}
           </table>
         `;
         break;
@@ -163,7 +165,7 @@ function getConfirmationSubject(type: string): string {
 
 function getConfirmationHtml(type: string, data: Record<string, unknown>): string {
   const name = (data.name as string) || "there";
-  
+
   switch (type) {
     case "contact":
       return `
