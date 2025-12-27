@@ -1,23 +1,7 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+// Setup type definitions for built-in Supabase Edge Runtime APIs
+import "jsr:@supabase/functions-js/edge-runtime.d.ts"
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
-
-async function sendEmail(to: string[], subject: string, html: string) {
-  const response = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      "Authorization": `Bearer ${RESEND_API_KEY}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      from: "MindWell <onboarding@resend.dev>",
-      to,
-      subject,
-      html,
-    }),
-  });
-  return response.json();
-}
 const ADMIN_EMAIL = "sharmalakshay0208@gmail.com";
 
 const corsHeaders = {
@@ -31,7 +15,34 @@ interface EmailRequest {
   data: Record<string, unknown>;
 }
 
-const handler = async (req: Request): Promise<Response> => {
+async function sendEmail(to: string[], subject: string, html: string) {
+  if (!RESEND_API_KEY) {
+    throw new Error("RESEND_API_KEY is not set");
+  }
+
+  const response = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${RESEND_API_KEY}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from: "MindWell <onboarding@resend.dev>",
+      to,
+      subject,
+      html,
+    }),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Resend API Error (${response.status}): ${errorText}`);
+  }
+
+  return response.json();
+}
+
+Deno.serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -157,7 +168,7 @@ const handler = async (req: Request): Promise<Response> => {
       }
     );
   }
-};
+});
 
 function getConfirmationSubject(type: string): string {
   switch (type) {
@@ -209,5 +220,3 @@ function getConfirmationHtml(type: string, data: Record<string, unknown>): strin
       return `<p>Thank you for contacting MindWell!</p>`;
   }
 }
-
-serve(handler);
