@@ -10,14 +10,16 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { Loader2, Lock, CreditCard, ArrowRight, QrCode } from "lucide-react";
+import { Loader2, Lock, CreditCard, ArrowRight, QrCode, Calendar } from "lucide-react";
 import { motion } from "framer-motion";
 import { sendBookingForm } from "@/lib/email";
+import { downloadICS, BookingEvent } from "@/lib/calendar";
 
 export default function Checkout() {
     const location = useLocation();
     const navigate = useNavigate();
     const [isProcessing, setIsProcessing] = useState(false);
+    const [isSuccess, setIsSuccess] = useState(false);
     const [paymentMethod, setPaymentMethod] = useState<"card" | "qr">("card");
     const [transactionId, setTransactionId] = useState("");
     const [formData, setFormData] = useState({
@@ -154,8 +156,12 @@ export default function Checkout() {
                     : "Payment details submitted for verification."
             );
 
-            // Redirect
-            navigate(resourceData ? "/resources" : "/");
+            // Show success view instead of redirecting
+            if (bookingData) {
+                setIsSuccess(true);
+            } else {
+                navigate("/resources");
+            }
 
         } catch (error) {
             console.error("Checkout error:", error);
@@ -163,6 +169,52 @@ export default function Checkout() {
             toast.error(msg);
         } finally {
             setIsProcessing(false);
+        }
+    };
+
+    const handleCalendarDownload = () => {
+        if (!bookingData) return;
+
+        // Convert time (e.g., "3:00 PM") to ISO string
+        // This is a basic implementation, assuming booking is for "Today" or future date
+        // In a real app, we'd parse bookingData.date and bookingData.time strictly
+
+        try {
+            const dateStr = bookingData.date; // YYYY-MM-DD
+            const timeStr = bookingData.time; // H:MM AM/PM
+
+            // Allow date-fns or similar to handle this if available, but manual parsing for now
+            const [year, month, day] = dateStr.split('-').map(Number);
+            const startDateTime = new Date(year, month - 1, day);
+
+            const [time, modifier] = timeStr.split(' ');
+            let [hours, minutes] = time.split(':').map(Number);
+
+            if (modifier === 'PM' && hours < 12) hours += 12;
+            if (modifier === 'AM' && hours === 12) hours = 0;
+
+            startDateTime.setHours(hours, minutes, 0, 0);
+
+            const endDateTime = new Date(startDateTime);
+            endDateTime.setMinutes(endDateTime.getMinutes() + 50); // Default 50 mins
+
+            const event: BookingEvent = {
+                title: `${bookingData.sessionType} with Dr. Sarah`,
+                description: `Format: ${bookingData.format}\n\nNotes: ${bookingData.notes || 'None'}`,
+                location: bookingData.format === 'virtual' ? 'Virtual (Link sent via email)' : '123 Healing St, San Francisco',
+                startTime: startDateTime.toISOString(),
+                endTime: endDateTime.toISOString(),
+                organizer: {
+                    name: 'MindWell Therapy',
+                    email: 'contact@mindwell.app'
+                }
+            };
+
+            downloadICS(event);
+            toast.success("Calendar event downloaded!");
+        } catch (e) {
+            console.error("Date parsing error", e);
+            toast.error("Could not generate calendar event");
         }
     };
 
@@ -185,6 +237,53 @@ export default function Checkout() {
             setFormData(prev => ({ ...prev, [id]: value }));
         }
     };
+
+    if (isSuccess && bookingData) {
+        return (
+            <Layout>
+                <div className="container-wide py-20 min-h-[60vh] flex items-center justify-center">
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="max-w-lg w-full bg-card border border-border/50 rounded-3xl p-8 shadow-card text-center space-y-6"
+                    >
+                        <div className="w-20 h-20 bg-green-500/10 text-green-500 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <Calendar className="w-10 h-10" />
+                        </div>
+
+                        <div>
+                            <h1 className="text-3xl font-display font-bold mb-2">Booking Confirmed!</h1>
+                            <p className="text-muted-foreground">
+                                Your {bookingData.sessionType} is scheduled for
+                                <br />
+                                <span className="font-semibold text-foreground">
+                                    {bookingData.date} at {bookingData.time}
+                                </span>
+                            </p>
+                        </div>
+
+                        <div className="bg-secondary/30 rounded-xl p-4 text-left text-sm space-y-2">
+                            <p><span className="text-muted-foreground">Format:</span> <span className="capitalize">{bookingData.format}</span></p>
+                            <p><span className="text-muted-foreground">Payment:</span> {paymentMethod === 'card' ? 'Paid via Card' : 'Pending Verification (UPI)'}</p>
+                            <p className="text-xs text-muted-foreground pt-2 border-t border-border/50">
+                                A confirmation email has been sent to {bookingData.email}.
+                            </p>
+                        </div>
+
+                        <div className="space-y-3 pt-2">
+                            <Button onClick={handleCalendarDownload} className="w-full gap-2 btn-glow" size="lg">
+                                <Calendar className="w-4 h-4" />
+                                Add to Calendar
+                            </Button>
+                            <Button variant="outline" onClick={() => navigate("/")} className="w-full">
+                                Return Home
+                            </Button>
+                        </div>
+                    </motion.div>
+                </div>
+            </Layout>
+        );
+    }
 
     return (
         <Layout>
