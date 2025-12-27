@@ -61,10 +61,10 @@ export function Header({ onSearchClick }: HeaderProps) {
         setScrolled(isScrolled);
       }
     };
-    
+
     // Initial check
     handleScroll();
-    
+
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, [scrolled]);
@@ -177,7 +177,7 @@ export function Header({ onSearchClick }: HeaderProps) {
             <ThemeToggle />
 
             {user ? (
-              <Link to="/profile">
+              <Link to="/dashboard">
                 <Avatar className="w-10 h-10 border-2 border-primary/20 hover:border-primary transition-colors cursor-pointer">
                   <AvatarImage src="" />
                   <AvatarFallback className="bg-primary/10 text-primary font-medium">
@@ -304,7 +304,7 @@ export function Header({ onSearchClick }: HeaderProps) {
                       className="w-full justify-start gap-2 bg-primary/10 text-primary font-semibold hover:bg-primary/20 hover:text-primary border border-primary/20"
                       asChild
                     >
-                      <Link to="/profile" onClick={() => setMobileMenuOpen(false)}>
+                      <Link to="/dashboard" onClick={() => setMobileMenuOpen(false)}>
                         <User className="w-4 h-4" />
                         Dashboard
                       </Link>
