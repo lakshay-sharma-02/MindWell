@@ -120,9 +120,11 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log("Admin email sent successfully:", adminEmailResponse);
 
+    let confirmationResponse = null;
+
     // Send confirmation email to user (if applicable)
     if (userEmail && type !== "newsletter") {
-      const confirmationResponse = await sendEmail(
+      confirmationResponse = await sendEmail(
         [userEmail],
         getConfirmationSubject(type),
         getConfirmationHtml(type, data)
@@ -131,7 +133,14 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     return new Response(
-      JSON.stringify({ success: true, message: "Email sent successfully" }),
+      JSON.stringify({
+        success: true,
+        message: "Email request processed",
+        details: {
+          admin: adminEmailResponse,
+          user: userEmail ? (type !== "newsletter" ? confirmationResponse : "skipped-newsletter") : "skipped-no-email"
+        }
+      }),
       {
         status: 200,
         headers: { "Content-Type": "application/json", ...corsHeaders },
