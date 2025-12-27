@@ -30,6 +30,7 @@ const Stories = lazy(() => import("./pages/Stories"));
 const Profile = lazy(() => import("./pages/Profile"));
 const CommunitySupport = lazy(() => import("./pages/CommunitySupport"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
+const Tools = lazy(() => import("./pages/Tools"));
 
 const queryClient = new QueryClient();
 
@@ -63,6 +64,7 @@ function AnimatedRoutes() {
             <Route path="/stories" element={<Stories />} />
             <Route path="/community" element={<CommunitySupport />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/tools" element={<Tools />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
