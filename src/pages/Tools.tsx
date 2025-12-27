@@ -6,7 +6,8 @@ import { MoodTracker } from "@/components/tools/MoodTracker";
 import { motion } from "framer-motion";
 import { WaveDivider } from "@/components/shared/WaveDivider";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Wind, PenTool, Sparkles } from "lucide-react";
+import { Wind, PenTool, Sparkles, Heart } from "lucide-react";
+import { GratitudeJournal } from "@/components/tools/GratitudeJournal";
 
 export default function Tools() {
     return (
@@ -51,7 +52,7 @@ export default function Tools() {
             <section className="py-20 bg-background min-h-[60vh]">
                 <div className="container-wide">
                     <Tabs defaultValue="breathing" className="max-w-4xl mx-auto">
-                        <TabsList className="grid w-full grid-cols-2 mb-12 p-1 bg-secondary/30 rounded-2xl h-auto">
+                        <TabsList className="grid w-full grid-cols-3 mb-12 p-1 bg-secondary/30 rounded-2xl h-auto">
                             <TabsTrigger value="breathing" className="w-full flex items-center justify-center text-lg py-4 rounded-xl data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all duration-300">
                                 <Wind className="w-5 h-5 mr-2" />
                                 Breathing
@@ -59,6 +60,10 @@ export default function Tools() {
                             <TabsTrigger value="mood" className="w-full flex items-center justify-center text-lg py-4 rounded-xl data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all duration-300">
                                 <PenTool className="w-5 h-5 mr-2" />
                                 Mood Journal
+                            </TabsTrigger>
+                            <TabsTrigger value="gratitude" className="w-full flex items-center justify-center text-lg py-4 rounded-xl data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all duration-300">
+                                <Heart className="w-5 h-5 mr-2" />
+                                Gratitude
                             </TabsTrigger>
                         </TabsList>
 
@@ -74,6 +79,10 @@ export default function Tools() {
 
                         <TabsContent value="mood" className="focus-visible:outline-none animate-in fade-in slide-in-from-bottom-4 duration-500">
                             <MoodTracker />
+                        </TabsContent>
+
+                        <TabsContent value="gratitude" className="focus-visible:outline-none animate-in fade-in slide-in-from-bottom-4 duration-500">
+                            <GratitudeJournal />
                         </TabsContent>
                     </Tabs>
                 </div>
