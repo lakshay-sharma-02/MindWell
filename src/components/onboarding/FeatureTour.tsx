@@ -75,26 +75,33 @@ export function FeatureTour({ isOpen, onComplete, onSkip }: FeatureTourProps) {
     };
 
     return (
-        <AnimatePresence>
+        <AnimatePresence mode="wait">
             <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
+                transition={{ duration: 0.5 }}
                 className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
             >
                 <motion.div
-                    initial={{ scale: 0.9, opacity: 0, y: 20 }}
+                    key={currentStep} // Key changes to trigger re-animation on step change
+                    initial={{ scale: 0.95, opacity: 0, y: 10 }}
                     animate={{ scale: 1, opacity: 1, y: 0 }}
-                    exit={{ scale: 0.9, opacity: 0, y: 20 }}
+                    exit={{ scale: 0.95, opacity: 0, y: -10 }}
+                    transition={{
+                        type: "spring",
+                        stiffness: 300,
+                        damping: 30
+                    }}
                     className="bg-card w-full max-w-md rounded-3xl shadow-2xl border border-border overflow-hidden"
                 >
                     {/* Progress Bar */}
                     <div className="h-1.5 bg-secondary w-full">
                         <motion.div
                             className="h-full bg-primary"
-                            initial={{ width: 0 }}
+                            initial={{ width: `${(currentStep / steps.length) * 100}%` }}
                             animate={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
-                            transition={{ duration: 0.3 }}
+                            transition={{ duration: 0.5, ease: "easeInOut" }}
                         />
                     </div>
 
@@ -105,36 +112,44 @@ export function FeatureTour({ isOpen, onComplete, onSkip }: FeatureTourProps) {
                             </Button>
                         </div>
 
-                        <motion.div
-                            key={currentStep}
-                            initial={{ opacity: 0, x: 20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            exit={{ opacity: 0, x: -20 }}
-                            transition={{ duration: 0.3 }}
-                            className="space-y-6"
-                        >
+                        <div className="space-y-6 min-h-[220px] flex flex-col justify-center">
                             <div className="flex justify-center">
-                                <div className="p-4 bg-secondary/30 rounded-full">
+                                <motion.div
+                                    initial={{ scale: 0 }}
+                                    animate={{ scale: 1, rotate: [0, 10, -10, 0] }}
+                                    transition={{ delay: 0.2, duration: 0.5 }}
+                                    className="p-4 bg-secondary/30 rounded-full"
+                                >
                                     {steps[currentStep].icon}
-                                </div>
+                                </motion.div>
                             </div>
 
                             <div>
-                                <h2 className="text-2xl font-display font-bold text-foreground mb-3">
+                                <motion.h2
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: 0.1 }}
+                                    className="text-2xl font-display font-bold text-foreground mb-3"
+                                >
                                     {steps[currentStep].title}
-                                </h2>
-                                <p className="text-muted-foreground leading-relaxed">
+                                </motion.h2>
+                                <motion.p
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    transition={{ delay: 0.2 }}
+                                    className="text-muted-foreground leading-relaxed"
+                                >
                                     {steps[currentStep].description}
-                                </p>
+                                </motion.p>
                             </div>
-                        </motion.div>
+                        </div>
 
                         <div className="pt-4 flex items-center justify-between">
                             <div className="flex gap-1">
                                 {steps.map((_, idx) => (
                                     <div
                                         key={idx}
-                                        className={`w-2 h-2 rounded-full transition-colors ${idx === currentStep ? "bg-primary" : "bg-border"}`}
+                                        className={`w-2 h-2 rounded-full transition-colors duration-300 ${idx === currentStep ? "bg-primary" : "bg-border"}`}
                                     />
                                 ))}
                             </div>

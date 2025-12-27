@@ -74,6 +74,22 @@ function AnimatedRoutes() {
   );
 }
 
+import { FeatureTour } from "@/components/onboarding/FeatureTour";
+
+function GlobalOverlays() {
+  const { hasSeenTour, completeTour, user, loading } = useAuth();
+
+  if (loading || !user) return null;
+
+  return (
+    <FeatureTour
+      isOpen={!hasSeenTour}
+      onComplete={completeTour}
+      onSkip={completeTour}
+    />
+  );
+}
+
 const App = () => (
   <HelmetProvider>
     <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
@@ -85,6 +101,7 @@ const App = () => (
               <Toaster />
               <Sonner />
               <AuthPopup />
+              <GlobalOverlays />
               <AnimatedRoutes />
             </TooltipProvider>
           </AuthProvider>

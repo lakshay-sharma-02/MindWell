@@ -33,14 +33,12 @@ export const useAudioPlayer = () => {
   return context;
 };
 
-import { FeatureTour } from "@/components/onboarding/FeatureTour";
-import { useAuth } from "@/hooks/useAuth";
 
 export function Layout({ children }: LayoutProps) {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [currentEpisode, setCurrentEpisode] = useState<PodcastEpisode | null>(null);
   const [isPlayerMinimized, setIsPlayerMinimized] = useState(false);
-  const { hasSeenTour, completeTour, user, loading } = useAuth(); // Get tour status
+
 
   // Global keyboard shortcut for search
   useEffect(() => {
@@ -68,15 +66,6 @@ export function Layout({ children }: LayoutProps) {
         <main className="flex-1">{children}</main>
         <Footer />
         <BackToTop />
-
-        {/* Feature Tour */}
-        {!loading && user && (
-          <FeatureTour
-            isOpen={!hasSeenTour}
-            onComplete={completeTour}
-            onSkip={completeTour}
-          />
-        )}
 
         {/* Search Modal */}
         <SearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
