@@ -140,8 +140,22 @@
     @apply border-border;
   }
 
+  html {
+    scroll-behavior: smooth;
+    overscroll-behavior-y: none;
+    /* Prevents rubber-banding on pull-to-refresh */
+    height: 100%;
+    -webkit-tap-highlight-color: transparent;
+    /* Remove tap highlight on mobile */
+  }
+
   body {
     @apply bg-background text-foreground font-body antialiased;
+    overscroll-behavior-y: none;
+    touch-action: manipulation;
+    /* Improves touch response */
+    height: 100%;
+    overflow-x: hidden;
   }
 
   h1,
@@ -153,9 +167,7 @@
     @apply font-display;
   }
 
-  html {
-    scroll-behavior: smooth;
-  }
+
 }
 
 
@@ -257,51 +269,10 @@
   .shine:hover::before {
     left: 100%;
   }
-}
 
-@layer utilities {
-  .animate-fade-up {
-    animation: fade-up 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-  }
-
-  .animate-fade-in {
-    animation: fade-in 0.6s ease-out forwards;
-  }
-
-  .animate-scale-in {
-    animation: scale-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-  }
-
-  .animate-slide-in-left {
-    animation: slide-in-left 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-  }
-
-  .animate-slide-in-right {
-    animation: slide-in-right 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-  }
-
-  .animation-delay-100 {
-    animation-delay: 100ms;
-  }
-
-  .animation-delay-200 {
-    animation-delay: 200ms;
-  }
-
-  .animation-delay-300 {
-    animation-delay: 300ms;
-  }
-
-  .animation-delay-400 {
-    animation-delay: 400ms;
-  }
-
-  .animation-delay-500 {
-    animation-delay: 500ms;
-  }
-
-  .animation-delay-600 {
-    animation-delay: 600ms;
+  /* Card Press Effect */
+  .card-press {
+    @apply transition-transform duration-200 active:scale-98 cursor-pointer;
   }
 
   /* Soft gradient border */
@@ -466,6 +437,53 @@
     width: 120px;
     height: 1px;
     background: linear-gradient(90deg, transparent, hsl(var(--border)), transparent);
+  }
+}
+
+
+@layer utilities {
+  .animate-fade-up {
+    animation: fade-up 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+
+  .animate-fade-in {
+    animation: fade-in 0.6s ease-out forwards;
+  }
+
+  .animate-scale-in {
+    animation: scale-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+
+  .animate-slide-in-left {
+    animation: slide-in-left 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+
+  .animate-slide-in-right {
+    animation: slide-in-right 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+
+  .animation-delay-100 {
+    animation-delay: 100ms;
+  }
+
+  .animation-delay-200 {
+    animation-delay: 200ms;
+  }
+
+  .animation-delay-300 {
+    animation-delay: 300ms;
+  }
+
+  .animation-delay-400 {
+    animation-delay: 400ms;
+  }
+
+  .animation-delay-500 {
+    animation-delay: 500ms;
+  }
+
+  .animation-delay-600 {
+    animation-delay: 600ms;
   }
 }
 
