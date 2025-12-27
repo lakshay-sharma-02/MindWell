@@ -111,7 +111,29 @@ export default function Checkout() {
             // await new Promise(resolve => setTimeout(resolve, 2000));
 
             if (bookingData) {
-                // Send booking email to admin
+                // 1. Save to Database
+                const { error: dbError } = await supabase.from('bookings').insert({
+                    customer_name: bookingData.name,
+                    customer_email: bookingData.email,
+                    customer_phone: bookingData.phone,
+                    session_type: bookingData.sessionType,
+                    format: bookingData.format,
+                    date: bookingData.date,
+                    time: bookingData.time,
+                    notes: bookingData.notes,
+                    status: 'confirmed',
+                    payment_method: paymentMethod,
+                    transaction_id: paymentMethod === 'qr' ? transactionId : 'CARD_MOCK'
+                });
+
+                if (dbError) {
+                    // Log error but generally proceed with email or alert user? 
+                    // Better to fail fast if DB fails, as that's the record.
+                    console.error("Database Insert Error:", dbError);
+                    throw new Error("Failed to save booking. Please try again or contact support.");
+                }
+
+                // 2. Send booking email to admin
                 const emailResult = await sendBookingForm({
                     name: bookingData.name,
                     email: bookingData.email,
@@ -129,7 +151,11 @@ export default function Checkout() {
 
                 if (!emailResult.success) {
                     const errorMsg = emailResult.error || "Unknown email error";
-                    throw new Error(`Payment recorded, but email failed: ${errorMsg}`);
+                    console.error("Email warning:", errorMsg);
+                    // We don't throw here strictly because DB save was successful, 
+                    // so the booking IS confirmed in backend. 
+                    // But we might want to warn the user or just log it.
+                    // For now, let's just proceed as "Success" UI will show.
                 }
             } else if (resourceData) {
                 // Insert into purchased_resources

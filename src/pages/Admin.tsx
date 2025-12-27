@@ -17,7 +17,9 @@ import {
   X,
   ShieldCheck
 } from "lucide-react";
+import { Calendar } from "lucide-react";
 import { BlogsManager } from "@/components/admin/BlogsManager";
+import { BookingsManager } from "@/components/admin/BookingsManager";
 import { PodcastsManager } from "@/components/admin/PodcastsManager";
 import { ResourcesManager } from "@/components/admin/ResourcesManager";
 import { TestimonialsManager } from "@/components/admin/TestimonialsManager";
@@ -55,6 +57,7 @@ const Admin = () => {
     { id: "community", label: "Community", icon: ShieldCheck },
     { id: "podcasts", label: "Podcasts", icon: Headphones },
     { id: "services", label: "Services", icon: Briefcase },
+    { id: "bookings", label: "Bookings", icon: Calendar },
     { id: "testimonials", label: "Testimonials", icon: MessageSquare }, // Reusing icon or change if needed
     { id: "faqs", label: "FAQs", icon: HelpCircle },
   ];
@@ -69,6 +72,7 @@ const Admin = () => {
       case "community": return <CommunityManager />;
       case "podcasts": return <PodcastsManager />;
       case "services": return <ServicesManager />;
+      case "bookings": return <BookingsManager />;
       case "testimonials": return <TestimonialsManager />;
       case "faqs": return <FaqsManager />;
       default: return <AdminOverview />;
