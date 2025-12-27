@@ -52,11 +52,11 @@ export default function Tools() {
                 <div className="container-wide">
                     <Tabs defaultValue="breathing" className="max-w-4xl mx-auto">
                         <TabsList className="grid w-full grid-cols-2 mb-12 p-1 bg-secondary/30 rounded-2xl">
-                            <TabsTrigger value="breathing" className="text-lg py-4 rounded-xl data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all duration-300">
+                            <TabsTrigger value="breathing" className="w-full flex items-center justify-center text-lg py-4 rounded-xl data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all duration-300">
                                 <Wind className="w-5 h-5 mr-2" />
                                 Breathing
                             </TabsTrigger>
-                            <TabsTrigger value="mood" className="text-lg py-4 rounded-xl data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all duration-300">
+                            <TabsTrigger value="mood" className="w-full flex items-center justify-center text-lg py-4 rounded-xl data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all duration-300">
                                 <PenTool className="w-5 h-5 mr-2" />
                                 Mood Journal
                             </TabsTrigger>
