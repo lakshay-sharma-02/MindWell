@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { createPortal } from "react-dom";
 import { Plus, Settings, Eye, EyeOff, LogOut, User, Shield, X, LayoutDashboard, FileText, Mic, BookOpen, MessageSquare, HelpCircle, Calendar } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/hooks/useAuth";
@@ -195,14 +196,14 @@ export function AdminFloatingPanel() {
     { type: "service" as const, label: "Service", icon: Settings, color: "text-rose-500" },
   ];
 
-  return (
+  return createPortal(
     <>
       {/* Floating Admin Button */}
       <motion.div
         initial={{ scale: 0, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ delay: 0.5, type: "spring" }}
-        className="fixed bottom-6 right-6 z-50"
+        className="fixed bottom-6 right-6 z-[100]" // Increased z-index
       >
         <AnimatePresence>
           {isExpanded && (
@@ -380,7 +381,8 @@ export function AdminFloatingPanel() {
       </Dialog>
 
 
-    </>
+    </>,
+    document.body
   );
 }
 
