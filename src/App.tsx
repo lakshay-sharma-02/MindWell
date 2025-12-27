@@ -1,4 +1,4 @@
-import { lazy, Suspense } from "react";
+import { Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { AuthPopup } from "@/components/auth/AuthPopup";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -11,27 +11,28 @@ import { AuthProvider, useAuth } from "@/hooks/useAuth";
 import { AnimatePresence, motion } from "framer-motion";
 import ScrollToTop from "@/components/utils/ScrollToTop";
 import { PageSkeleton } from "@/components/layout/PageSkeleton";
+import { lazyWithRetry } from "@/utils/lazyWithRetry";
 
-// Lazy load pages for performance
-const Index = lazy(() => import("./pages/Index"));
-const Blog = lazy(() => import("./pages/Blog"));
-const BlogPost = lazy(() => import("./pages/BlogPost"));
-const Podcasts = lazy(() => import("./pages/Podcasts"));
-const Resources = lazy(() => import("./pages/Resources"));
-const About = lazy(() => import("./pages/About"));
-const Book = lazy(() => import("./pages/Book"));
-const Contact = lazy(() => import("./pages/Contact"));
-const Quiz = lazy(() => import("./pages/Quiz"));
-const Services = lazy(() => import("./pages/Services"));
-const Auth = lazy(() => import("./pages/Auth"));
-const Admin = lazy(() => import("./pages/Admin"));
-const NotFound = lazy(() => import("./pages/NotFound"));
-const Checkout = lazy(() => import("./pages/Checkout"));
-const Stories = lazy(() => import("./pages/Stories"));
-const Profile = lazy(() => import("./pages/Profile"));
-const CommunitySupport = lazy(() => import("./pages/CommunitySupport"));
-const Dashboard = lazy(() => import("./pages/Dashboard"));
-const Tools = lazy(() => import("./pages/Tools"));
+// Lazy load pages for performance with retry logic
+const Index = lazyWithRetry(() => import("./pages/Index"));
+const Blog = lazyWithRetry(() => import("./pages/Blog"));
+const BlogPost = lazyWithRetry(() => import("./pages/BlogPost"));
+const Podcasts = lazyWithRetry(() => import("./pages/Podcasts"));
+const Resources = lazyWithRetry(() => import("./pages/Resources"));
+const About = lazyWithRetry(() => import("./pages/About"));
+const Book = lazyWithRetry(() => import("./pages/Book"));
+const Contact = lazyWithRetry(() => import("./pages/Contact"));
+const Quiz = lazyWithRetry(() => import("./pages/Quiz"));
+const Services = lazyWithRetry(() => import("./pages/Services"));
+const Auth = lazyWithRetry(() => import("./pages/Auth"));
+const Admin = lazyWithRetry(() => import("./pages/Admin"));
+const NotFound = lazyWithRetry(() => import("./pages/NotFound"));
+const Checkout = lazyWithRetry(() => import("./pages/Checkout"));
+const Stories = lazyWithRetry(() => import("./pages/Stories"));
+const Profile = lazyWithRetry(() => import("./pages/Profile"));
+const CommunitySupport = lazyWithRetry(() => import("./pages/CommunitySupport"));
+const Dashboard = lazyWithRetry(() => import("./pages/Dashboard"));
+const Tools = lazyWithRetry(() => import("./pages/Tools"));
 
 const queryClient = new QueryClient();
 
