@@ -7,7 +7,13 @@ import {
     LayoutDashboard,
     PenTool,
     Calendar,
-    Users
+    Users,
+    Sparkles,
+    Heart,
+    Library,
+    BookOpen,
+    Headphones,
+    MessageCircle
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -37,10 +43,46 @@ const steps = [
         path: "/tools"
     },
     {
+        title: "Wellness Assessment",
+        description: "Take a quick quiz to understand your emotional well-being and get personalized recommendations.",
+        icon: <Sparkles className="w-10 h-10 text-violet-500" />,
+        path: "/quiz"
+    },
+    {
+        title: "Professional Services",
+        description: "Explore our range of therapy services including CBT, EMDR, and couples therapy.",
+        icon: <Heart className="w-10 h-10 text-rose-500" />,
+        path: "/services"
+    },
+    {
         title: "Easy Booking",
         description: "Schedule sessions with our experts easily. Choose between virtual or in-person visits.",
         icon: <Calendar className="w-10 h-10 text-blue-500" />,
         path: "/book"
+    },
+    {
+        title: "Resource Library",
+        description: "Access our extensive collection of guides, worksheets, and exercises.",
+        icon: <Library className="w-10 h-10 text-cyan-500" />,
+        path: "/resources"
+    },
+    {
+        title: "Inspiring Stories",
+        description: "Read real stories of recovery and growth from our community members.",
+        icon: <MessageCircle className="w-10 h-10 text-emerald-500" />,
+        path: "/stories"
+    },
+    {
+        title: "Blog & Articles",
+        description: "Stay informed with the latest insights on mental health and wellness.",
+        icon: <BookOpen className="w-10 h-10 text-orange-500" />,
+        path: "/blog"
+    },
+    {
+        title: "Podcasts",
+        description: "Listen to expert conversations and guided sessions on the go.",
+        icon: <Headphones className="w-10 h-10 text-indigo-500" />,
+        path: "/podcasts"
     },
     {
         title: "Community",
