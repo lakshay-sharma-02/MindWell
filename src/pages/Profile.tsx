@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { LogOut, User, Settings, Save, Loader2, Heart, BookOpen, Package, ExternalLink } from "lucide-react";
+import { LogOut, User, Settings, Save, Loader2, Heart, BookOpen, Package, ExternalLink, Flame } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate, Link } from "react-router-dom";
 import { Tables } from "@/types/database";
@@ -212,6 +212,21 @@ export default function Profile() {
                                         </CardHeader>
                                         <CardContent>
                                             <p className="text-sm text-muted-foreground">Start discovering stories to track your journey.</p>
+                                        </CardContent>
+                                    </Card>
+                                    <Card className="bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-950/10 dark:to-amber-950/10 border-orange-200/50">
+                                        <CardHeader className="pb-2">
+                                            <CardDescription>Wellness Tools</CardDescription>
+                                            <CardTitle className="text-lg flex items-center gap-2">
+                                                <Flame className="w-5 h-5 text-orange-500" />
+                                                Worry Jar
+                                            </CardTitle>
+                                        </CardHeader>
+                                        <CardContent>
+                                            <p className="text-sm text-muted-foreground mb-4">Feeling overwhelmed? Let it go.</p>
+                                            <Button size="sm" className="w-full bg-orange-500 hover:bg-orange-600 text-white" asChild>
+                                                <Link to="/tools?tab=worry">Open Jar</Link>
+                                            </Button>
                                         </CardContent>
                                     </Card>
                                 </div>

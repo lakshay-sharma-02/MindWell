@@ -9,9 +9,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Wind, PenTool, Sparkles, Heart, Flame } from "lucide-react";
 import { GratitudeJournal } from "@/components/tools/GratitudeJournal";
 import { WorryJar } from "@/components/tools/WorryJar";
-import { ZenGarden } from "@/components/tools/ZenGarden";
+
+import { useSearchParams } from "react-router-dom";
 
 export default function Tools() {
+    const [searchParams] = useSearchParams();
+    const defaultTab = searchParams.get("tab") || "breathing";
+
     return (
         <Layout>
             <SEOHead
@@ -53,7 +57,7 @@ export default function Tools() {
             {/* Tools Section */}
             <section className="py-20 bg-background min-h-[60vh]">
                 <div className="container-wide">
-                    <Tabs defaultValue="breathing" className="max-w-4xl mx-auto">
+                    <Tabs defaultValue={defaultTab} className="max-w-4xl mx-auto">
                         <TabsList className="grid w-full grid-cols-1 md:grid-cols-3 mb-12 p-1 bg-secondary/30 rounded-2xl h-auto relative">
                             <TabsTrigger value="breathing" className="w-full flex items-center justify-center text-base md:text-lg py-3 md:py-4 rounded-xl data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all duration-300">
                                 <Wind className="w-5 h-5 mr-2" />
@@ -70,10 +74,6 @@ export default function Tools() {
                             <TabsTrigger value="worry" className="w-full flex items-center justify-center text-base md:text-lg py-3 md:py-4 rounded-xl data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all duration-300">
                                 <Flame className="w-5 h-5 mr-2" />
                                 Worry Jar
-                            </TabsTrigger>
-                            <TabsTrigger value="zen" className="w-full flex items-center justify-center text-base md:text-lg py-3 md:py-4 rounded-xl data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all duration-300">
-                                <Sparkles className="w-5 h-5 mr-2" />
-                                Zen Garden
                             </TabsTrigger>
                         </TabsList>
 
@@ -98,10 +98,6 @@ export default function Tools() {
 
                         <TabsContent value="worry" className="focus-visible:outline-none animate-in fade-in slide-in-from-bottom-4 duration-500">
                             <WorryJar />
-                        </TabsContent>
-
-                        <TabsContent value="zen" className="focus-visible:outline-none animate-in fade-in slide-in-from-bottom-4 duration-500">
-                            <ZenGarden />
                         </TabsContent>
                     </Tabs>
                 </div>
