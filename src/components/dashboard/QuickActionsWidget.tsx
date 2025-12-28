@@ -26,7 +26,7 @@ export function QuickActionsWidget() {
                         <Button
                             key={action.label}
                             variant="outline"
-                            className={`h-auto py-4 flex flex-col gap-2 items-center justify-center border-border/50 transition-colors ${action.bg}`}
+                            className={`h-auto py-4 flex flex-col gap-2 items-center justify-center border-border/50 transition-colors ${action.bg} ${action.label === "Sign Out" ? "col-span-2" : ""}`}
                             asChild
                         >
                             {action.onClick ? (
