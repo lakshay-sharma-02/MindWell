@@ -15,7 +15,7 @@
     --popover-foreground: 220 25% 12%;
 
     /* Deep forest teal - sophisticated primary */
-    --primary: 165 45% 35%;
+    --primary: 170 55% 32%;
     --primary-foreground: 45 30% 97%;
 
     /* Warm sand secondary */
@@ -26,10 +26,10 @@
     --muted-foreground: 220 15% 40%;
 
     /* Warm copper accent */
-    --accent: 18 60% 55%;
+    --accent: 18 45% 50%;
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 70% 50%;
+    --destructive: 350 65% 55%;
     --destructive-foreground: 0 0% 100%;
 
     --border: 38 20% 85%;
@@ -57,9 +57,10 @@
     --indigo: 235 45% 52%;
 
     /* Elegant shadows for light mode */
-    --shadow-soft: 0 2px 8px -2px hsl(220 25% 12% / 0.04), 0 4px 12px -4px hsl(220 25% 12% / 0.06);
-    --shadow-card: 0 4px 20px -4px hsl(220 25% 12% / 0.08), 0 8px 32px -8px hsl(220 25% 12% / 0.06);
-    --shadow-elevated: 0 12px 48px -12px hsl(220 25% 12% / 0.12), 0 20px 60px -20px hsl(220 25% 12% / 0.08);
+    /* Elegant tinted shadows for light mode (Teal based) */
+    --shadow-soft: 0 2px 8px -2px hsl(170 55% 10% / 0.04), 0 4px 12px -4px hsl(170 55% 10% / 0.06);
+    --shadow-card: 0 4px 20px -4px hsl(170 55% 10% / 0.08), 0 8px 32px -8px hsl(170 55% 10% / 0.06);
+    --shadow-elevated: 0 12px 48px -12px hsl(170 55% 10% / 0.12), 0 20px 60px -20px hsl(170 55% 10% / 0.08);
     --shadow-glow: 0 0 30px -6px hsl(165 45% 35% / 0.2);
     --shadow-glow-accent: 0 0 30px -6px hsl(18 60% 55% / 0.2);
 
@@ -79,34 +80,34 @@
   }
 
   .dark {
-    /* Deep, cozy dark theme - warm and inviting */
-    --background: 225 20% 9%;
+    /* Deep, cozy dark theme - warm forest vibe */
+    --background: 170 30% 8%;
     --foreground: 30 15% 92%;
 
-    --card: 225 18% 12%;
+    --card: 170 25% 12%;
     --card-foreground: 30 15% 92%;
 
-    --popover: 225 18% 12%;
+    --popover: 170 25% 12%;
     --popover-foreground: 30 15% 92%;
 
     /* Warmer, softer teal for dark mode */
-    --primary: 168 45% 52%;
+    --primary: 170 55% 50%;
     --primary-foreground: 225 20% 9%;
 
-    --secondary: 225 15% 16%;
+    --secondary: 170 20% 16%;
     --secondary-foreground: 30 15% 92%;
 
-    --muted: 225 15% 18%;
-    --muted-foreground: 30 10% 55%;
+    --muted: 170 20% 18%;
+    --muted-foreground: 30 12% 62%;
 
-    --accent: 20 65% 58%;
+    --accent: 20 50% 55%;
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 60% 50%;
+    --destructive: 350 60% 55%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 225 15% 18%;
-    --input: 225 15% 18%;
+    --border: 170 20% 22%;
+    --input: 170 20% 22%;
     --ring: 168 45% 52%;
 
     /* Dark mode extended palette */
