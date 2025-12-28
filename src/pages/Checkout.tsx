@@ -12,6 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { Loader2, Lock, CreditCard, ArrowRight, QrCode, Calendar } from "lucide-react";
 import { motion } from "framer-motion";
+import { QRCodeSVG } from "qrcode.react";
 import { sendBookingForm } from "@/lib/email";
 import { downloadICS, BookingEvent } from "@/lib/calendar";
 
@@ -467,12 +468,12 @@ export default function Checkout() {
                                             <CardDescription>Use any UPI app to scan and pay</CardDescription>
                                         </CardHeader>
                                         <CardContent className="flex flex-col items-center space-y-6 pb-6">
-                                            <div className="relative w-64 h-64 bg-white/5 rounded-xl border border-border flex items-center justify-center p-4">
-                                                <div className="absolute inset-0 bg-white/5 blur-xl -z-10" />
-                                                <img
-                                                    src="/payment-qr.jpg"
-                                                    alt="Payment QR Code"
-                                                    className="w-full h-full object-contain rounded-lg shadow-lg"
+                                            <div className="relative w-64 h-64 bg-white rounded-xl border border-border flex items-center justify-center p-4">
+                                                <QRCodeSVG
+                                                    value={`upi://pay?pa=sharmalakshay0208@oksbi&pn=Lakshay%20Sharma&am=${amount.toFixed(2)}&cu=INR`}
+                                                    size={220}
+                                                    level="H"
+                                                    includeMargin={true}
                                                 />
                                             </div>
                                             <div className="text-center space-y-1">
@@ -483,7 +484,7 @@ export default function Checkout() {
                                             </div>
                                             <div className="text-sm text-muted-foreground text-center max-w-xs">
                                                 <p>1. Scan the QR code with your UPI app</p>
-                                                <p>2. Complete the payment of <span className="text-primary font-bold">${amount.toFixed(2)}</span></p>
+                                                <p>2. The amount of <span className="text-primary font-bold">${amount.toFixed(2)}</span> will be pre-filled</p>
                                                 <p>3. Enter the transaction ID below</p>
                                             </div>
 
