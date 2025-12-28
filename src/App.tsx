@@ -12,6 +12,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import ScrollToTop from "@/components/utils/ScrollToTop";
 import { PageSkeleton } from "@/components/layout/PageSkeleton";
 import { lazyWithRetry } from "@/utils/lazyWithRetry";
+import { SmoothScroll } from "@/components/utils/SmoothScroll";
 
 // Lazy load pages for performance with retry logic
 const Index = lazyWithRetry(() => import("./pages/Index"));
@@ -97,6 +98,7 @@ const App = () => (
     <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
       <QueryClientProvider client={queryClient}>
         <BrowserRouter>
+          <SmoothScroll />
           <ScrollToTop />
           <AuthProvider>
             <TooltipProvider>
