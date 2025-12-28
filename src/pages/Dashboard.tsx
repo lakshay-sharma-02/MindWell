@@ -7,6 +7,7 @@ import { WelcomeWidget } from "@/components/dashboard/WelcomeWidget";
 import { MoodSummaryWidget } from "@/components/dashboard/MoodSummaryWidget";
 import { QuickActionsWidget } from "@/components/dashboard/QuickActionsWidget";
 import { RecommendedWidget } from "@/components/dashboard/RecommendedWidget";
+import { DailyAffirmationWidget } from "@/components/dashboard/DailyAffirmationWidget";
 import { useNavigate } from "react-router-dom";
 import { PageSkeleton } from "@/components/layout/PageSkeleton";
 import { supabase } from "@/integrations/supabase/client";
@@ -49,6 +50,8 @@ export default function Dashboard() {
                 <div className="max-w-6xl mx-auto space-y-6">
                     {/* Top Row: Welcome (Full Width) */}
                     <WelcomeWidget userName={profile?.full_name} />
+
+                    <DailyAffirmationWidget />
 
                     {/* Middle Row: Mood & Actions */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
