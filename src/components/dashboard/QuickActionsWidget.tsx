@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { Heart, Wind, PenTool, BookOpen, LogOut } from "lucide-react";
+import { Heart, Wind, PenTool, BookOpen, LogOut, Flame } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
 export function QuickActionsWidget() {
@@ -9,8 +9,9 @@ export function QuickActionsWidget() {
 
     const actions = [
         { label: "Mental Quiz", icon: Heart, href: "/quiz", color: "text-rose-500", bg: "hover:bg-rose-500/10" },
-        { label: "Breathe", icon: Wind, href: "/tools", color: "text-sky-500", bg: "hover:bg-sky-500/10" },
-        { label: "Journal", icon: PenTool, href: "/tools", color: "text-amber-500", bg: "hover:bg-amber-500/10" },
+        { label: "Breathe", icon: Wind, href: "/tools?tab=breathing", color: "text-sky-500", bg: "hover:bg-sky-500/10" },
+        { label: "Worry Jar", icon: Flame, href: "/tools?tab=worry", color: "text-orange-500", bg: "hover:bg-orange-500/10" },
+        { label: "Journal", icon: PenTool, href: "/tools?tab=gratitude", color: "text-amber-500", bg: "hover:bg-amber-500/10" },
         { label: "Sign Out", icon: LogOut, href: "#", onClick: signOut, color: "text-slate-500", bg: "hover:bg-slate-500/10" },
     ];
 
