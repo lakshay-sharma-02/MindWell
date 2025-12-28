@@ -8,6 +8,7 @@ import { WaveDivider } from "@/components/shared/WaveDivider";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Wind, PenTool, Sparkles, Heart } from "lucide-react";
 import { GratitudeJournal } from "@/components/tools/GratitudeJournal";
+import { WorryJar } from "@/components/tools/WorryJar";
 
 export default function Tools() {
     return (
@@ -65,6 +66,10 @@ export default function Tools() {
                                 <Heart className="w-5 h-5 mr-2" />
                                 Gratitude
                             </TabsTrigger>
+                            <TabsTrigger value="worry" className="w-full flex items-center justify-center text-base md:text-lg py-3 md:py-4 rounded-xl data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all duration-300">
+                                <Flame className="w-5 h-5 mr-2" />
+                                Worry Jar
+                            </TabsTrigger>
                         </TabsList>
 
 
@@ -84,6 +89,10 @@ export default function Tools() {
 
                         <TabsContent value="gratitude" className="focus-visible:outline-none animate-in fade-in slide-in-from-bottom-4 duration-500">
                             <GratitudeJournal />
+                        </TabsContent>
+
+                        <TabsContent value="worry" className="focus-visible:outline-none animate-in fade-in slide-in-from-bottom-4 duration-500">
+                            <WorryJar />
                         </TabsContent>
                     </Tabs>
                 </div>
