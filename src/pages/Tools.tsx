@@ -6,7 +6,7 @@ import { MoodTracker } from "@/components/tools/MoodTracker";
 import { motion } from "framer-motion";
 import { WaveDivider } from "@/components/shared/WaveDivider";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Wind, PenTool, Sparkles, Heart } from "lucide-react";
+import { Wind, PenTool, Sparkles, Heart, Flame } from "lucide-react";
 import { GratitudeJournal } from "@/components/tools/GratitudeJournal";
 import { WorryJar } from "@/components/tools/WorryJar";
 
