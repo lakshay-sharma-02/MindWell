@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Wind, PenTool, Sparkles, Heart, Flame } from "lucide-react";
 import { GratitudeJournal } from "@/components/tools/GratitudeJournal";
 import { WorryJar } from "@/components/tools/WorryJar";
+import { ZenGarden } from "@/components/tools/ZenGarden";
 
 export default function Tools() {
     return (
@@ -70,6 +71,10 @@ export default function Tools() {
                                 <Flame className="w-5 h-5 mr-2" />
                                 Worry Jar
                             </TabsTrigger>
+                            <TabsTrigger value="zen" className="w-full flex items-center justify-center text-base md:text-lg py-3 md:py-4 rounded-xl data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all duration-300">
+                                <Sparkles className="w-5 h-5 mr-2" />
+                                Zen Garden
+                            </TabsTrigger>
                         </TabsList>
 
 
@@ -93,6 +98,10 @@ export default function Tools() {
 
                         <TabsContent value="worry" className="focus-visible:outline-none animate-in fade-in slide-in-from-bottom-4 duration-500">
                             <WorryJar />
+                        </TabsContent>
+
+                        <TabsContent value="zen" className="focus-visible:outline-none animate-in fade-in slide-in-from-bottom-4 duration-500">
+                            <ZenGarden />
                         </TabsContent>
                     </Tabs>
                 </div>
