@@ -4,6 +4,7 @@ import { Heart, Mail, Phone, MapPin, ArrowRight, Instagram, Linkedin, Twitter, Y
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { useSiteSettings } from "@/hooks/useSiteSettings";
 import { sendNewsletterSubscription } from "@/lib/email";
 
 const footerLinks = {
@@ -25,17 +26,20 @@ const footerLinks = {
   ],
 };
 
-const socialLinks = [
-  { name: "Instagram", icon: Instagram, href: "#" },
-  { name: "LinkedIn", icon: Linkedin, href: "#" },
-  { name: "Twitter", icon: Twitter, href: "#" },
-  { name: "YouTube", icon: Youtube, href: "#" },
-];
 
 export function Footer() {
+  const { settings } = useSiteSettings();
   const [email, setEmail] = useState("");
   const [isSubscribing, setIsSubscribing] = useState(false);
   const { toast } = useToast();
+
+  const socialLinks = [
+    { name: "Instagram", icon: Instagram, href: settings.social_links.instagram },
+    { name: "LinkedIn", icon: Linkedin, href: settings.social_links.linkedin },
+    { name: "Twitter", icon: Twitter, href: settings.social_links.twitter },
+    // YouTube not in settings schema yet, keeping default or could add
+    { name: "YouTube", icon: Youtube, href: "#" },
+  ];
 
   const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -97,13 +101,13 @@ export function Footer() {
             {/* Contact Info */}
             <div className="space-y-3 mb-6">
               <a
-                href="mailto:hello@mindwell.com"
+                href={`mailto:${settings.global_info.contact_email}`}
                 className="flex items-center gap-3 text-sm text-muted-foreground hover:text-primary transition-colors group"
               >
                 <div className="w-9 h-9 rounded-xl bg-card dark:bg-secondary/50 border border-border/50 flex items-center justify-center group-hover:border-primary/30 group-hover:bg-primary/5 transition-all">
                   <Mail className="w-4 h-4" />
                 </div>
-                hello@mindwell.com
+                {settings.global_info.contact_email}
               </a>
               <a
                 href="tel:+1234567890"

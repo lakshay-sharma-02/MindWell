@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from "@/integrations/supabase/client";
+import { useSiteSettings } from "@/hooks/useSiteSettings";
 
 const authSchema = z.object({
   email: z.string().trim().email({ message: "Please enter a valid email address" }),
@@ -27,6 +28,7 @@ export function AuthPopup() {
 
   const { toast } = useToast();
   const { user, signIn, signUp, loading } = useAuth();
+  const { settings } = useSiteSettings();
 
   useEffect(() => {
     // Show popup if user is not logged in
@@ -59,6 +61,15 @@ export function AuthPopup() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!isLogin && !settings.features.registration_enabled) {
+      toast({
+        title: "Registration Disabled",
+        description: "New user registration is currently turned off.",
+        variant: "destructive"
+      });
+      return;
+    }
 
     if (!validateForm()) return;
 
@@ -240,19 +251,32 @@ export function AuthPopup() {
 
           {/* Toggle */}
           <div className="mt-6 text-center">
-            <p className="text-muted-foreground">
-              {isLogin ? "Don't have an account?" : "Already have an account?"}
-              <button
-                type="button"
-                onClick={() => {
-                  setIsLogin(!isLogin);
-                  setErrors({});
-                }}
-                className="ml-2 text-primary hover:underline font-medium"
-              >
-                {isLogin ? 'Sign up' : 'Sign in'}
-              </button>
-            </p>
+            {settings.features.registration_enabled ? (
+              <p className="text-muted-foreground">
+                {isLogin ? "Don't have an account?" : "Already have an account?"}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsLogin(!isLogin);
+                    setErrors({});
+                  }}
+                  className="ml-2 text-primary hover:underline font-medium"
+                >
+                  {isLogin ? 'Sign up' : 'Sign in'}
+                </button>
+              </p>
+            ) : (
+              isLogin ? null : (
+                <p className="text-muted-foreground text-sm">
+                  Registration is currently closed. <button onClick={() => setIsLogin(true)} className="text-primary hover:underline">Back to Login</button>
+                </p>
+              )
+            )}
+            {!isLogin && !settings.features.registration_enabled && (
+              <div className="mt-2 text-amber-500 text-sm">
+                New registrations are temporarily disabled.
+              </div>
+            )}
           </div>
         </div>
       </DialogContent>

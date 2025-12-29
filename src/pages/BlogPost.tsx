@@ -13,6 +13,7 @@ import { BlogCard } from "@/components/blog/BlogCard";
 import { CommentSection } from "@/components/shared/CommentSection";
 import { SocialShare } from "@/components/shared/SocialShare";
 import { useAuth } from "@/hooks/useAuth";
+import { useSiteSettings } from "@/hooks/useSiteSettings";
 
 type Blog = Tables<"blogs">;
 
@@ -29,6 +30,7 @@ const categoryColors: Record<string, string> = {
 const BlogPost = () => {
   const { slug } = useParams<{ slug: string }>();
   const { user } = useAuth();
+  const { settings } = useSiteSettings();
   const [post, setPost] = useState<Blog | null>(null);
   const [relatedPosts, setRelatedPosts] = useState<Blog[]>([]);
   const [loading, setLoading] = useState(true);
@@ -389,8 +391,8 @@ const BlogPost = () => {
                   onClick={handleLike}
                   disabled={likeLoading}
                   className={`flex items-center gap-2 px-6 py-3 rounded-full transition-colors ${isLiked
-                      ? "bg-rose-500 text-white hover:bg-rose-600 shadow-md shadow-rose-500/20"
-                      : "bg-rose-500/10 text-rose-500 hover:bg-rose-500/20"
+                    ? "bg-rose-500 text-white hover:bg-rose-600 shadow-md shadow-rose-500/20"
+                    : "bg-rose-500/10 text-rose-500 hover:bg-rose-500/20"
                     }`}
                 >
                   <Heart className={`w-5 h-5 ${isLiked ? "fill-current" : ""}`} />
@@ -403,9 +405,11 @@ const BlogPost = () => {
           </motion.div>
 
           {/* Comments */}
-          <section className="mt-16" id="comments">
-            <CommentSection postId={post.id} postType="blog" />
-          </section>
+          {settings.features.blog_comments && (
+            <section className="mt-16" id="comments">
+              <CommentSection postId={post.id} postType="blog" />
+            </section>
+          )}
         </div>
 
         {/* Related Posts */}
