@@ -8,11 +8,11 @@ export function QuickActionsWidget() {
     const { signOut } = useAuth();
 
     const actions = [
-        { label: "Mental Quiz", icon: Heart, href: "/quiz", color: "text-rose-500", bg: "hover:bg-rose-500/10" },
-        { label: "Breathe", icon: Wind, href: "/tools?tab=breathing", color: "text-sky-500", bg: "hover:bg-sky-500/10" },
-        { label: "Worry Jar", icon: Flame, href: "/tools?tab=worry", color: "text-orange-500", bg: "hover:bg-orange-500/10" },
-        { label: "Journal", icon: PenTool, href: "/tools?tab=gratitude", color: "text-amber-500", bg: "hover:bg-amber-500/10" },
-        { label: "Sign Out", icon: LogOut, href: "#", onClick: signOut, color: "text-slate-500", bg: "hover:bg-slate-500/10" },
+        { label: "Mental Quiz", icon: Heart, href: "/quiz", color: "text-terracotta", bg: "hover:bg-terracotta/10" },
+        { label: "Breathe", icon: Wind, href: "/tools?tab=breathing", color: "text-sage", bg: "hover:bg-sage/10" },
+        { label: "Worry Jar", icon: Flame, href: "/tools?tab=worry", color: "text-accent", bg: "hover:bg-accent/10" },
+        { label: "Journal", icon: PenTool, href: "/tools?tab=gratitude", color: "text-primary", bg: "hover:bg-primary/10" },
+        { label: "Sign Out", icon: LogOut, href: "#", onClick: signOut, color: "text-muted-foreground", bg: "hover:bg-muted/50" },
     ];
 
     return (

@@ -39,55 +39,55 @@ const steps = [
     {
         title: "Wellness Tools",
         description: "Discover our Gratitude Journal, Mood Tracker, and other tools designed to support your journey.",
-        icon: <PenTool className="w-10 h-10 text-amber-500" />,
+        icon: <PenTool className="w-10 h-10 text-accent" />,
         path: "/tools"
     },
     {
         title: "Wellness Assessment",
         description: "Take a quick quiz to understand your emotional well-being and get personalized recommendations.",
-        icon: <Sparkles className="w-10 h-10 text-violet-500" />,
+        icon: <Sparkles className="w-10 h-10 text-terracotta" />,
         path: "/quiz"
     },
     {
         title: "Professional Services",
         description: "Explore our range of therapy services including CBT, EMDR, and couples therapy.",
-        icon: <Heart className="w-10 h-10 text-rose-500" />,
+        icon: <Heart className="w-10 h-10 text-terracotta" />,
         path: "/services"
     },
     {
         title: "Easy Booking",
         description: "Schedule sessions with our experts easily. Choose between virtual or in-person visits.",
-        icon: <Calendar className="w-10 h-10 text-blue-500" />,
+        icon: <Calendar className="w-10 h-10 text-primary" />,
         path: "/book"
     },
     {
         title: "Resource Library",
         description: "Access our extensive collection of guides, worksheets, and exercises.",
-        icon: <Library className="w-10 h-10 text-cyan-500" />,
+        icon: <Library className="w-10 h-10 text-sage" />,
         path: "/resources"
     },
     {
         title: "Inspiring Stories",
         description: "Read real stories of recovery and growth from our community members.",
-        icon: <MessageCircle className="w-10 h-10 text-emerald-500" />,
+        icon: <MessageCircle className="w-10 h-10 text-sage-dark" />,
         path: "/stories"
     },
     {
         title: "Blog & Articles",
         description: "Stay informed with the latest insights on mental health and wellness.",
-        icon: <BookOpen className="w-10 h-10 text-orange-500" />,
+        icon: <BookOpen className="w-10 h-10 text-accent" />,
         path: "/blog"
     },
     {
         title: "Podcasts",
         description: "Listen to expert conversations and guided sessions on the go.",
-        icon: <Headphones className="w-10 h-10 text-indigo-500" />,
+        icon: <Headphones className="w-10 h-10 text-primary" />,
         path: "/podcasts"
     },
     {
         title: "Community",
         description: "You're not alone. Join our supportive community to share and heal together.",
-        icon: <Users className="w-10 h-10 text-purple-500" />,
+        icon: <Users className="w-10 h-10 text-terracotta" />,
         path: "/community"
     }
 ];
