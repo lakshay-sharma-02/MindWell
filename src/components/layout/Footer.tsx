@@ -238,22 +238,23 @@ export function Footer() {
         {/* Bottom */}
         <div className="mt-16 pt-8 border-t border-border/50">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            © {new Date().getFullYear()} {settings.global_info.title}. All rights reserved.
-          </p>
-          <div className="flex flex-wrap justify-center gap-6">
-            {footerLinks.legal.map((link) => (
-              <Link
-                key={link.name}
-                to={link.href}
-                className="text-sm text-muted-foreground hover:text-primary transition-colors"
-              >
-                {link.name}
-              </Link>
-            ))}
+            <p className="text-sm text-muted-foreground text-center md:text-left">
+              © {new Date().getFullYear()} {settings.global_info.title}. All rights reserved.
+            </p>
+            <div className="flex flex-wrap justify-center gap-6">
+              {footerLinks.legal.map((link) => (
+                <Link
+                  key={link.name}
+                  to={link.href}
+                  className="text-sm text-muted-foreground hover:text-primary transition-colors"
+                >
+                  {link.name}
+                </Link>
+              ))}
+            </div>
           </div>
         </div>
       </div>
-    </div>
-    </footer >
+    </footer>
   );
 }
