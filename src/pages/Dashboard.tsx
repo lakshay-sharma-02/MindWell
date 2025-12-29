@@ -12,6 +12,8 @@ import { useNavigate } from "react-router-dom";
 import { PageSkeleton } from "@/components/layout/PageSkeleton";
 import { supabase } from "@/integrations/supabase/client";
 
+import { m } from "framer-motion";
+
 export default function Dashboard() {
     const { user, loading } = useAuth();
     const navigate = useNavigate();
@@ -39,6 +41,21 @@ export default function Dashboard() {
         return <PageSkeleton />;
     }
 
+    const container = {
+        hidden: { opacity: 0 },
+        show: {
+            opacity: 1,
+            transition: {
+                staggerChildren: 0.1
+            }
+        }
+    };
+
+    const item = {
+        hidden: { opacity: 0, y: 20 },
+        show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
+    };
+
     return (
         <Layout>
             <SEOHead
@@ -47,27 +64,36 @@ export default function Dashboard() {
             />
 
             <div className="container-wide py-24 min-h-screen bg-secondary/5">
-                <div className="max-w-6xl mx-auto space-y-6">
+                <m.div
+                    className="max-w-6xl mx-auto space-y-6"
+                    variants={container}
+                    initial="hidden"
+                    animate="show"
+                >
                     {/* Top Row: Welcome (Full Width) */}
-                    <WelcomeWidget userName={profile?.full_name} />
+                    <m.div variants={item}>
+                        <WelcomeWidget userName={profile?.full_name} />
+                    </m.div>
 
-                    <DailyAffirmationWidget />
+                    <m.div variants={item}>
+                        <DailyAffirmationWidget />
+                    </m.div>
 
                     {/* Middle Row: Mood & Actions */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div className="md:col-span-2 h-[300px]">
+                        <m.div variants={item} className="md:col-span-2 h-[300px]">
                             <MoodSummaryWidget userId={user.id} />
-                        </div>
-                        <div className="h-auto">
+                        </m.div>
+                        <m.div variants={item} className="h-auto">
                             <QuickActionsWidget />
-                        </div>
+                        </m.div>
                     </div>
 
                     {/* Bottom Row: Recommendations */}
-                    <div className="pt-2">
+                    <m.div variants={item} className="pt-2">
                         <RecommendedWidget />
-                    </div>
-                </div>
+                    </m.div>
+                </m.div>
             </div>
         </Layout>
     );
