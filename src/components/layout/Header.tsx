@@ -245,11 +245,17 @@ export function Header({ onSearchClick }: HeaderProps) {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.3, ease: "easeInOut" }}
+              transition={{ duration: 0.4, ease: [0.32, 0.72, 0, 1] }}
               className="lg:hidden overflow-hidden border-t border-border/50"
+              drag="y"
+              dragConstraints={{ top: 0, bottom: 0 }}
+              dragElastic={0.2}
+              onDragEnd={(_, info) => {
+                if (info.offset.y < -50) setMobileMenuOpen(false);
+              }}
             >
               <motion.div
-                className="py-4 space-y-1"
+                className="py-6 space-y-2" // Increased vertical padding
                 initial={{ y: -10 }}
                 animate={{ y: 0 }}
                 exit={{ y: -10 }}
@@ -258,19 +264,19 @@ export function Header({ onSearchClick }: HeaderProps) {
                   if (item.items) {
                     return (
                       <Collapsible key={item.name} className="w-full">
-                        <CollapsibleTrigger className="flex w-full items-center justify-between px-4 py-3 text-base font-medium text-muted-foreground hover:text-foreground hover:bg-secondary/60 rounded-xl transition-colors [&[data-state=open]>svg]:rotate-180">
+                        <CollapsibleTrigger className="flex w-full items-center justify-between px-6 py-4 text-base font-medium text-muted-foreground hover:text-foreground hover:bg-secondary/60 active:bg-secondary/80 rounded-xl transition-colors [&[data-state=open]>svg]:rotate-180">
                           {item.name}
-                          <ChevronDown className="h-4 w-4 transition-transform duration-200" />
+                          <ChevronDown className="h-5 w-5 transition-transform duration-200" />
                         </CollapsibleTrigger>
-                        <CollapsibleContent className="space-y-1">
+                        <CollapsibleContent className="space-y-1 pt-1 pb-2">
                           {item.items.map((subItem) => (
                             <Link
                               key={subItem.name}
                               to={subItem.href}
                               onClick={() => setMobileMenuOpen(false)}
-                              className={`block px-4 py-2.5 mx-2 rounded-xl text-sm font-medium transition-colors pl-8 ${isActive(subItem.href)
+                              className={`block px-6 py-3.5 mx-2 rounded-xl text-sm font-medium transition-colors pl-8 ${isActive(subItem.href)
                                 ? "bg-primary/10 text-primary"
-                                : "text-muted-foreground hover:text-foreground hover:bg-secondary/60"
+                                : "text-muted-foreground hover:text-foreground hover:bg-secondary/60 active:bg-secondary/80"
                                 }`}
                             >
                               {subItem.name}
@@ -291,9 +297,9 @@ export function Header({ onSearchClick }: HeaderProps) {
                       <Link
                         to={item.href}
                         onClick={() => setMobileMenuOpen(false)}
-                        className={`block px-4 py-3 rounded-xl text-base font-medium transition-colors ${isActive(item.href)
+                        className={`block px-6 py-4 rounded-xl text-base font-medium transition-colors ${isActive(item.href)
                           ? "bg-primary/10 text-primary"
-                          : "text-muted-foreground hover:text-foreground hover:bg-secondary/60"
+                          : "text-muted-foreground hover:text-foreground hover:bg-secondary/60 active:bg-secondary/80"
                           }`}
                       >
                         {item.name}
@@ -302,28 +308,28 @@ export function Header({ onSearchClick }: HeaderProps) {
                   );
                 })}
 
-                <div className="border-t border-border/50 my-4 pt-4 mx-4">
+                <div className="border-t border-border/50 my-6 pt-6 mx-6">
                   {user ? (
                     <Button
                       variant="ghost"
-                      className="w-full justify-start gap-2 bg-primary/10 text-primary font-semibold hover:bg-primary/20 hover:text-primary border border-primary/20"
+                      className="w-full justify-start gap-2 bg-primary/10 text-primary font-semibold hover:bg-primary/20 hover:text-primary border border-primary/20 h-12 text-base"
                       asChild
                     >
                       <Link to="/dashboard" onClick={() => setMobileMenuOpen(false)}>
-                        <User className="w-4 h-4" />
+                        <User className="w-5 h-5" />
                         Dashboard
                       </Link>
                     </Button>
                   ) : (
-                    <Button variant="outline" className="w-full justify-start gap-2 border-primary/20 hover:bg-primary/5" asChild>
+                    <Button variant="outline" className="w-full justify-start gap-2 border-primary/20 hover:bg-primary/5 h-12 text-base" asChild>
                       <Link to="/auth" onClick={() => setMobileMenuOpen(false)}>
-                        <User className="w-4 h-4" />
+                        <User className="w-5 h-5" />
                         Sign In
                       </Link>
                     </Button>
                   )}
 
-                  <Button variant="default" className="w-full btn-glow mt-3" asChild>
+                  <Button variant="default" className="w-full btn-glow mt-4 h-12 text-base" asChild>
                     <Link to="/book" onClick={() => setMobileMenuOpen(false)}>
                       Book a Session
                     </Link>
