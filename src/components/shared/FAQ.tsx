@@ -1,14 +1,16 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Minus, Pencil, Trash2 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { Plus, Minus, Pencil, Trash2, Loader2 } from "lucide-react";
+import { useState, useEffect, lazy, Suspense } from "react";
 import { faqData, FAQItem } from "@/data/faq";
 import { supabase } from "@/integrations/supabase/client";
 import { useAdminEdit } from "@/hooks/useAdminEdit";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
-import { FaqForm } from "@/components/admin/forms/FaqForm";
 import { getErrorMessage } from "@/lib/getErrorMessage";
+import { SectionErrorBoundary } from "@/components/shared/SectionErrorBoundary";
+
+const FaqForm = lazy(() => import("@/components/admin/forms/FaqForm").then(module => ({ default: module.FaqForm })));
 
 interface FAQProps {
   items?: FAQItem[];
@@ -114,108 +116,112 @@ export function FAQ({
     }
   };
 
+  const handleEdit = (item: ExtendedFAQItem) => {
+    setEditingItem(item);
+  };
+
   return (
-    <section className="section-padding bg-secondary/30 relative">
-      <div className="container-wide relative">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center mb-12 relative"
-        >
-          {isEditMode && (
-            <div className="absolute top-0 right-0">
-              <Button onClick={() => setIsAdding(true)} size="sm" className="gap-2">
-                <Plus className="w-4 h-4" /> Add FAQ
-              </Button>
-            </div>
-          )}
+    <SectionErrorBoundary name="FAQ">
+      <section className="section-padding bg-background relative overflow-hidden">
+        <div className="container-narrow relative">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-12"
+          >
+            {isEditMode && (
+              <div className="absolute top-0 right-0"> {/* This div was moved and modified */}
+                <Button onClick={() => setIsAdding(true)} size="sm" className="gap-2">
+                  <Plus className="w-4 h-4" /> Add FAQ
+                </Button>
+              </div>
+            )}
 
-          <h2 className="font-display text-3xl md:text-4xl font-semibold text-foreground mb-4">
-            {title}
-          </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            {subtitle}
-          </p>
-        </motion.div>
+            {title && <h2 className="text-3xl md:text-4xl font-bold mb-4 gradient-text">{title}</h2>}
+            {subtitle && <p className="text-muted-foreground max-w-2xl mx-auto">{subtitle}</p>}
+          </motion.div>
 
-        <div className="max-w-3xl mx-auto space-y-4">
-          <AnimatePresence>
-            {displayItems.map((item, index) => (
-              <motion.div
-                key={item.id || index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                exit={{ opacity: 0, height: 0 }}
-                transition={{ delay: index * 0.05 }}
-              >
-                <button
-                  onClick={() => setOpenIndex(openIndex === index ? null : index)}
-                  className="w-full text-left p-6 rounded-2xl bg-card shadow-soft hover:shadow-card transition-all group relative"
+          <div className="space-y-4">
+            <AnimatePresence>
+              {displayItems.map((item, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.1 }}
+                  className="border border-border/50 rounded-xl overflow-hidden bg-card/50 backdrop-blur-sm hover:border-primary/20 transition-all duration-300"
                 >
-                  <div className="flex items-center justify-between gap-4">
-                    <h3 className="font-display text-lg font-medium text-foreground pr-8 flex-1">
-                      {item.question}
-                    </h3>
+                  <div
+                    onClick={() => setOpenIndex(openIndex === index ? -1 : index)}
+                    className="flex items-center justify-between w-full p-6 text-left cursor-pointer"
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        setOpenIndex(openIndex === index ? -1 : index);
+                      }
+                    }}
+                  >
+                    <span className="font-semibold text-foreground text-lg">{item.question}</span>
 
                     <div className="flex items-center gap-2">
-                      {/* Edit Controls */}
                       {isEditMode && item.id && (
-                        <div className="flex gap-2 mr-2" onClick={(e) => e.stopPropagation()}>
-                          <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground hover:text-primary" onClick={() => setEditingItem(item)}>
-                            <Pencil className="w-4 h-4" />
+                        <div className="flex gap-1 mr-2" onClick={(e) => e.stopPropagation()}>
+                          <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => handleEdit(item)}>
+                            <Pencil className="w-4 h-4 text-muted-foreground hover:text-primary" />
                           </Button>
-                          <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground hover:text-destructive" onClick={(e) => handleDelete(item.id!, e)}>
-                            <Trash2 className="w-4 h-4" />
+                          <Button size="icon" variant="ghost" className="h-8 w-8" onClick={(e) => handleDelete(item.id!, e)}>
+                            <Trash2 className="w-4 h-4 text-muted-foreground hover:text-destructive" />
                           </Button>
                         </div>
                       )}
-
-                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                        {openIndex === index ? (
-                          <Minus className="w-4 h-4 text-primary" />
-                        ) : (
-                          <Plus className="w-4 h-4 text-primary" />
-                        )}
-                      </div>
+                      {openIndex === index ? (
+                        <Minus className="w-5 h-5 text-primary shrink-0" />
+                      ) : (
+                        <Plus className="w-5 h-5 text-muted-foreground shrink-0" />
+                      )}
                     </div>
                   </div>
-
-                  <motion.div
-                    initial={false}
-                    animate={{
-                      height: openIndex === index ? "auto" : 0,
-                      opacity: openIndex === index ? 1 : 0,
-                    }}
-                    transition={{ duration: 0.3 }}
-                    className="overflow-hidden"
-                  >
-                    <p className="text-muted-foreground mt-4 leading-relaxed">
-                      {item.answer}
-                    </p>
-                  </motion.div>
-                </button>
-              </motion.div>
-            ))}
-          </AnimatePresence>
+                  <AnimatePresence>
+                    {openIndex === index && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.3 }}
+                      >
+                        <div
+                          className="px-6 pb-6 text-muted-foreground leading-relaxed prose prose-sm dark:prose-invert max-w-none"
+                          dangerouslySetInnerHTML={{ __html: item.answer }}
+                        />
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </div>
         </div>
-      </div>
 
-      {/* Edit/Add Dialogs */}
-      <Dialog open={!!editingItem || isAdding} onOpenChange={(open) => { if (!open) { setEditingItem(null); setIsAdding(false); } }}>
-        <DialogContent className="max-w-lg">
-          <DialogHeader>
-            <DialogTitle>{editingItem ? "Edit FAQ" : "Add FAQ"}</DialogTitle>
-          </DialogHeader>
-          <FaqForm
-            initialData={editingItem}
-            onSubmit={handleSave}
-            isSubmitting={isSubmitting}
-            onCancel={() => { setEditingItem(null); setIsAdding(false); }}
-          />
-        </DialogContent>
-      </Dialog>
-    </section>
+        <Dialog open={!!editingItem || isAdding} onOpenChange={(open) => { if (!open) { setEditingItem(null); setIsAdding(false); } }}>
+          <DialogContent className="sm:max-w-[600px]">
+            <DialogHeader>
+              <DialogTitle>{editingItem ? "Edit FAQ" : "Add FAQ"}</DialogTitle>
+            </DialogHeader>
+            <Suspense fallback={<div className="flex justify-center p-8"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>}>
+              <FaqForm
+                initialData={editingItem}
+                onSubmit={handleSave}
+                isSubmitting={isSubmitting}
+                onCancel={() => { setEditingItem(null); setIsAdding(false); }}
+              />
+            </Suspense>
+          </DialogContent>
+        </Dialog>
+      </section>
+    </SectionErrorBoundary>
   );
 }
+

@@ -75,7 +75,7 @@ const services = [
 
 
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Tables } from "@/types/database";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
@@ -84,6 +84,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
+import { Plus, Loader2, Trash2 } from "lucide-react";
+import { SectionErrorBoundary } from "@/components/shared/SectionErrorBoundary";
+
+const ServiceForm = lazy(() => import("@/components/admin/forms/ServiceForm").then(module => ({ default: module.ServiceForm })));
 
 type Service = Tables<"booking_services">;
 
@@ -91,15 +95,11 @@ const Services = () => {
   const { isEditMode } = useAdminEdit();
   const [pricingPlans, setPricingPlans] = useState<Service[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  // CRUD State
   const [editingService, setEditingService] = useState<Service | null>(null);
-  const [formData, setFormData] = useState({
-    title: "",
-    duration: "",
-    price: "",
-    description: "",
-    features: "",
-    popular: false
-  });
+  const [isAdding, setIsAdding] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     fetchServices();
@@ -110,16 +110,12 @@ const Services = () => {
       const { data, error } = await supabase
         .from("booking_services")
         .select("*")
-        .order("price", { ascending: true }); // Order by price or creation
+        .order("price", { ascending: true });
 
       if (error) throw error;
 
-      // If data is empty (first run), might want to seed or just show empty. 
-      // For now, let's assume if empty we fallback to static or just show empty.
       if (data && data.length > 0) {
         setPricingPlans(data);
-      } else {
-        // Optional: Seed hardcoded if empty, but better to just respect DB
       }
     } catch (error) {
       console.error("Error loading services", error);
@@ -128,44 +124,62 @@ const Services = () => {
     }
   };
 
-  const handleEditClick = (service: Service) => {
-    setEditingService(service);
-    setFormData({
-      title: service.title,
-      duration: service.duration,
-      price: service.price,
-      description: service.description,
-      features: service.features ? service.features.join("\\n") : "",
-      popular: service.popular || false
-    });
-  };
-
-  const handleUpdate = async () => {
-    if (!editingService) return;
-
+  const handleSave = async (data: any) => {
+    setIsSubmitting(true);
     try {
-      const featuresArray = formData.features.split("\\n").filter(f => f.trim() !== "");
+      // Convert newline separated features back to array if needed
+      // ServiceForm passes string for features, we need array?
+      // Wait, ServiceForm passes `data.features` as string from Textarea.
+      // We need to split it.
+      const featuresArray = typeof data.features === 'string'
+        ? data.features.split("\n").filter((f: string) => f.trim() !== "")
+        : data.features;
 
-      const { error } = await supabase
-        .from("booking_services")
-        .update({
-          title: formData.title,
-          duration: formData.duration,
-          price: formData.price,
-          description: formData.description,
-          features: featuresArray,
-          popular: formData.popular
-        })
-        .eq("id", editingService.id);
+      const payload = {
+        title: data.title,
+        duration: data.duration,
+        price: data.price,
+        description: data.description,
+        features: featuresArray,
+        popular: data.popular
+      };
 
-      if (error) throw error;
+      if (editingService) {
+        const { error } = await supabase
+          .from("booking_services")
+          .update(payload)
+          .eq("id", editingService.id);
+        if (error) throw error;
+        toast.success("Service updated successfully!");
+      } else {
+        const { error } = await supabase
+          .from("booking_services")
+          .insert([payload]);
+        if (error) throw error;
+        toast.success("Service created successfully!");
+      }
 
-      toast.success("Service updated successfully!");
       setEditingService(null);
+      setIsAdding(false);
       fetchServices();
     } catch (error) {
-      console.error("Update failed:", error);
-      toast.error("Failed to update service");
+      console.error("Save failed:", error);
+      toast.error("Failed to save service");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this service?")) return;
+    try {
+      const { error } = await supabase.from("booking_services").delete().eq("id", id);
+      if (error) throw error;
+      toast.success("Service deleted successfully");
+      fetchServices();
+    } catch (error) {
+      console.error("Delete failed:", error);
+      toast.error("Failed to delete service");
     }
   };
 
@@ -354,164 +368,142 @@ const Services = () => {
       </section>
 
       {/* Pricing */}
-      <section id="pricing" className="section-padding bg-secondary/20">
-        <div className="container-wide">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mb-12"
-          >
-            <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-4">
-              Simple, Transparent Pricing
-            </h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              Invest in your wellbeing. All plans include our commitment to your growth.
-            </p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-            {pricingPlans.map((plan, index) => (
-              <motion.div
-                key={plan.id || plan.title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-                className={`relative bg-card rounded-2xl p-6 border transition-all duration-300 hover:shadow-card ${plan.popular
-                  ? "border-primary shadow-glow"
-                  : "border-border/50 hover:border-primary/30"
-                  }`}
-              >
-                {/* Visual Cue for Edit Mode */}
-                {isEditMode && (
-                  <div
-                    className="absolute -right-3 -top-3 z-20 cursor-pointer hover:scale-110 transition-transform"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      handleEditClick(plan);
-                    }}
-                  >
-                    <div className="bg-amber-500 text-white p-2 rounded-full shadow-lg">
-                      <Pencil className="w-4 h-4" />
-                    </div>
-                  </div>
-                )}
-                {plan.popular && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-primary text-primary-foreground text-xs font-medium">
-                    Most Popular
-                  </div>
-                )}
-
-                <div className="text-center mb-6">
-                  <h3 className="font-display text-xl font-semibold text-foreground mb-1">{plan.title}</h3>
-                  <p className="text-sm text-muted-foreground mb-4">{plan.duration}</p>
-                  <div className="flex items-baseline justify-center gap-1">
-                    <span className="text-4xl font-display font-bold text-foreground">{plan.price}</span>
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-2">{plan.description}</p>
+      <SectionErrorBoundary name="Services Pricing">
+        <section id="pricing" className="section-padding bg-secondary/20">
+          <div className="container-wide">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-center mb-12 relative"
+            >
+              {isEditMode && (
+                <div className="absolute top-0 right-0 z-10">
+                  <Button onClick={() => setIsAdding(true)} size="sm" className="gap-2">
+                    <Plus className="w-4 h-4" /> Add Service
+                  </Button>
                 </div>
+              )}
+              <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-4">
+                Simple, Transparent Pricing
+              </h2>
+              <p className="text-muted-foreground max-w-2xl mx-auto">
+                Invest in your wellbeing. All plans include our commitment to your growth.
+              </p>
+            </motion.div>
 
-                <ul className="space-y-3 mb-6">
-                  {(plan.features || []).map((feature) => (
-                    <li key={feature} className="flex items-center gap-2 text-sm">
-                      <Check className="w-4 h-4 text-primary flex-shrink-0" />
-                      <span className="text-muted-foreground">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-
-                <Button
-                  variant={plan.popular ? "default" : "outline"}
-                  className="w-full"
-                  asChild
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+              {pricingPlans.map((plan, index) => (
+                <motion.div
+                  key={plan.id || plan.title}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.1 }}
+                  className={`relative bg-card rounded-2xl p-6 transition-all duration-300 hover:shadow-card ${plan.popular
+                    ? "gradient-border pulse-glow shadow-glow border-transparent"
+                    : "border border-border/50 hover:border-primary/30"
+                    }`}
                 >
-                  <Link to="/book">Get Started</Link>
-                </Button>
-              </motion.div>
-            ))}
+                  {/* Visual Cue for Edit Mode */}
+                  {isEditMode && (
+                    <div className="absolute -right-3 -top-3 z-20 flex gap-1">
+                      <div
+                        className="cursor-pointer hover:scale-110 transition-transform bg-amber-500 text-white p-2 rounded-full shadow-lg"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setEditingService(plan);
+                        }}
+                      >
+                        <Pencil className="w-4 h-4" />
+                      </div>
+
+                      {plan.id && (
+                        <div
+                          className="cursor-pointer hover:scale-110 transition-transform bg-destructive text-white p-2 rounded-full shadow-lg"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            handleDelete(plan.id);
+                          }}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </div>
+                      )}
+                    </div>
+                  )}
+                  {plan.popular && (
+                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-primary text-primary-foreground text-xs font-medium">
+                      Most Popular
+                    </div>
+                  )}
+
+                  <div className="text-center mb-6">
+                    <h3 className="font-display text-xl font-semibold text-foreground mb-1">{plan.title}</h3>
+                    <p className="text-sm text-muted-foreground mb-4">{plan.duration}</p>
+                    <div className="flex items-baseline justify-center gap-1">
+                      <span className="text-4xl font-display font-bold text-foreground">{plan.price}</span>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-2">{plan.description}</p>
+                  </div>
+
+                  <ul className="space-y-3 mb-6">
+                    {(plan.features || []).map((feature) => (
+                      <li key={feature} className="flex items-center gap-2 text-sm">
+                        <Check className="w-4 h-4 text-primary flex-shrink-0" />
+                        <span className="text-muted-foreground">{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+
+                  <Button
+                    variant={plan.popular ? "default" : "outline"}
+                    className="w-full"
+                    asChild
+                  >
+                    <Link to="/book">Get Started</Link>
+                  </Button>
+                </motion.div>
+              ))}
+            </div>
+
+            {/* Edit/Add Dialog */}
+            <Dialog open={!!editingService || isAdding} onOpenChange={(open) => { if (!open) { setEditingService(null); setIsAdding(false); } }}>
+              <DialogContent className="sm:max-w-[600px]">
+                <DialogHeader>
+                  <DialogTitle>{editingService ? "Edit Service" : "Add Service"}</DialogTitle>
+                </DialogHeader>
+                <Suspense fallback={<div className="flex justify-center p-8"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>}>
+                  <ServiceForm
+                    initialData={editingService}
+                    onSubmit={handleSave}
+                    isSubmitting={isSubmitting}
+                    onCancel={() => { setEditingService(null); setIsAdding(false); }}
+                  />
+                </Suspense>
+              </DialogContent>
+            </Dialog>
+
+            {/* Trust indicators */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="flex flex-wrap justify-center gap-6 mt-12"
+            >
+              {[
+                { icon: Shield, text: "HIPAA Compliant" },
+                { icon: Video, text: "Secure Video Sessions" },
+                { icon: Clock, text: "Flexible Scheduling" }
+              ].map((item) => (
+                <div key={item.text} className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <item.icon className="w-4 h-4 text-primary" />
+                  {item.text}
+                </div>
+              ))}
+            </motion.div>
           </div>
-
-          {/* Edit Dialog */}
-          <Dialog open={!!editingService} onOpenChange={(open) => !open && setEditingService(null)}>
-            <DialogContent className="max-w-md">
-              <DialogHeader>
-                <DialogTitle>Edit Service</DialogTitle>
-              </DialogHeader>
-              <div className="space-y-4 py-4">
-                <div className="space-y-2">
-                  <Label>Title</Label>
-                  <Input
-                    value={formData.title}
-                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label>Price</Label>
-                    <Input
-                      value={formData.price}
-                      onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Duration</Label>
-                    <Input
-                      value={formData.duration}
-                      onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
-                    />
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <Label>Description</Label>
-                  <Textarea
-                    value={formData.description}
-                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>Features (one per line)</Label>
-                  <Textarea
-                    value={formData.features}
-                    onChange={(e) => setFormData({ ...formData, features: e.target.value })}
-                    rows={5}
-                  />
-                </div>
-                <div className="flex items-center gap-2">
-                  <Switch
-                    checked={formData.popular}
-                    onCheckedChange={(c) => setFormData({ ...formData, popular: c })}
-                  />
-                  <Label>Popular</Label>
-                </div>
-              </div>
-              <DialogFooter>
-                <Button variant="outline" onClick={() => setEditingService(null)}>Cancel</Button>
-                <Button onClick={handleUpdate}>Save Changes</Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-
-          {/* Trust indicators */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="flex flex-wrap justify-center gap-6 mt-12"
-          >
-            {[
-              { icon: Shield, text: "HIPAA Compliant" },
-              { icon: Video, text: "Secure Video Sessions" },
-              { icon: Clock, text: "Flexible Scheduling" }
-            ].map((item) => (
-              <div key={item.text} className="flex items-center gap-2 text-sm text-muted-foreground">
-                <item.icon className="w-4 h-4 text-primary" />
-                {item.text}
-              </div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
+        </section>
+      </SectionErrorBoundary>
 
       {/* CTA */}
       <section className="section-padding">

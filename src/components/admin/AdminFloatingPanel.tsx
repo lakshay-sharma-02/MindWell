@@ -14,9 +14,17 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { getErrorMessage } from "@/lib/getErrorMessage";
-import { SiteSettings } from "@/components/admin/SiteSettings";
-import { TestimonialForm } from "@/components/admin/forms/TestimonialForm";
-import { FaqForm } from "@/components/admin/forms/FaqForm";
+import { Loader2 } from "lucide-react";
+import { lazy, Suspense } from "react";
+
+// Lazy load admin components
+const SiteSettings = lazy(() => import("@/components/admin/SiteSettings").then(module => ({ default: module.SiteSettings })));
+const TestimonialForm = lazy(() => import("@/components/admin/forms/TestimonialForm").then(module => ({ default: module.TestimonialForm })));
+const FaqForm = lazy(() => import("@/components/admin/forms/FaqForm").then(module => ({ default: module.FaqForm })));
+const ServiceForm = lazy(() => import("@/components/admin/forms/ServiceForm").then(module => ({ default: module.ServiceForm })));
+const BlogForm = lazy(() => import("@/components/admin/forms/BlogForm").then(module => ({ default: module.BlogForm })));
+const PodcastForm = lazy(() => import("@/components/admin/forms/PodcastForm").then(module => ({ default: module.PodcastForm })));
+const ResourceForm = lazy(() => import("@/components/admin/forms/ResourceForm").then(module => ({ default: module.ResourceForm })));
 
 type ContentType = "blog" | "podcast" | "resource" | "testimonial" | "faq" | "service" | null;
 
@@ -158,15 +166,28 @@ export function AdminFloatingPanel() {
           break;
         case "service":
           table = "booking_services";
-          insertData = {
-            title: data.title,
-            duration: data.duration,
-            price: data.price,
-            description: data.description,
-            features: (data.features as string).split("\n").filter(f => f.trim() !== ""),
-            popular: data.popular ?? false,
-          };
+          // ServiceForm.tsx returns 'features' as string mostly unless I parsed it there?
+          // Wait, ServiceForm.tsx I wrote returns the `data` state which has features as string (Textarea).
+          // And in Services.tsx I parsed it.
+          // But here in AdminFloatingPanel I am doing raw insert.
+          // I need to parse features string to array here too if table expects array!
+          // Supabase 'booking_services' 'features' column is typically text[] or jsonb.
+          // Looking at AdminFloatingPanel original code (Step 1098 line 170):
+          // features: (data.features as string).split("\n").filter(f => f.trim() !== "")
           {
+            const featuresVal = typeof data.features === 'string'
+              ? data.features.split("\n").filter((f: string) => f.trim() !== "")
+              : data.features;
+
+            insertData = {
+              title: data.title,
+              duration: data.duration,
+              price: data.price,
+              description: data.description,
+              features: featuresVal,
+              popular: data.popular ?? false,
+            };
+
             const { error } = await supabase.from(table).insert(insertData);
             if (error) throw error;
           }
@@ -320,168 +341,45 @@ export function AdminFloatingPanel() {
         )}
       </motion.div>
 
-      {/* Add Content Dialogs */}
-      <Dialog open={addingType === "blog"} onOpenChange={() => setAddingType(null)}>
-        <DialogContent className="max-w-lg">
+      {/* Add Content Dialog (Unified) */}
+      <Dialog open={!!addingType} onOpenChange={(open) => !open && setAddingType(null)}>
+        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <FileText className="w-5 h-5 text-blue-500" />
-              Add New Blog Post
+              {addingType && (() => {
+                const item = contentTypes.find(ct => ct.type === addingType);
+                if (!item) return null;
+                const Icon = item.icon;
+                return <Icon className={`w-5 h-5 ${item.color}`} />;
+              })()}
+              Add New {addingType ? addingType.charAt(0).toUpperCase() + addingType.slice(1) : 'Item'}
             </DialogTitle>
           </DialogHeader>
-          <BlogForm onSubmit={(data) => handleQuickAdd("blog", data)} isSubmitting={isSubmitting} />
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={addingType === "podcast"} onOpenChange={() => setAddingType(null)}>
-        <DialogContent className="max-w-lg">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Mic className="w-5 h-5 text-purple-500" />
-              Add New Podcast
-            </DialogTitle>
-          </DialogHeader>
-          <PodcastForm onSubmit={(data) => handleQuickAdd("podcast", data)} isSubmitting={isSubmitting} />
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={addingType === "resource"} onOpenChange={() => setAddingType(null)}>
-        <DialogContent className="max-w-lg">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <BookOpen className="w-5 h-5 text-green-500" />
-              Add New Resource
-            </DialogTitle>
-          </DialogHeader>
-          <ResourceForm onSubmit={(data) => handleQuickAdd("resource", data)} isSubmitting={isSubmitting} />
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={addingType === "testimonial"} onOpenChange={() => setAddingType(null)}>
-        <DialogContent className="max-w-lg">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <MessageSquare className="w-5 h-5 text-amber-500" />
-              Add New Testimonial
-            </DialogTitle>
-          </DialogHeader>
-          <TestimonialForm onSubmit={(data) => handleQuickAdd("testimonial", data)} isSubmitting={isSubmitting} />
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={addingType === "faq"} onOpenChange={() => setAddingType(null)}>
-        <DialogContent className="max-w-lg">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <HelpCircle className="w-5 h-5 text-cyan-500" />
-              Add New FAQ
-            </DialogTitle>
-          </DialogHeader>
-          <FaqForm onSubmit={(data) => handleQuickAdd("faq", data)} isSubmitting={isSubmitting} />
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={addingType === "service"} onOpenChange={() => setAddingType(null)}>
-        <DialogContent className="max-w-lg">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Settings className="w-5 h-5 text-rose-500" />
-              Add New Service
-            </DialogTitle>
-          </DialogHeader>
-          <ServiceForm onSubmit={(data) => handleQuickAdd("service", data)} isSubmitting={isSubmitting} />
+          <Suspense fallback={<div className="flex justify-center p-8"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>}>
+            {addingType === "blog" && <BlogForm onSubmit={(data) => handleQuickAdd("blog", data)} isSubmitting={isSubmitting} />}
+            {addingType === "podcast" && <PodcastForm onSubmit={(data) => handleQuickAdd("podcast", data)} isSubmitting={isSubmitting} />}
+            {addingType === "resource" && <ResourceForm onSubmit={(data) => handleQuickAdd("resource", data)} isSubmitting={isSubmitting} />}
+            {addingType === "testimonial" && <TestimonialForm onSubmit={(data) => handleQuickAdd("testimonial", data)} isSubmitting={isSubmitting} />}
+            {addingType === "faq" && <FaqForm onSubmit={(data) => handleQuickAdd("faq", data)} isSubmitting={isSubmitting} />}
+            {addingType === "service" && <ServiceForm onSubmit={(data) => handleQuickAdd("service", data)} isSubmitting={isSubmitting} />}
+          </Suspense>
         </DialogContent>
       </Dialog>
 
       <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
-        <DialogContent className="max-w-4xl max-h-[85vh] overflow-y-auto">
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Global Site Settings</DialogTitle>
+            <DialogTitle>Site Settings</DialogTitle>
           </DialogHeader>
-          <div className="mt-4">
+          <Suspense fallback={<div className="flex justify-center p-8"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>}>
             <SiteSettings />
-          </div>
+          </Suspense>
         </DialogContent>
       </Dialog>
 
 
     </>,
     document.body
-  );
-}
-
-// Form Components are now imported from @/components/admin/forms/
-
-/* 
-  Note: ServiceForm, BlogForm, PodcastForm, ResourceForm should also be extracted 
-  to separate files in @/components/admin/forms/ for consistency, 
-  but for now we are reusing TestimonialForm and FaqForm as requested.
-  
-  I will keep the others here for now or extract them if I have time. 
-  Actually, to clean this file up, I should ideally extract all.
-  But I only created TestimonialForm and FaqForm.
-  
-  Let's replace the local TestimonialForm and FaqForm with imports.
-*/
-
-function BlogForm({ onSubmit, isSubmitting }: { onSubmit: (data: Record<string, unknown>) => void; isSubmitting: boolean }) {
-  const [data, setData] = useState({ title: "", excerpt: "", content: "", category: "General", author: "Admin", published: false });
-  return (
-    <form onSubmit={(e) => { e.preventDefault(); onSubmit(data); }} className="space-y-4">
-      <div><Label>Title</Label><Input value={data.title} onChange={(e) => setData({ ...data, title: e.target.value })} required /></div>
-      <div><Label>Category</Label><Input value={data.category} onChange={(e) => setData({ ...data, category: e.target.value })} /></div>
-      <div><Label>Author</Label><Input value={data.author} onChange={(e) => setData({ ...data, author: e.target.value })} /></div>
-      <div><Label>Excerpt</Label><Textarea value={data.excerpt} onChange={(e) => setData({ ...data, excerpt: e.target.value })} required /></div>
-      <div><Label>Content</Label><Textarea value={data.content} onChange={(e) => setData({ ...data, content: e.target.value })} rows={4} /></div>
-      <div className="flex items-center gap-2"><Switch checked={data.published} onCheckedChange={(v) => setData({ ...data, published: v })} /><Label>Publish immediately</Label></div>
-      <Button type="submit" disabled={isSubmitting} className="w-full">{isSubmitting ? "Creating..." : "Create Blog Post"}</Button>
-    </form>
-  );
-}
-
-function PodcastForm({ onSubmit, isSubmitting }: { onSubmit: (data: Record<string, unknown>) => void; isSubmitting: boolean }) {
-  const [data, setData] = useState({ title: "", description: "", guest_name: "", duration: "30:00", audio_url: "", published: false });
-  return (
-    <form onSubmit={(e) => { e.preventDefault(); onSubmit(data); }} className="space-y-4">
-      <div><Label>Title</Label><Input value={data.title} onChange={(e) => setData({ ...data, title: e.target.value })} required /></div>
-      <div><Label>Guest Name</Label><Input value={data.guest_name} onChange={(e) => setData({ ...data, guest_name: e.target.value })} /></div>
-      <div><Label>Duration</Label><Input value={data.duration} onChange={(e) => setData({ ...data, duration: e.target.value })} placeholder="30:00" /></div>
-      <div><Label>Audio URL</Label><Input value={data.audio_url} onChange={(e) => setData({ ...data, audio_url: e.target.value })} /></div>
-      <div><Label>Description</Label><Textarea value={data.description} onChange={(e) => setData({ ...data, description: e.target.value })} required /></div>
-      <div className="flex items-center gap-2"><Switch checked={data.published} onCheckedChange={(v) => setData({ ...data, published: v })} /><Label>Publish immediately</Label></div>
-      <Button type="submit" disabled={isSubmitting} className="w-full">{isSubmitting ? "Creating..." : "Create Podcast"}</Button>
-    </form>
-  );
-}
-
-function ResourceForm({ onSubmit, isSubmitting }: { onSubmit: (data: Record<string, unknown>) => void; isSubmitting: boolean }) {
-  const [data, setData] = useState({ title: "", description: "", type: "PDF Guide", download_url: "", published: false });
-  return (
-    <form onSubmit={(e) => { e.preventDefault(); onSubmit(data); }} className="space-y-4">
-      <div><Label>Title</Label><Input value={data.title} onChange={(e) => setData({ ...data, title: e.target.value })} required /></div>
-      <div><Label>Type</Label><Input value={data.type} onChange={(e) => setData({ ...data, type: e.target.value })} placeholder="PDF Guide, Video, etc." /></div>
-      <div><Label>Download URL</Label><Input value={data.download_url} onChange={(e) => setData({ ...data, download_url: e.target.value })} /></div>
-      <div><Label>Description</Label><Textarea value={data.description} onChange={(e) => setData({ ...data, description: e.target.value })} required /></div>
-      <div className="flex items-center gap-2"><Switch checked={data.published} onCheckedChange={(v) => setData({ ...data, published: v })} /><Label>Publish immediately</Label></div>
-      <Button type="submit" disabled={isSubmitting} className="w-full">{isSubmitting ? "Creating..." : "Create Resource"}</Button>
-    </form>
-  );
-}
-
-function ServiceForm({ onSubmit, isSubmitting }: { onSubmit: (data: Record<string, unknown>) => void; isSubmitting: boolean }) {
-  const [data, setData] = useState({ title: "", duration: "50 minutes", price: "$150", description: "", features: "", popular: false });
-  return (
-    <form onSubmit={(e) => { e.preventDefault(); onSubmit(data); }} className="space-y-4">
-      <div className="grid grid-cols-2 gap-4">
-        <div><Label>Title</Label><Input value={data.title} onChange={(e) => setData({ ...data, title: e.target.value })} required /></div>
-        <div><Label>Price</Label><Input value={data.price} onChange={(e) => setData({ ...data, price: e.target.value })} required /></div>
-      </div>
-      <div><Label>Duration</Label><Input value={data.duration} onChange={(e) => setData({ ...data, duration: e.target.value })} required /></div>
-      <div><Label>Description</Label><Textarea value={data.description} onChange={(e) => setData({ ...data, description: e.target.value })} required /></div>
-      <div><Label>Features (one per line)</Label><Textarea value={data.features} onChange={(e) => setData({ ...data, features: e.target.value })} rows={4} placeholder="Feature 1&#10;Feature 2" /></div>
-      <div className="flex items-center gap-2"><Switch checked={data.popular} onCheckedChange={(v) => setData({ ...data, popular: v })} /><Label>Mark as Popular</Label></div>
-      <Button type="submit" disabled={isSubmitting} className="w-full">{isSubmitting ? "Creating..." : "Create Service"}</Button>
-    </form>
   );
 }
 

@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { RichTextEditor } from "@/components/ui/RichTextEditor";
 
 interface FaqFormProps {
     initialData?: any;
@@ -58,13 +59,11 @@ export function FaqForm({ initialData, onSubmit, isSubmitting, onCancel }: FaqFo
                     onChange={(e) => setData({ ...data, sort_order: parseInt(e.target.value) })}
                 />
             </div>
-            <div>
-                <Label>Answer</Label>
-                <Textarea
+            <div className="space-y-2">
+                <Label htmlFor="answer">Answer</Label>
+                <RichTextEditor
                     value={data.answer}
-                    onChange={(e) => setData({ ...data, answer: e.target.value })}
-                    required
-                    rows={4}
+                    onChange={(value) => setData({ ...data, answer: value })}
                 />
             </div>
             <div className="flex items-center gap-2">

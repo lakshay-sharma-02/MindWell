@@ -73,9 +73,11 @@ export function Footer() {
   return (
     <footer className="relative overflow-hidden bg-secondary/40 dark:bg-card/60 border-t border-border/50">
       {/* Ambient background */}
-      <div className="absolute inset-0 pointer-events-none">
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div className="absolute bottom-0 left-1/4 w-[500px] h-[250px] bg-primary/5 rounded-full blur-[120px]" />
         <div className="absolute bottom-0 right-1/4 w-[400px] h-[200px] bg-accent/5 rounded-full blur-[100px]" />
+        {/* Alive Morph Blob */}
+        <div className="absolute -bottom-20 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-primary/5 rounded-full blur-[100px] morph opacity-20 pointer-events-none" />
       </div>
 
       <div className="container-wide relative py-16 lg:py-20">

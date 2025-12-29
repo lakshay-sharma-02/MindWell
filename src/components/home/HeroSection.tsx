@@ -128,7 +128,7 @@ export function HeroSection() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.15 }}
-            className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-foreground leading-[1.06] mb-6 tracking-tight"
+            className="font-display text-balance text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-foreground leading-[1.06] mb-6 tracking-tight"
           >
             {hero.title_line_1}
             <br />
@@ -147,7 +147,7 @@ export function HeroSection() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
-            className="text-lg md:text-xl text-muted-foreground leading-relaxed mb-12 max-w-2xl mx-auto"
+            className="text-lg md:text-xl text-balance text-muted-foreground leading-relaxed mb-12 max-w-2xl mx-auto"
           >
             {hero.description}
           </motion.p>
@@ -166,9 +166,9 @@ export function HeroSection() {
               </Link>
             </Button>
             <Button
-              variant="outline"
+              variant="ghost" 
               size="xl"
-              className="bg-card/60 backdrop-blur-sm border-border hover:bg-card hover:border-primary/30 group"
+              className="bg-primary/5 text-primary hover:bg-primary/10 border-none group"
               asChild
             >
               <Link to="/resources">

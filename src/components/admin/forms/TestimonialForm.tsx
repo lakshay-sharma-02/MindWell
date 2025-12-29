@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { RichTextEditor } from "@/components/ui/RichTextEditor";
 
 interface TestimonialFormProps {
     initialData?: any;
@@ -70,12 +71,11 @@ export function TestimonialForm({ initialData, onSubmit, isSubmitting, onCancel 
                     onChange={(e) => setData({ ...data, image_url: e.target.value })}
                 />
             </div>
-            <div>
-                <Label>Content</Label>
-                <Textarea
+            <div className="space-y-2">
+                <Label htmlFor="content">Content</Label>
+                <RichTextEditor
                     value={data.content}
-                    onChange={(e) => setData({ ...data, content: e.target.value })}
-                    required
+                    onChange={(value) => setData({ ...data, content: value })}
                 />
             </div>
             <div className="flex items-center gap-2">

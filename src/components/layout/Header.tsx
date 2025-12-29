@@ -154,8 +154,8 @@ export function Header({ onSearchClick }: HeaderProps) {
                           to={item.href}
                           className={cn(
                             navigationMenuTriggerStyle(),
-                            "bg-transparent hover:bg-secondary/50",
-                            isActive(item.href) && "text-primary bg-primary/5"
+                            "bg-transparent hover:bg-transparent animated-underline",
+                            isActive(item.href) && "text-primary font-medium"
                           )}
                         >
                           {item.name}

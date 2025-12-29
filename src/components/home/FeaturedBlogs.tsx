@@ -103,10 +103,10 @@ export function FeaturedBlogs() {
               <BookOpen className="w-4 h-4" />
               Latest Articles
             </motion.div>
-            <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-3">
+            <h2 className="font-display text-balance text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-3">
               Insights for Your Journey
             </h2>
-            <p className="text-muted-foreground max-w-lg">
+            <p className="text-muted-foreground max-w-lg text-balance">
               Evidence-based insights for your mental health journey, written with care.
             </p>
           </div>
