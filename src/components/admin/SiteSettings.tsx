@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Save, Globe, Settings, Share2, Loader2 } from "lucide-react";
 import { Json } from "@/types/database";
+import { hexToHsl, hslToHex } from "@/lib/utils";
 
 interface GlobalInfo {
     title: string;
@@ -16,6 +17,9 @@ interface GlobalInfo {
     contact_email: string;
     contact_phone: string;
     contact_address: string;
+    branding: {
+        primary_color: string;
+    };
 }
 
 interface Features {
@@ -40,6 +44,9 @@ export function SiteSettings() {
         contact_email: "",
         contact_phone: "",
         contact_address: "",
+        branding: {
+            primary_color: "170 55% 32%",
+        },
     });
 
     const [features, setFeatures] = useState<Features>({
@@ -194,8 +201,28 @@ export function SiteSettings() {
                                 id="contact-address"
                                 value={globalInfo.contact_address}
                                 onChange={(e) => setGlobalInfo(prev => ({ ...prev, contact_address: e.target.value }))}
-                                placeholder="San Francisco, CA"
                             />
+                        </div>
+                        <div className="grid gap-2">
+                            <Label htmlFor="primary-color">Primary Color</Label>
+                            <div className="flex items-center gap-4">
+                                <div className="h-10 w-20 rounded border border-input overflow-hidden relative">
+                                    <Input
+                                        id="primary-color"
+                                        type="color"
+                                        className="absolute inset-0 w-[150%] h-[150%] -top-[25%] -left-[25%] p-0 border-0 cursor-pointer"
+                                        value={hslToHex(globalInfo.branding?.primary_color)}
+                                        onChange={(e) => setGlobalInfo(prev => ({
+                                            ...prev,
+                                            branding: { ...prev.branding, primary_color: hexToHsl(e.target.value) }
+                                        }))}
+                                    />
+                                </div>
+                                <span className="text-sm text-muted-foreground font-mono">
+                                    {globalInfo.branding?.primary_color || "Default Teal"}
+                                </span>
+                            </div>
+                            <p className="text-xs text-muted-foreground">Select a brand color. It will be applied globally.</p>
                         </div>
                     </CardContent>
                 </Card>

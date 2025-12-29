@@ -2,6 +2,8 @@ import { motion } from "framer-motion";
 import { Plus, Minus } from "lucide-react";
 import { useState } from "react";
 import { faqData, FAQItem } from "@/data/faq";
+import { supabase } from "@/integrations/supabase/client";
+import { useEffect } from "react";
 
 interface FAQProps {
   items?: FAQItem[];
@@ -9,12 +11,43 @@ interface FAQProps {
   subtitle?: string;
 }
 
-export function FAQ({ 
-  items = faqData, 
+export function FAQ({
+  items = faqData,
   title = "Frequently Asked Questions",
   subtitle = "Everything you need to know before getting started."
 }: FAQProps) {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
+  const [displayItems, setDisplayItems] = useState<FAQItem[]>(items);
+
+  useEffect(() => {
+    // Only fetch if no custom items are passed and we are using default static data
+    if (items === faqData) {
+      fetchFaqs();
+    } else {
+      setDisplayItems(items);
+    }
+  }, [items]);
+
+  const fetchFaqs = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('faqs')
+        .select('*')
+        .eq('published', true)
+        .order('sort_order', { ascending: true });
+
+      if (error) throw error;
+
+      if (data && data.length > 0) {
+        setDisplayItems(data.map(f => ({
+          question: f.question,
+          answer: f.answer
+        })));
+      }
+    } catch (error) {
+      console.error('Error fetching FAQs:', error);
+    }
+  };
 
   return (
     <section className="section-padding bg-secondary/30">
@@ -34,7 +67,7 @@ export function FAQ({
         </motion.div>
 
         <div className="max-w-3xl mx-auto space-y-4">
-          {items.map((item, index) => (
+          {displayItems.map((item, index) => (
             <motion.div
               key={index}
               initial={{ opacity: 0, y: 20 }}
@@ -58,7 +91,7 @@ export function FAQ({
                     )}
                   </div>
                 </div>
-                
+
                 <motion.div
                   initial={false}
                   animate={{

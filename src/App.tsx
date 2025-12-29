@@ -1,4 +1,4 @@
-import { Suspense } from "react";
+import { Suspense, useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { AuthPopup } from "@/components/auth/AuthPopup";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -140,6 +140,15 @@ function AppContent() {
   const { settings, loading: settingsLoading } = useSiteSettings();
   const { user, isAdmin } = useAuth();
   const location = useLocation();
+
+  // Apply dynamic branding
+  useEffect(() => {
+    if (settings.global_info.branding?.primary_color) {
+      document.documentElement.style.setProperty('--primary', settings.global_info.branding.primary_color);
+      document.documentElement.style.setProperty('--ring', settings.global_info.branding.primary_color);
+      // Optional: Set ring color or others
+    }
+  }, [settings.global_info.branding]);
 
   // Show loading skeleton while settings load
   if (settingsLoading) return <PageSkeleton />;
