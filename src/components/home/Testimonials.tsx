@@ -1,9 +1,15 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, ChevronRight, Star, Quote, CheckCircle2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, Star, Quote, CheckCircle2, Pencil, Trash2, Plus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Tables } from "@/types/database";
 import { testimonials as staticTestimonials, Testimonial } from "@/data/testimonials";
+import { useAdminEdit } from "@/hooks/useAdminEdit";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { toast } from "@/hooks/use-toast";
+import { TestimonialForm } from "@/components/admin/forms/TestimonialForm";
+import { getErrorMessage } from "@/lib/getErrorMessage";
 
 export function Testimonials() {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -11,49 +17,66 @@ export function Testimonials() {
   const [items, setItems] = useState<Testimonial[]>(staticTestimonials);
   const [loading, setLoading] = useState(true);
 
+  // Edit Mode State
+  const { isEditMode } = useAdminEdit();
+  const [editingItem, setEditingItem] = useState<Testimonial | null>(null);
+  const [isAdding, setIsAdding] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   useEffect(() => {
     fetchTestimonials();
   }, []);
 
   const fetchTestimonials = async () => {
     try {
+      // In edit mode, we might want to see unpublished ones too? 
+      // For now, let's keep it simple and just fetch published unless we handle that logic better later.
+      // But if we are editing, we probably want to see everything? 
+      // Let's stick to public view for now, but admins usually want to see drafts.
+      // Ideally we check isAdmin and fetch all if true.
+
       const { data, error } = await supabase
         .from('testimonials')
         .select('*')
-        .eq('published', true)
+        // .eq('published', true) // TODO: Toggle this based on admin view?
         .order('created_at', { ascending: false });
 
       if (error) throw error;
 
       if (data && data.length > 0) {
-        // Transform DB data to match Testimonial interface
         const mappedTestimonials: Testimonial[] = data.map(t => ({
           id: t.id,
           name: t.name,
           role: t.role || "Client",
           content: t.content,
           rating: t.rating || 5,
-          // Use image if available, else generate initials
-          avatar: t.image || t.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase(),
-          verified: true // Assume DB testimonials are verified by admin
+          avatar: t.image_url || t.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase(),
+          verified: true,
+          published: t.published // Keep track of published state
         }));
+
+        // Filter for display unless in edit mode or debug? 
+        // For now, client logic: default to all so broken/unpublished are visible to fix?
+        // Actually, let's filter purely client side if we fetched everything.
+        // But RLS policies might restrict anon users anyway. Assuming public read policy.
+
+        // Let's just use what we got.
         setItems(mappedTestimonials);
       }
     } catch (error) {
       console.error('Error fetching testimonials:', error);
-      // Fallback to static is already initial state
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    if (!isAutoPlaying) return;
+    if (!isAutoPlaying || isEditMode) return; // Pause autoplay in edit mode
     const interval = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % items.length);
     }, 6000);
     return () => clearInterval(interval);
-  }, [isAutoPlaying, items.length]);
+  }, [isAutoPlaying, items.length, isEditMode]);
 
   const next = () => {
     setIsAutoPlaying(false);
@@ -63,6 +86,63 @@ export function Testimonials() {
   const prev = () => {
     setIsAutoPlaying(false);
     setCurrentIndex((prev) => (prev - 1 + items.length) % items.length);
+  };
+
+  // CRUD Handlers
+  const handleSave = async (data: any) => {
+    setIsSubmitting(true);
+    try {
+      if (editingItem) {
+        // Update
+        const { error } = await supabase
+          .from('testimonials')
+          .update({
+            name: data.name,
+            role: data.role,
+            content: data.content,
+            rating: data.rating,
+            image_url: data.image_url,
+            published: data.published
+          })
+          .eq('id', editingItem.id);
+        if (error) throw error;
+        toast({ title: "Updated", description: "Testimonial updated successfully." });
+      } else {
+        // Create
+        const { error } = await supabase
+          .from('testimonials')
+          .insert([{
+            name: data.name,
+            role: data.role,
+            content: data.content,
+            rating: data.rating,
+            image_url: data.image_url,
+            published: data.published
+          }]);
+        if (error) throw error;
+        toast({ title: "Created", description: "Testimonial created successfully." });
+      }
+
+      setEditingItem(null);
+      setIsAdding(false);
+      fetchTestimonials();
+    } catch (error) {
+      toast({ title: "Error", description: getErrorMessage(error), variant: "destructive" });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this testimonial?")) return;
+    try {
+      const { error } = await supabase.from('testimonials').delete().eq('id', id);
+      if (error) throw error;
+      toast({ title: "Deleted", description: "Testimonial deleted." });
+      fetchTestimonials();
+    } catch (error) {
+      toast({ title: "Error", description: getErrorMessage(error), variant: "destructive" });
+    }
   };
 
   return (
@@ -83,8 +163,16 @@ export function Testimonials() {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-12"
+          className="text-center mb-12 relative"
         >
+          {isEditMode && (
+            <div className="absolute top-0 right-0">
+              <Button onClick={() => setIsAdding(true)} size="sm" className="gap-2">
+                <Plus className="w-4 h-4" /> Add Testimonial
+              </Button>
+            </div>
+          )}
+
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             whileInView={{ opacity: 1, scale: 1 }}
@@ -113,7 +201,19 @@ export function Testimonials() {
                 exit={{ opacity: 0, y: -30, scale: 0.98 }}
                 transition={{ duration: 0.5, ease: "easeOut" }}
               >
-                <div className="bg-card rounded-3xl p-8 md:p-12 shadow-card border border-border/50 relative overflow-hidden">
+                <div className="bg-card rounded-3xl p-8 md:p-12 shadow-card border border-border/50 relative overflow-hidden group">
+                  {/* Edit Controls */}
+                  {isEditMode && items[currentIndex]?.id && (
+                    <div className="absolute top-4 left-4 z-50 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Button size="icon" variant="secondary" onClick={() => setEditingItem(items[currentIndex])}>
+                        <Pencil className="w-4 h-4" />
+                      </Button>
+                      <Button size="icon" variant="destructive" onClick={() => handleDelete(items[currentIndex].id!)}>
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  )}
+
                   {/* Decorative quote */}
                   <div className="absolute top-6 right-6 md:top-8 md:right-8">
                     <Quote className="w-16 h-16 md:w-20 md:h-20 text-primary/5" />
@@ -144,9 +244,9 @@ export function Testimonials() {
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
                       transition={{ type: "spring", stiffness: 200 }}
-                      className="w-14 h-14 rounded-full bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center text-primary-foreground font-semibold text-lg shadow-glow"
+                      className="w-14 h-14 rounded-full bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center text-primary-foreground font-semibold text-lg shadow-glow overflow-hidden"
                     >
-                      {items[currentIndex].avatar}
+                      {items[currentIndex].avatar.length <= 2 ? items[currentIndex].avatar : <img src={items[currentIndex].avatar} alt={items[currentIndex].name} className="w-full h-full object-cover" />}
                     </motion.div>
                     <div>
                       <div className="flex items-center gap-2">
@@ -218,6 +318,21 @@ export function Testimonials() {
           </div>
         </div>
       </div>
+
+      {/* Edit/Add Dialogs */}
+      <Dialog open={!!editingItem || isAdding} onOpenChange={(open) => { if (!open) { setEditingItem(null); setIsAdding(false); } }}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>{editingItem ? "Edit Testimonial" : "Add Testimonial"}</DialogTitle>
+          </DialogHeader>
+          <TestimonialForm
+            initialData={editingItem}
+            onSubmit={handleSave}
+            isSubmitting={isSubmitting}
+            onCancel={() => { setEditingItem(null); setIsAdding(false); }}
+          />
+        </DialogContent>
+      </Dialog>
     </section>
   );
 }

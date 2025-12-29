@@ -18,7 +18,7 @@ import {
   MessageCircle
 } from "lucide-react";
 import { BentoCard, BentoGrid } from "@/components/shared/BentoGrid";
-import { useAdmin } from "@/contexts/AdminContext";
+import { useAdminEdit } from "@/hooks/useAdminEdit";
 import { Pencil } from "lucide-react";
 
 const services = [
@@ -88,7 +88,7 @@ import { toast } from "sonner";
 type Service = Tables<"booking_services">;
 
 const Services = () => {
-  const { isEditMode } = useAdmin();
+  const { isEditMode } = useAdminEdit();
   const [pricingPlans, setPricingPlans] = useState<Service[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [editingService, setEditingService] = useState<Service | null>(null);

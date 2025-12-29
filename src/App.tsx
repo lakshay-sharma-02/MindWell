@@ -8,7 +8,6 @@ import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { AuthProvider, useAuth } from "@/hooks/useAuth";
-import { AdminProvider } from "@/contexts/AdminContext";
 import { AnimatePresence, m, LazyMotion, domAnimation } from "framer-motion";
 import ScrollToTop from "@/components/utils/ScrollToTop";
 import { PageSkeleton } from "@/components/layout/PageSkeleton";
@@ -119,13 +118,11 @@ const App = () => {
             <ScrollToTop />
             <AuthProvider>
               <TooltipProvider>
-                <AdminProvider>
-                  <Toaster />
-                  <Sonner />
-                  <AuthPopup />
-                  <GlobalOverlays />
-                  <AppContent />
-                </AdminProvider>
+                <Toaster />
+                <Sonner />
+                <AuthPopup />
+                <GlobalOverlays />
+                <AppContent />
               </TooltipProvider>
             </AuthProvider>
           </BrowserRouter>

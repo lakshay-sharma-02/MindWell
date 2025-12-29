@@ -1,6 +1,8 @@
 import { ReactNode, useState, useEffect, createContext, useContext } from "react";
 import { Header } from "./Header";
 import { Footer } from "./Footer";
+import { AdminFloatingPanel } from "@/components/admin/AdminFloatingPanel";
+import { AdminEditProvider } from "@/hooks/useAdminEdit";
 import { ScrollProgress } from "@/components/effects/ScrollProgress";
 import { BackToTop } from "@/components/effects/BackToTop";
 import { CursorGlow } from "@/components/effects/CursorGlow";
@@ -55,36 +57,40 @@ export function Layout({ children }: LayoutProps) {
 
   return (
     <AudioContext.Provider value={{ playEpisode }}>
-      <div className="min-h-screen flex flex-col relative">
-        <AnnouncementBanner />
-        <CursorGlow />
-        <ScrollProgress />
-        <Header onSearchClick={() => setIsSearchOpen(true)} />
-        <main className="flex-1">{children}</main>
-        <Footer />
-        <BackToTop />
+      <AdminEditProvider>
+        <div className="min-h-screen flex flex-col bg-background font-body relative">
+          <AnnouncementBanner />
+          <CursorGlow />
+          <ScrollProgress />
+          <Header onSearchClick={() => setIsSearchOpen(true)} />
 
-        {/* Search Modal */}
-        <SearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
+          <main className="flex-grow pt-16 lg:pt-[4.5rem] relative z-10">
+            {children}
+          </main>
 
-        {/* Audio Player */}
-        {currentEpisode && (
-          <AudioPlayer
-            episode={currentEpisode}
-            onClose={() => setCurrentEpisode(null)}
-            isMinimized={isPlayerMinimized}
-            onToggleMinimize={() => setIsPlayerMinimized(!isPlayerMinimized)}
-          />
-        )}
+          <Footer />
+          <BackToTop />
+          <AdminFloatingPanel />
 
-        {/* Engagement Features */}
-        <SocialProofToast />
-        <NewsletterModal />
-        <CookieBanner />
+          {/* Search Modal */}
+          <SearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
 
-        {/* Admin Panel */}
-        <AdminFloatingPanel />
-      </div>
+          {/* Audio Player */}
+          {currentEpisode && (
+            <AudioPlayer
+              episode={currentEpisode}
+              onClose={() => setCurrentEpisode(null)}
+              isMinimized={isPlayerMinimized}
+              onToggleMinimize={() => setIsPlayerMinimized(!isPlayerMinimized)}
+            />
+          )}
+
+          {/* Engagement Features */}
+          <SocialProofToast />
+          <NewsletterModal />
+          <CookieBanner />
+        </div>
+      </AdminEditProvider>
     </AudioContext.Provider>
   );
 }

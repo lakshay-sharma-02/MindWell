@@ -3,7 +3,7 @@ import { createPortal } from "react-dom";
 import { Plus, Settings, Eye, EyeOff, LogOut, User, Shield, X, LayoutDashboard, FileText, Mic, BookOpen, MessageSquare, HelpCircle, Calendar } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/hooks/useAuth";
-import { useAdmin } from "@/contexts/AdminContext";
+import { useAdminEdit } from "@/hooks/useAdminEdit";
 import { useLocation, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -14,15 +14,19 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { getErrorMessage } from "@/lib/getErrorMessage";
+import { SiteSettings } from "@/components/admin/SiteSettings";
+import { TestimonialForm } from "@/components/admin/forms/TestimonialForm";
+import { FaqForm } from "@/components/admin/forms/FaqForm";
 
 type ContentType = "blog" | "podcast" | "resource" | "testimonial" | "faq" | "service" | null;
 
 export function AdminFloatingPanel() {
   const { user, isAdmin, signOut, loading } = useAuth();
-  const { isEditMode, toggleEditMode } = useAdmin();
+  const { isEditMode, toggleEditMode } = useAdminEdit();
   const [isExpanded, setIsExpanded] = useState(false);
   const [addingType, setAddingType] = useState<ContentType>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const { toast } = useToast();
   const location = useLocation();
 
@@ -268,6 +272,13 @@ export function AdminFloatingPanel() {
                     {isEditMode ? "Exit Edit Mode" : "Edit Mode"}
                   </span>
                 </button>
+                <button
+                  onClick={() => setSettingsOpen(true)}
+                  className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-secondary transition-colors w-full"
+                >
+                  <Settings className="w-4 h-4 text-muted-foreground" />
+                  <span className="text-sm text-foreground">Site Settings</span>
+                </button>
               </div>
 
               {/* Footer */}
@@ -382,13 +393,37 @@ export function AdminFloatingPanel() {
         </DialogContent>
       </Dialog>
 
+      <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
+        <DialogContent className="max-w-4xl max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Global Site Settings</DialogTitle>
+          </DialogHeader>
+          <div className="mt-4">
+            <SiteSettings />
+          </div>
+        </DialogContent>
+      </Dialog>
+
 
     </>,
     document.body
   );
 }
 
-// Form Components
+// Form Components are now imported from @/components/admin/forms/
+
+/* 
+  Note: ServiceForm, BlogForm, PodcastForm, ResourceForm should also be extracted 
+  to separate files in @/components/admin/forms/ for consistency, 
+  but for now we are reusing TestimonialForm and FaqForm as requested.
+  
+  I will keep the others here for now or extract them if I have time. 
+  Actually, to clean this file up, I should ideally extract all.
+  But I only created TestimonialForm and FaqForm.
+  
+  Let's replace the local TestimonialForm and FaqForm with imports.
+*/
+
 function BlogForm({ onSubmit, isSubmitting }: { onSubmit: (data: Record<string, unknown>) => void; isSubmitting: boolean }) {
   const [data, setData] = useState({ title: "", excerpt: "", content: "", category: "General", author: "Admin", published: false });
   return (
@@ -429,35 +464,6 @@ function ResourceForm({ onSubmit, isSubmitting }: { onSubmit: (data: Record<stri
       <div><Label>Description</Label><Textarea value={data.description} onChange={(e) => setData({ ...data, description: e.target.value })} required /></div>
       <div className="flex items-center gap-2"><Switch checked={data.published} onCheckedChange={(v) => setData({ ...data, published: v })} /><Label>Publish immediately</Label></div>
       <Button type="submit" disabled={isSubmitting} className="w-full">{isSubmitting ? "Creating..." : "Create Resource"}</Button>
-    </form>
-  );
-}
-
-function TestimonialForm({ onSubmit, isSubmitting }: { onSubmit: (data: Record<string, unknown>) => void; isSubmitting: boolean }) {
-  const [data, setData] = useState({ name: "", role: "", content: "", rating: 5, image_url: "", published: false });
-  return (
-    <form onSubmit={(e) => { e.preventDefault(); onSubmit(data); }} className="space-y-4">
-      <div><Label>Name</Label><Input value={data.name} onChange={(e) => setData({ ...data, name: e.target.value })} required /></div>
-      <div><Label>Role</Label><Input value={data.role} onChange={(e) => setData({ ...data, role: e.target.value })} placeholder="CEO, Parent, etc." /></div>
-      <div><Label>Rating (1-5)</Label><Input type="number" min={1} max={5} value={data.rating} onChange={(e) => setData({ ...data, rating: parseInt(e.target.value) })} /></div>
-      <div><Label>Image URL</Label><Input value={data.image_url} onChange={(e) => setData({ ...data, image_url: e.target.value })} /></div>
-      <div><Label>Content</Label><Textarea value={data.content} onChange={(e) => setData({ ...data, content: e.target.value })} required /></div>
-      <div className="flex items-center gap-2"><Switch checked={data.published} onCheckedChange={(v) => setData({ ...data, published: v })} /><Label>Publish immediately</Label></div>
-      <Button type="submit" disabled={isSubmitting} className="w-full">{isSubmitting ? "Creating..." : "Create Testimonial"}</Button>
-    </form>
-  );
-}
-
-function FaqForm({ onSubmit, isSubmitting }: { onSubmit: (data: Record<string, unknown>) => void; isSubmitting: boolean }) {
-  const [data, setData] = useState({ question: "", answer: "", category: "General", sort_order: 0, published: false });
-  return (
-    <form onSubmit={(e) => { e.preventDefault(); onSubmit(data); }} className="space-y-4">
-      <div><Label>Question</Label><Input value={data.question} onChange={(e) => setData({ ...data, question: e.target.value })} required /></div>
-      <div><Label>Category</Label><Input value={data.category} onChange={(e) => setData({ ...data, category: e.target.value })} /></div>
-      <div><Label>Sort Order</Label><Input type="number" value={data.sort_order} onChange={(e) => setData({ ...data, sort_order: parseInt(e.target.value) })} /></div>
-      <div><Label>Answer</Label><Textarea value={data.answer} onChange={(e) => setData({ ...data, answer: e.target.value })} required rows={4} /></div>
-      <div className="flex items-center gap-2"><Switch checked={data.published} onCheckedChange={(v) => setData({ ...data, published: v })} /><Label>Publish immediately</Label></div>
-      <Button type="submit" disabled={isSubmitting} className="w-full">{isSubmitting ? "Creating..." : "Create FAQ"}</Button>
     </form>
   );
 }
