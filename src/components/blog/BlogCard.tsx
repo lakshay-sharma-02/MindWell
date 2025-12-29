@@ -182,7 +182,7 @@ export function BlogCard({ post, featured = false, onUpdate, className = "" }: B
         </div>
       </Link>
 
-      <div className={`p-5 ${featured ? 'md:p-6' : ''}`}>
+      <div className={`p-5 ${featured ? 'md:p-6' : ''} flex flex-col flex-1`}>
         <div className="flex items-center gap-3 mb-3">
           <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
             <Clock className="w-3.5 h-3.5" />
@@ -222,12 +222,12 @@ export function BlogCard({ post, featured = false, onUpdate, className = "" }: B
             className="w-full text-muted-foreground text-sm leading-relaxed mb-4 bg-transparent border border-primary rounded p-2 focus:outline-none resize-none"
           />
         ) : (
-          <p className={`text-muted-foreground text-sm leading-relaxed mb-4 ${featured ? 'line-clamp-3' : 'line-clamp-2'}`}>
+          <p className={`text-muted-foreground text-sm leading-relaxed mb-4 ${featured ? 'line-clamp-4 md:line-clamp-6' : 'line-clamp-2'}`}>
             {post.excerpt}
           </p>
         )}
 
-        <div className="flex items-center gap-3 pt-4 border-t border-border/50">
+        <div className="flex items-center gap-3 pt-4 border-t border-border/50 mt-auto">
           <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center">
             <span className="text-sm font-semibold text-primary">
               {post.author.name.charAt(0)}
