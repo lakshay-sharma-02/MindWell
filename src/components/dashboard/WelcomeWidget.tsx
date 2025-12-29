@@ -16,10 +16,10 @@ const QUOTES = [
     "Peace comes from within. Do not seek it without.",
 ];
 
-export function WelcomeWidget({ userName = "Friend" }: WelcomeWidgetProps) {
+export function WelcomeWidget({ userName }: WelcomeWidgetProps) {
     const [greeting, setGreeting] = useState("");
     const [quote, setQuote] = useState("");
-    const [Icon, setIcon] = useState(Sun);
+    const [Icon, setIcon] = useState<React.ElementType>(() => Sun);
 
     useEffect(() => {
         const hour = new Date().getHours();
@@ -28,17 +28,18 @@ export function WelcomeWidget({ userName = "Friend" }: WelcomeWidgetProps) {
 
         if (hour < 12) {
             setGreeting("Good Morning");
-            setIcon(Sunrise);
+            setIcon(() => Sunrise);
         } else if (hour < 18) {
             setGreeting("Good Afternoon");
-            setIcon(Sun);
+            setIcon(() => Sun);
         } else {
             setGreeting("Good Evening");
-            setIcon(Moon);
+            setIcon(() => Moon);
         }
     }, []);
 
-    const firstName = userName.split(" ")[0];
+    const nameToDisplay = userName || "Friend";
+    const firstName = nameToDisplay.split(" ")[0];
 
     return (
         <Card className="border-none bg-gradient-to-r from-primary/10 to-secondary/20 shadow-sm overflow-hidden relative hover-lift">
