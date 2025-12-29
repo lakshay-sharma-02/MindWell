@@ -84,8 +84,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
-import { Plus, Loader2, Trash2 } from "lucide-react";
+import { Plus, Loader2, Trash2, Pencil } from "lucide-react";
 import { SectionErrorBoundary } from "@/components/shared/SectionErrorBoundary";
+import { useServices } from "@/hooks/useServices";
 
 const ServiceForm = lazy(() => import("@/components/admin/forms/ServiceForm").then(module => ({ default: module.ServiceForm })));
 
@@ -93,93 +94,48 @@ type Service = Tables<"booking_services">;
 
 const Services = () => {
   const { isEditMode } = useAdminEdit();
-  const [pricingPlans, setPricingPlans] = useState<Service[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  // Using the new React Query hook
+  const { services: pricingPlans, isLoading, createService, updateService, deleteService } = useServices();
 
-  // CRUD State
   const [editingService, setEditingService] = useState<Service | null>(null);
   const [isAdding, setIsAdding] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  useEffect(() => {
-    fetchServices();
-  }, []);
-
-  const fetchServices = async () => {
-    try {
-      const { data, error } = await supabase
-        .from("booking_services")
-        .select("*")
-        .order("price", { ascending: true });
-
-      if (error) throw error;
-
-      if (data && data.length > 0) {
-        setPricingPlans(data);
-      }
-    } catch (error) {
-      console.error("Error loading services", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  // We don't need manual loading state or fetch effects anymore!
 
   const handleSave = async (data: any) => {
-    setIsSubmitting(true);
+    // The data coming from Zod form
+    const featuresArray = data.features.split("\n").filter((f: string) => f.trim() !== "");
+
+    const payload = {
+      title: data.title,
+      duration: data.duration,
+      price: data.price,
+      description: data.description,
+      features: featuresArray,
+      popular: data.popular
+    };
+
     try {
-      // Convert newline separated features back to array if needed
-      // ServiceForm passes string for features, we need array?
-      // Wait, ServiceForm passes `data.features` as string from Textarea.
-      // We need to split it.
-      const featuresArray = typeof data.features === 'string'
-        ? data.features.split("\n").filter((f: string) => f.trim() !== "")
-        : data.features;
-
-      const payload = {
-        title: data.title,
-        duration: data.duration,
-        price: data.price,
-        description: data.description,
-        features: featuresArray,
-        popular: data.popular
-      };
-
       if (editingService) {
-        const { error } = await supabase
-          .from("booking_services")
-          .update(payload)
-          .eq("id", editingService.id);
-        if (error) throw error;
-        toast.success("Service updated successfully!");
+        await updateService.mutateAsync({ id: editingService.id, ...payload });
       } else {
-        const { error } = await supabase
-          .from("booking_services")
-          .insert([payload]);
-        if (error) throw error;
-        toast.success("Service created successfully!");
+        await createService.mutateAsync(payload);
       }
 
       setEditingService(null);
       setIsAdding(false);
-      fetchServices();
     } catch (error) {
-      console.error("Save failed:", error);
-      toast.error("Failed to save service");
-    } finally {
-      setIsSubmitting(false);
+      // Error handling is done in the hook via toast
+      console.error("Mutation failed", error);
     }
   };
 
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure you want to delete this service?")) return;
     try {
-      const { error } = await supabase.from("booking_services").delete().eq("id", id);
-      if (error) throw error;
-      toast.success("Service deleted successfully");
-      fetchServices();
+      await deleteService.mutateAsync(id);
     } catch (error) {
-      console.error("Delete failed:", error);
-      toast.error("Failed to delete service");
+      console.error("Delete failed", error);
     }
   };
 
@@ -476,7 +432,7 @@ const Services = () => {
                   <ServiceForm
                     initialData={editingService}
                     onSubmit={handleSave}
-                    isSubmitting={isSubmitting}
+                    isSubmitting={createService.isPending || updateService.isPending}
                     onCancel={() => { setEditingService(null); setIsAdding(false); }}
                   />
                 </Suspense>
