@@ -90,12 +90,11 @@ export function Footer() {
                 <Heart className="w-6 h-6 text-primary-foreground" fill="currentColor" />
               </motion.div>
               <span className="font-display text-2xl font-semibold text-foreground">
-                MindWell
+                {settings.global_info.title}
               </span>
             </Link>
             <p className="text-muted-foreground text-sm leading-relaxed mb-6 max-w-sm">
-              Supporting your journey to mental wellness with expert guidance,
-              evidence-based resources, and compassionate care since 2015.
+              {settings.global_info.description}
             </p>
 
             {/* Contact Info */}
@@ -239,23 +238,22 @@ export function Footer() {
         {/* Bottom */}
         <div className="mt-16 pt-8 border-t border-border/50">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-sm text-muted-foreground text-center md:text-left">
-              © {new Date().getFullYear()} MindWell Psychology. All rights reserved.
-            </p>
-            <div className="flex flex-wrap justify-center gap-6">
-              {footerLinks.legal.map((link) => (
-                <Link
-                  key={link.name}
-                  to={link.href}
-                  className="text-sm text-muted-foreground hover:text-primary transition-colors"
-                >
-                  {link.name}
-                </Link>
-              ))}
-            </div>
+            © {new Date().getFullYear()} {settings.global_info.title}. All rights reserved.
+          </p>
+          <div className="flex flex-wrap justify-center gap-6">
+            {footerLinks.legal.map((link) => (
+              <Link
+                key={link.name}
+                to={link.href}
+                className="text-sm text-muted-foreground hover:text-primary transition-colors"
+              >
+                {link.name}
+              </Link>
+            ))}
           </div>
         </div>
       </div>
-    </footer>
+    </div>
+    </footer >
   );
 }
