@@ -6,6 +6,8 @@ interface SiteSettings {
         title: string;
         description: string;
         contact_email: string;
+        contact_phone: string;
+        contact_address: string;
     };
     landing_page: {
         hero: {
@@ -35,6 +37,8 @@ const defaultSettings: SiteSettings = {
         title: "MindWell",
         description: "Mental Health & Wellness Platform",
         contact_email: "hello@mindwell.com",
+        contact_phone: "(123) 456-7890",
+        contact_address: "San Francisco, CA",
     },
     landing_page: {
         hero: {

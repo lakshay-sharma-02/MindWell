@@ -9,38 +9,42 @@ import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { sendContactForm } from "@/lib/email";
 
-const contactInfo = [
-  {
-    icon: Mail,
-    title: "Email",
-    value: "hello@mindwell.com",
-    href: "mailto:hello@mindwell.com",
-    description: "We respond within 24 hours"
-  },
-  {
-    icon: Phone,
-    title: "Phone",
-    value: "(123) 456-7890",
-    href: "tel:+1234567890",
-    description: "Mon-Fri, 9am-6pm PT"
-  },
-  {
-    icon: MapPin,
-    title: "Location",
-    value: "San Francisco, CA",
-    href: null,
-    description: "123 Wellness Way, Suite 456"
-  },
-  {
-    icon: Clock,
-    title: "Office Hours",
-    value: "Mon-Fri: 9am-6pm",
-    href: null,
-    description: "Saturday by appointment"
-  }
-];
+import { useSiteSettings } from "@/hooks/useSiteSettings";
+import { Link } from "react-router-dom";
 
 const Contact = () => {
+  const { settings } = useSiteSettings();
+
+  const contactInfo = [
+    {
+      icon: Mail,
+      title: "Email",
+      value: settings.global_info.contact_email,
+      href: `mailto:${settings.global_info.contact_email}`,
+      description: "We respond within 24 hours"
+    },
+    {
+      icon: Phone,
+      title: "Phone",
+      value: settings.global_info.contact_phone || "(123) 456-7890",
+      href: `tel:${settings.global_info.contact_phone}`,
+      description: "Mon-Fri, 9am-6pm PT"
+    },
+    {
+      icon: MapPin,
+      title: "Location",
+      value: settings.global_info.contact_address || "San Francisco, CA",
+      href: null,
+      description: "123 Wellness Way, Suite 456"
+    },
+    {
+      icon: Clock,
+      title: "Office Hours",
+      value: "Mon-Fri: 9am-6pm",
+      href: null,
+      description: "Saturday by appointment"
+    }
+  ];
   const [formData, setFormData] = useState({
     name: "",
     email: "",

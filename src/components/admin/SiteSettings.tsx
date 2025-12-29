@@ -14,6 +14,8 @@ interface GlobalInfo {
     title: string;
     description: string;
     contact_email: string;
+    contact_phone: string;
+    contact_address: string;
 }
 
 interface Features {
@@ -36,6 +38,8 @@ export function SiteSettings() {
         title: "",
         description: "",
         contact_email: "",
+        contact_phone: "",
+        contact_address: "",
     });
 
     const [features, setFeatures] = useState<Features>({
@@ -172,6 +176,25 @@ export function SiteSettings() {
                                 value={globalInfo.contact_email}
                                 onChange={(e) => setGlobalInfo(prev => ({ ...prev, contact_email: e.target.value }))}
                                 placeholder="hello@mindwell.com"
+                            />
+                        </div>
+                        <div className="grid gap-2">
+                            <Label htmlFor="contact-phone">Phone Number</Label>
+                            <Input
+                                id="contact-phone"
+                                type="tel"
+                                value={globalInfo.contact_phone}
+                                onChange={(e) => setGlobalInfo(prev => ({ ...prev, contact_phone: e.target.value }))}
+                                placeholder="(123) 456-7890"
+                            />
+                        </div>
+                        <div className="grid gap-2">
+                            <Label htmlFor="contact-address">Office Address</Label>
+                            <Input
+                                id="contact-address"
+                                value={globalInfo.contact_address}
+                                onChange={(e) => setGlobalInfo(prev => ({ ...prev, contact_address: e.target.value }))}
+                                placeholder="San Francisco, CA"
                             />
                         </div>
                     </CardContent>
