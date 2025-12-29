@@ -58,7 +58,7 @@ export default function Dashboard() {
                         <div className="md:col-span-2 h-[300px]">
                             <MoodSummaryWidget userId={user.id} />
                         </div>
-                        <div className="h-[300px]">
+                        <div className="h-auto">
                             <QuickActionsWidget />
                         </div>
                     </div>
