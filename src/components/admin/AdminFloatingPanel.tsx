@@ -3,6 +3,7 @@ import { createPortal } from "react-dom";
 import { Plus, Settings, Eye, EyeOff, LogOut, User, Shield, X, LayoutDashboard, FileText, Mic, BookOpen, MessageSquare, HelpCircle, Calendar } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/hooks/useAuth";
+import { useAdmin } from "@/contexts/AdminContext";
 import { useLocation, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -18,8 +19,8 @@ type ContentType = "blog" | "podcast" | "resource" | "testimonial" | "faq" | "se
 
 export function AdminFloatingPanel() {
   const { user, isAdmin, signOut, loading } = useAuth();
+  const { isEditMode, toggleEditMode } = useAdmin();
   const [isExpanded, setIsExpanded] = useState(false);
-  const [isEditMode, setIsEditMode] = useState(false);
   const [addingType, setAddingType] = useState<ContentType>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
@@ -255,7 +256,7 @@ export function AdminFloatingPanel() {
                   <span className="text-sm text-foreground">Full Dashboard</span>
                 </Link>
                 <button
-                  onClick={() => setIsEditMode(!isEditMode)}
+                  onClick={toggleEditMode}
                   className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-secondary transition-colors w-full"
                 >
                   {isEditMode ? (

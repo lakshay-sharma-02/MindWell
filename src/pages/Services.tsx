@@ -3,12 +3,12 @@ import { SEOHead } from "@/components/seo/SEOHead";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { 
-  Brain, 
-  Heart, 
-  Users, 
-  Sparkles, 
-  ArrowRight, 
+import {
+  Brain,
+  Heart,
+  Users,
+  Sparkles,
+  ArrowRight,
   Check,
   Clock,
   Video,
@@ -18,6 +18,8 @@ import {
   MessageCircle
 } from "lucide-react";
 import { BentoCard, BentoGrid } from "@/components/shared/BentoGrid";
+import { useAdmin } from "@/contexts/AdminContext";
+import { Pencil } from "lucide-react";
 
 const services = [
   {
@@ -115,6 +117,7 @@ const pricingPlans = [
 ];
 
 const Services = () => {
+  const { isEditMode } = useAdmin();
   return (
     <Layout>
       <SEOHead
@@ -166,7 +169,7 @@ const Services = () => {
               transition={{ delay: 0.2 }}
               className="text-lg md:text-xl text-muted-foreground mb-8"
             >
-              Every journey is unique. Explore our range of evidence-based 
+              Every journey is unique. Explore our range of evidence-based
               therapeutic approaches to find what resonates with your needs.
             </motion.p>
 
@@ -255,21 +258,21 @@ const Services = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
-              { 
-                step: "01", 
-                title: "Book a Consultation", 
+              {
+                step: "01",
+                title: "Book a Consultation",
                 description: "Schedule a free 15-minute call to discuss your needs and see if we're a good fit.",
                 icon: Clock
               },
-              { 
-                step: "02", 
-                title: "Choose Your Approach", 
+              {
+                step: "02",
+                title: "Choose Your Approach",
                 description: "Together, we'll determine the therapeutic approach that best suits your goals.",
                 icon: Sparkles
               },
-              { 
-                step: "03", 
-                title: "Begin Your Journey", 
+              {
+                step: "03",
+                title: "Begin Your Journey",
                 description: "Start your sessions in-person or via secure video call at your convenience.",
                 icon: Heart
               }
@@ -324,12 +327,19 @@ const Services = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
-                className={`relative bg-card rounded-2xl p-6 border transition-all duration-300 hover:shadow-card ${
-                  plan.popular 
-                    ? "border-primary shadow-glow" 
-                    : "border-border/50 hover:border-primary/30"
-                }`}
+                className={`relative bg-card rounded-2xl p-6 border transition-all duration-300 hover:shadow-card ${plan.popular
+                  ? "border-primary shadow-glow"
+                  : "border-border/50 hover:border-primary/30"
+                  }`}
               >
+                {/* Visual Cue for Edit Mode */}
+                {isEditMode && (
+                  <div className="absolute -right-3 -top-3 z-20 cursor-pointer hover:scale-110 transition-transform">
+                    <div className="bg-amber-500 text-white p-2 rounded-full shadow-lg">
+                      <Pencil className="w-4 h-4" />
+                    </div>
+                  </div>
+                )}
                 {plan.popular && (
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-primary text-primary-foreground text-xs font-medium">
                     Most Popular
@@ -354,8 +364,8 @@ const Services = () => {
                   ))}
                 </ul>
 
-                <Button 
-                  variant={plan.popular ? "default" : "outline"} 
+                <Button
+                  variant={plan.popular ? "default" : "outline"}
                   className="w-full"
                   asChild
                 >
