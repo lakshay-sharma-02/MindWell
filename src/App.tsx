@@ -37,8 +37,6 @@ const Tools = lazyWithRetry(() => import("./pages/Tools"));
 
 const queryClient = new QueryClient();
 
-import { featureLoaders } from "@/utils/featureLoaders";
-
 function AnimatedRoutes() {
   const location = useLocation();
 
