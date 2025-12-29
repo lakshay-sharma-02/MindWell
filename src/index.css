@@ -231,6 +231,16 @@
     @apply bg-card/50 backdrop-blur-lg border border-border/40;
   }
 
+  /* Premium Glass Panel */
+  .glass-panel {
+    @apply bg-background/80 backdrop-blur-xl border-b border-border/50 shadow-sm transition-all duration-300;
+  }
+
+  /* Micro-interaction: Hover Lift */
+  .hover-lift {
+    @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-card;
+  }
+
   /* Light mode specific glass */
   :root .glass {
     background: linear-gradient(135deg, hsl(var(--card) / 0.9), hsl(var(--card) / 0.7));

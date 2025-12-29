@@ -16,7 +16,7 @@ export function QuickActionsWidget() {
     ];
 
     return (
-        <Card className="h-full">
+        <Card className="h-full hover-lift">
             <CardHeader className="pb-2">
                 <CardTitle className="text-lg font-display">Quick Actions</CardTitle>
             </CardHeader>

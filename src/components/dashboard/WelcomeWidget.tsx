@@ -41,11 +41,11 @@ export function WelcomeWidget({ userName = "Friend" }: WelcomeWidgetProps) {
     const firstName = userName.split(" ")[0];
 
     return (
-        <Card className="border-none bg-gradient-to-r from-primary/10 to-secondary/20 shadow-sm overflow-hidden relative">
+        <Card className="border-none bg-gradient-to-r from-primary/10 to-secondary/20 shadow-sm overflow-hidden relative hover-lift">
             <div className="absolute right-0 top-0 opacity-5 -translate-y-1/2 translate-x-1/4">
                 <Icon className="w-64 h-64 text-primary" />
             </div>
-            
+
             <CardContent className="p-8 relative z-10">
                 <div className="flex flex-col md:flex-row gap-6 items-start md:items-center justify-between">
                     <div>

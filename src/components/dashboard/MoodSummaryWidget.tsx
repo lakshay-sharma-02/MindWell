@@ -60,7 +60,7 @@ export function MoodSummaryWidget({ userId }: MoodSummaryWidgetProps) {
     }
 
     return (
-        <Card className="h-full flex flex-col">
+        <Card className="h-full flex flex-col hover-lift">
             <CardHeader className="pb-2">
                 <CardTitle className="text-lg font-display">Mood Check-in</CardTitle>
                 <CardDescription>Your emotional trends</CardDescription>

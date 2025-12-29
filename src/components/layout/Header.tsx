@@ -87,7 +87,7 @@ export function Header({ onSearchClick }: HeaderProps) {
   return (
     <header
       className={`sticky top-0 z-50 transition-all duration-500 ${scrolled
-        ? "bg-background/95 backdrop-blur-xl shadow-soft border-b border-border/50"
+        ? "glass-panel"
         : "bg-background/60 backdrop-blur-md"
         }`}
     >

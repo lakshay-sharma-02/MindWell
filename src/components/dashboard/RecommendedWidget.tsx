@@ -30,7 +30,7 @@ export function RecommendedWidget() {
     if (!blog) return null;
 
     return (
-        <Card className="overflow-hidden border-primary/20 bg-gradient-to-br from-background to-primary/5">
+        <Card className="overflow-hidden border-primary/20 bg-gradient-to-br from-background to-primary/5 hover-lift">
             <CardHeader className="pb-2 flex flex-row items-center justify-between">
                 <CardTitle className="text-lg font-display flex items-center gap-2">
                     <Sparkles className="w-4 h-4 text-primary" />
