@@ -1,4 +1,4 @@
-import { ReactNode, useState, useEffect } from "react";
+import { ReactNode, useState, useEffect, createContext, useContext } from "react";
 import { Header } from "./Header";
 import { Footer } from "./Footer";
 import { ScrollProgress } from "@/components/effects/ScrollProgress";
@@ -16,9 +16,6 @@ import { PodcastEpisode } from "@/data/podcasts";
 interface LayoutProps {
   children: ReactNode;
 }
-
-// Create a context for the audio player
-import { createContext, useContext } from "react";
 
 interface AudioContextType {
   playEpisode: (episode: PodcastEpisode) => void;

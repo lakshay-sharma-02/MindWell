@@ -7,6 +7,17 @@ interface SiteSettings {
         description: string;
         contact_email: string;
     };
+    landing_page: {
+        hero: {
+            badge_text: string;
+            badge_rating: string;
+            title_line_1: string;
+            title_highlight: string;
+            description: string;
+            cta_primary: string;
+            cta_secondary: string;
+        }
+    };
     features: {
         registration_enabled: boolean;
         maintenance_mode: boolean;
@@ -24,6 +35,17 @@ const defaultSettings: SiteSettings = {
         title: "MindWell",
         description: "Mental Health & Wellness Platform",
         contact_email: "hello@mindwell.com",
+    },
+    landing_page: {
+        hero: {
+            badge_text: "Trusted by 1,200+ clients",
+            badge_rating: "4.9",
+            title_line_1: "You Deserve to Feel",
+            title_highlight: "Whole Again",
+            description: "Compassionate therapy, thoughtful resources, and genuine support for wherever you are on your journey. You're not alone in this.",
+            cta_primary: "Start Your Journey",
+            cta_secondary: "Free Resources"
+        }
     },
     features: {
         registration_enabled: true,
@@ -59,6 +81,7 @@ export const useSiteSettings = () => {
                     if (setting.key === 'global_info') newSettings.global_info = setting.value as any;
                     if (setting.key === 'features') newSettings.features = setting.value as any;
                     if (setting.key === 'social_links') newSettings.social_links = setting.value as any;
+                    if (setting.key === 'landing_page') newSettings.landing_page = setting.value as any;
                 });
                 setSettings(newSettings);
             }

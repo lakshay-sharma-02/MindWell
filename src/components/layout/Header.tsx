@@ -49,10 +49,15 @@ interface HeaderProps {
   onSearchClick?: () => void;
 }
 
+import { useSiteSettings } from "@/hooks/useSiteSettings";
+
+// ... existing imports ...
+
 export function Header({ onSearchClick }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
+  const { settings } = useSiteSettings();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -104,7 +109,7 @@ export function Header({ onSearchClick }: HeaderProps) {
               <Heart className="w-5 h-5 text-primary-foreground" fill="currentColor" />
             </motion.div>
             <span className="font-display text-xl font-semibold text-foreground">
-              MindWell
+              {settings.global_info.title}
             </span>
           </Link>
 

@@ -3,8 +3,12 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, Heart, Sparkles, Users, BookOpen, Headphones, Star } from "lucide-react";
 import { motion } from "framer-motion";
 import { AnimatedCounter } from "@/components/shared/AnimatedCounter";
+import { useSiteSettings } from "@/hooks/useSiteSettings";
 
 export function HeroSection() {
+  const { settings } = useSiteSettings();
+  const hero = settings.landing_page.hero;
+
   const stats = [
     { icon: Users, value: 1200, suffix: "+", label: "Clients Helped" },
     { icon: BookOpen, value: 50, suffix: "+", label: "Resources" },
@@ -16,15 +20,15 @@ export function HeroSection() {
       {/* Elegant mesh gradient background */}
       <div className="absolute inset-0">
         <div className="absolute inset-0 bg-gradient-to-br from-background via-background to-secondary/40" />
-        
+
         {/* Animated mesh overlay */}
         <div className="absolute inset-0 opacity-70 dark:opacity-50">
           <div className="absolute top-0 right-0 w-full h-full bg-mesh-gradient dark:bg-dark-mesh" />
         </div>
-        
+
         {/* Primary glowing orb */}
         <motion.div
-          animate={{ 
+          animate={{
             scale: [1, 1.15, 1],
             opacity: [0.15, 0.25, 0.15],
             x: [0, 30, 0],
@@ -33,10 +37,10 @@ export function HeroSection() {
           transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
           className="absolute top-[5%] right-[5%] w-[600px] h-[600px] bg-primary/25 dark:bg-primary/35 rounded-full blur-[150px]"
         />
-        
+
         {/* Accent orb */}
         <motion.div
-          animate={{ 
+          animate={{
             scale: [1.1, 1, 1.1],
             opacity: [0.1, 0.2, 0.1],
             x: [0, -20, 0]
@@ -44,10 +48,10 @@ export function HeroSection() {
           transition={{ duration: 18, repeat: Infinity, ease: "easeInOut", delay: 5 }}
           className="absolute bottom-[0%] left-[0%] w-[500px] h-[500px] bg-accent/20 dark:bg-accent/30 rounded-full blur-[130px]"
         />
-        
+
         {/* Tertiary glow */}
         <motion.div
-          animate={{ 
+          animate={{
             scale: [1, 1.1, 1],
             opacity: [0.08, 0.15, 0.08]
           }}
@@ -59,30 +63,30 @@ export function HeroSection() {
       {/* Floating decorative elements */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         {/* Vertical lines */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 0.4, height: 120 }}
           transition={{ delay: 1, duration: 1 }}
-          className="absolute top-[20%] left-[12%] w-px bg-gradient-to-b from-transparent via-primary/30 to-transparent" 
+          className="absolute top-[20%] left-[12%] w-px bg-gradient-to-b from-transparent via-primary/30 to-transparent"
         />
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 0.3, height: 80 }}
           transition={{ delay: 1.3, duration: 1 }}
-          className="absolute top-[30%] right-[18%] w-px bg-gradient-to-b from-transparent via-accent/25 to-transparent" 
+          className="absolute top-[30%] right-[18%] w-px bg-gradient-to-b from-transparent via-accent/25 to-transparent"
         />
-        
+
         {/* Floating particles */}
         {[...Array(8)].map((_, i) => (
           <motion.div
             key={i}
             initial={{ opacity: 0, y: 20 }}
-            animate={{ 
+            animate={{
               opacity: [0, 0.6, 0],
               y: [0, -40, 0],
               x: [0, Math.sin(i) * 15, 0]
             }}
-            transition={{ 
+            transition={{
               duration: 5 + Math.random() * 3,
               repeat: Infinity,
               delay: i * 0.7,
@@ -106,15 +110,15 @@ export function HeroSection() {
             transition={{ duration: 0.6 }}
             className="inline-flex items-center gap-2 mb-8"
           >
-            <motion.span 
+            <motion.span
               whileHover={{ scale: 1.02 }}
               className="px-5 py-2.5 rounded-full bg-card/80 dark:bg-card/60 backdrop-blur-sm text-primary text-sm font-medium border border-border/50 flex items-center gap-2.5 shadow-soft"
             >
               <Heart className="w-4 h-4 fill-primary/30" />
-              Trusted by 1,200+ clients
+              {hero.badge_text}
               <span className="flex items-center gap-0.5 text-amber">
                 <Star className="w-3.5 h-3.5 fill-current" />
-                4.9
+                {hero.badge_rating}
               </span>
             </motion.span>
           </motion.div>
@@ -126,15 +130,15 @@ export function HeroSection() {
             transition={{ duration: 0.8, delay: 0.15 }}
             className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-foreground leading-[1.06] mb-6 tracking-tight"
           >
-            You Deserve to Feel
+            {hero.title_line_1}
             <br />
-            <motion.span 
+            <motion.span
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.4, duration: 0.8 }}
               className="text-gradient-animate"
             >
-              Whole Again
+              {hero.title_highlight}
             </motion.span>
           </motion.h1>
 
@@ -145,8 +149,7 @@ export function HeroSection() {
             transition={{ duration: 0.6, delay: 0.3 }}
             className="text-lg md:text-xl text-muted-foreground leading-relaxed mb-12 max-w-2xl mx-auto"
           >
-            Compassionate therapy, thoughtful resources, and genuine support 
-            for wherever you are on your journey. You're not alone in this.
+            {hero.description}
           </motion.p>
 
           {/* CTA Buttons */}
@@ -158,19 +161,19 @@ export function HeroSection() {
           >
             <Button variant="hero" size="xl" className="btn-glow group" asChild>
               <Link to="/book">
-                Start Your Journey
+                {hero.cta_primary}
                 <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
               </Link>
             </Button>
-            <Button 
-              variant="outline" 
-              size="xl" 
-              className="bg-card/60 backdrop-blur-sm border-border hover:bg-card hover:border-primary/30 group" 
+            <Button
+              variant="outline"
+              size="xl"
+              className="bg-card/60 backdrop-blur-sm border-border hover:bg-card hover:border-primary/30 group"
               asChild
             >
               <Link to="/resources">
                 <Sparkles className="w-5 h-5 mr-2 group-hover:rotate-12 transition-transform" />
-                Free Resources
+                {hero.cta_secondary}
               </Link>
             </Button>
           </motion.div>
@@ -221,10 +224,10 @@ export function HeroSection() {
           transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
           className="w-6 h-10 rounded-full border-2 border-muted-foreground/30 flex items-start justify-center p-1.5"
         >
-          <motion.div 
+          <motion.div
             animate={{ opacity: [0.5, 1, 0.5], height: [4, 8, 4] }}
             transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-            className="w-1 bg-muted-foreground/50 rounded-full" 
+            className="w-1 bg-muted-foreground/50 rounded-full"
           />
         </motion.div>
       </motion.div>

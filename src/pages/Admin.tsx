@@ -31,6 +31,7 @@ import { AdminOverview } from "@/components/admin/AdminOverview";
 import { UsersManager } from "@/components/admin/UsersManager";
 import { CommunityManager } from "@/components/admin/CommunityManager";
 import { SiteSettings } from "@/components/admin/SiteSettings";
+import { ContentManager } from "@/components/admin/ContentManager";
 import { CommunicationsManager } from "@/components/admin/CommunicationsManager";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -64,6 +65,7 @@ const Admin = () => {
     { id: "testimonials", label: "Testimonials", icon: MessageSquare }, // Reusing icon or change if needed
     { id: "faqs", label: "FAQs", icon: HelpCircle },
     { id: "communications", label: "Communications", icon: MessageSquare },
+    { id: "content", label: "Page Content", icon: FileText },
     { id: "settings", label: "Settings", icon: Settings },
   ];
 
@@ -81,6 +83,7 @@ const Admin = () => {
       case "testimonials": return <TestimonialsManager />;
       case "faqs": return <FaqsManager />;
       case "communications": return <CommunicationsManager />;
+      case "content": return <ContentManager />;
       case "settings": return <SiteSettings />;
       default: return <AdminOverview />;
     }
