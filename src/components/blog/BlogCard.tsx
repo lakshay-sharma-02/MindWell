@@ -28,6 +28,7 @@ interface BlogCardProps {
   post: BlogPost;
   featured?: boolean;
   onUpdate?: () => void;
+  className?: string;
 }
 
 const categoryColors: Record<string, { bg: string; text: string }> = {
@@ -38,7 +39,7 @@ const categoryColors: Record<string, { bg: string; text: string }> = {
   "Depression": { bg: "bg-amber/10", text: "text-amber" },
 };
 
-export function BlogCard({ post, featured = false, onUpdate }: BlogCardProps) {
+export function BlogCard({ post, featured = false, onUpdate, className = "" }: BlogCardProps) {
   const { isAdmin } = useAuth();
   const { toast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
@@ -101,10 +102,10 @@ export function BlogCard({ post, featured = false, onUpdate }: BlogCardProps) {
   };
 
   return (
-    <motion.article 
+    <motion.article
       whileHover={{ y: -4 }}
       transition={{ duration: 0.3 }}
-      className={`group relative bg-card rounded-2xl overflow-hidden shadow-soft hover:shadow-card transition-all duration-400 border border-border/50 hover:border-primary/20 ${featured ? 'md:col-span-2' : ''} ${isEditing ? 'ring-2 ring-primary' : ''}`}
+      className={`group relative bg-card rounded-2xl overflow-hidden shadow-soft hover:shadow-card transition-all duration-400 border border-border/50 hover:border-primary/20 ${featured ? 'md:col-span-2' : ''} ${isEditing ? 'ring-2 ring-primary' : ''} ${className}`}
     >
       {/* Admin Edit Controls */}
       {isAdmin && !isEditing && (
@@ -155,7 +156,7 @@ export function BlogCard({ post, featured = false, onUpdate }: BlogCardProps) {
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 rounded-full border border-foreground/10" />
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 rounded-full border border-foreground/5" />
           </div>
-          
+
           {/* Category pill - editable */}
           <div className="absolute top-4 left-4">
             {isEditing ? (
@@ -172,7 +173,7 @@ export function BlogCard({ post, featured = false, onUpdate }: BlogCardProps) {
               </span>
             )}
           </div>
-          
+
           {!isEditing && (
             <div className="absolute bottom-4 right-4 w-10 h-10 rounded-full bg-card/80 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity border border-border/50">
               <ArrowUpRight className="w-4 h-4 text-foreground" />
