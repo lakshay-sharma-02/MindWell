@@ -73,51 +73,102 @@ const services = [
   }
 ];
 
-const pricingPlans = [
-  {
-    name: "Single Session",
-    price: 150,
-    duration: "50 minutes",
-    description: "Perfect for trying therapy or occasional check-ins",
-    features: [
-      "50-minute session",
-      "Video or in-person",
-      "Personalized approach",
-      "Session notes provided"
-    ]
-  },
-  {
-    name: "Monthly Plan",
-    price: 520,
-    duration: "4 sessions/month",
-    description: "Recommended for consistent progress and support",
-    features: [
-      "4 weekly sessions",
-      "Priority scheduling",
-      "Between-session support",
-      "Progress tracking",
-      "Resource library access"
-    ],
-    popular: true
-  },
-  {
-    name: "Intensive",
-    price: 1200,
-    duration: "10 sessions",
-    description: "Deep work for significant breakthroughs",
-    features: [
-      "10 sessions package",
-      "Flexible scheduling",
-      "Extended session option",
-      "Crisis support",
-      "Full resource access",
-      "Quarterly review"
-    ]
-  }
-];
+
+
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { Tables } from "@/types/database";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { toast } from "sonner";
+
+type Service = Tables<"booking_services">;
 
 const Services = () => {
   const { isEditMode } = useAdmin();
+  const [pricingPlans, setPricingPlans] = useState<Service[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [editingService, setEditingService] = useState<Service | null>(null);
+  const [formData, setFormData] = useState({
+    title: "",
+    duration: "",
+    price: "",
+    description: "",
+    features: "",
+    popular: false
+  });
+
+  useEffect(() => {
+    fetchServices();
+  }, []);
+
+  const fetchServices = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("booking_services")
+        .select("*")
+        .order("price", { ascending: true }); // Order by price or creation
+
+      if (error) throw error;
+
+      // If data is empty (first run), might want to seed or just show empty. 
+      // For now, let's assume if empty we fallback to static or just show empty.
+      if (data && data.length > 0) {
+        setPricingPlans(data);
+      } else {
+        // Optional: Seed hardcoded if empty, but better to just respect DB
+      }
+    } catch (error) {
+      console.error("Error loading services", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleEditClick = (service: Service) => {
+    setEditingService(service);
+    setFormData({
+      title: service.title,
+      duration: service.duration,
+      price: service.price,
+      description: service.description,
+      features: service.features ? service.features.join("\\n") : "",
+      popular: service.popular || false
+    });
+  };
+
+  const handleUpdate = async () => {
+    if (!editingService) return;
+
+    try {
+      const featuresArray = formData.features.split("\\n").filter(f => f.trim() !== "");
+
+      const { error } = await supabase
+        .from("booking_services")
+        .update({
+          title: formData.title,
+          duration: formData.duration,
+          price: formData.price,
+          description: formData.description,
+          features: featuresArray,
+          popular: formData.popular
+        })
+        .eq("id", editingService.id);
+
+      if (error) throw error;
+
+      toast.success("Service updated successfully!");
+      setEditingService(null);
+      fetchServices();
+    } catch (error) {
+      console.error("Update failed:", error);
+      toast.error("Failed to update service");
+    }
+  };
+
   return (
     <Layout>
       <SEOHead
@@ -322,7 +373,7 @@ const Services = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
             {pricingPlans.map((plan, index) => (
               <motion.div
-                key={plan.name}
+                key={plan.id || plan.title}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -334,7 +385,13 @@ const Services = () => {
               >
                 {/* Visual Cue for Edit Mode */}
                 {isEditMode && (
-                  <div className="absolute -right-3 -top-3 z-20 cursor-pointer hover:scale-110 transition-transform">
+                  <div
+                    className="absolute -right-3 -top-3 z-20 cursor-pointer hover:scale-110 transition-transform"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleEditClick(plan);
+                    }}
+                  >
                     <div className="bg-amber-500 text-white p-2 rounded-full shadow-lg">
                       <Pencil className="w-4 h-4" />
                     </div>
@@ -347,16 +404,16 @@ const Services = () => {
                 )}
 
                 <div className="text-center mb-6">
-                  <h3 className="font-display text-xl font-semibold text-foreground mb-1">{plan.name}</h3>
+                  <h3 className="font-display text-xl font-semibold text-foreground mb-1">{plan.title}</h3>
                   <p className="text-sm text-muted-foreground mb-4">{plan.duration}</p>
                   <div className="flex items-baseline justify-center gap-1">
-                    <span className="text-4xl font-display font-bold text-foreground">${plan.price}</span>
+                    <span className="text-4xl font-display font-bold text-foreground">{plan.price}</span>
                   </div>
                   <p className="text-xs text-muted-foreground mt-2">{plan.description}</p>
                 </div>
 
                 <ul className="space-y-3 mb-6">
-                  {plan.features.map((feature) => (
+                  {(plan.features || []).map((feature) => (
                     <li key={feature} className="flex items-center gap-2 text-sm">
                       <Check className="w-4 h-4 text-primary flex-shrink-0" />
                       <span className="text-muted-foreground">{feature}</span>
@@ -374,6 +431,66 @@ const Services = () => {
               </motion.div>
             ))}
           </div>
+
+          {/* Edit Dialog */}
+          <Dialog open={!!editingService} onOpenChange={(open) => !open && setEditingService(null)}>
+            <DialogContent className="max-w-md">
+              <DialogHeader>
+                <DialogTitle>Edit Service</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4 py-4">
+                <div className="space-y-2">
+                  <Label>Title</Label>
+                  <Input
+                    value={formData.title}
+                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Price</Label>
+                    <Input
+                      value={formData.price}
+                      onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Duration</Label>
+                    <Input
+                      value={formData.duration}
+                      onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label>Description</Label>
+                  <Textarea
+                    value={formData.description}
+                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Features (one per line)</Label>
+                  <Textarea
+                    value={formData.features}
+                    onChange={(e) => setFormData({ ...formData, features: e.target.value })}
+                    rows={5}
+                  />
+                </div>
+                <div className="flex items-center gap-2">
+                  <Switch
+                    checked={formData.popular}
+                    onCheckedChange={(c) => setFormData({ ...formData, popular: c })}
+                  />
+                  <Label>Popular</Label>
+                </div>
+              </div>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setEditingService(null)}>Cancel</Button>
+                <Button onClick={handleUpdate}>Save Changes</Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
 
           {/* Trust indicators */}
           <motion.div
