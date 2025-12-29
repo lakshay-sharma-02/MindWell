@@ -105,7 +105,7 @@ const Admin = () => {
 
       {/* Sidebar Navigation */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-64 bg-card border-r border-border transition-transform duration-300 lg:translate-x-0 lg:static lg:block ${mobileMenuOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full"
+        className={`fixed inset-y-0 left-0 z-50 w-64 bg-card border-r border-border transition-transform duration-300 lg:translate-x-0 lg:sticky lg:top-0 lg:h-screen lg:block ${mobileMenuOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full"
           }`}
       >
         <div className="h-full flex flex-col">
@@ -145,7 +145,7 @@ const Admin = () => {
       </aside>
 
       {/* Main Content Area */}
-      <main className="flex-1 min-w-0 flex flex-col h-screen overflow-hidden">
+      <main className="flex-1 min-w-0 flex flex-col min-h-screen">
         {/* Mobile Header */}
         <header className="lg:hidden flex items-center justify-between p-4 border-b border-border bg-card">
           <span className="font-bold">Menu</span>
@@ -155,7 +155,7 @@ const Admin = () => {
         </header>
 
         {/* Scrollable Content */}
-        <div className="flex-1 overflow-y-auto p-4 md:p-8 lg:p-12 scroll-smooth">
+        <div className="flex-1 p-4 md:p-8 lg:p-12">
           <div className="max-w-6xl mx-auto animate-in fade-in duration-500">
             {renderContent()}
           </div>
