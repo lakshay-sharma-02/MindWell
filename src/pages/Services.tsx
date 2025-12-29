@@ -75,18 +75,13 @@ const services = [
 
 
 
-import { useState, useEffect, lazy, Suspense } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { useState, lazy, Suspense } from "react";
 import { Tables } from "@/types/database";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { toast } from "sonner";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Plus, Loader2, Trash2, Pencil } from "lucide-react";
 import { SectionErrorBoundary } from "@/components/shared/SectionErrorBoundary";
 import { useServices } from "@/hooks/useServices";
+import { ServiceValues } from "@/lib/schemas/serviceSchema";
 
 const ServiceForm = lazy(() => import("@/components/admin/forms/ServiceForm").then(module => ({ default: module.ServiceForm })));
 
@@ -100,9 +95,7 @@ const Services = () => {
   const [editingService, setEditingService] = useState<Service | null>(null);
   const [isAdding, setIsAdding] = useState(false);
 
-  // We don't need manual loading state or fetch effects anymore!
-
-  const handleSave = async (data: any) => {
+  const handleSave = async (data: ServiceValues) => {
     // The data coming from Zod form
     const featuresArray = data.features.split("\n").filter((f: string) => f.trim() !== "");
 
