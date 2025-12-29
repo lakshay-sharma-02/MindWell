@@ -150,7 +150,7 @@ export function BlogCard({ post, featured = false, onUpdate, className = "" }: B
 
       <Link to={`/blog/${post.slug}`} className={`block ${isEditing ? 'pointer-events-none' : ''}`}>
         {/* Image area with gradient overlay */}
-        <div className={`relative ${featured ? 'aspect-[2/1]' : 'aspect-[16/10]'} bg-secondary overflow-hidden`}>
+        <div className={`relative ${featured ? 'aspect-[2.5/1]' : 'aspect-[16/10]'} bg-secondary overflow-hidden`}>
           <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-secondary to-accent/10" />
           <div className="absolute inset-0 opacity-30">
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 rounded-full border border-foreground/10" />

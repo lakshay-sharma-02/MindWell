@@ -120,7 +120,7 @@ export function FeaturedBlogs() {
         </motion.div>
 
         {featured.length > 0 ? (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 auto-rows-fr">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
             {featured.map((post, index) => {
               const isMain = index === 0;
               return (
@@ -130,7 +130,7 @@ export function FeaturedBlogs() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: "-50px" }}
                   transition={{ duration: 0.5, delay: index * 0.12 }}
-                  className={`${isMain ? 'lg:col-span-2 lg:row-span-2' : 'lg:col-span-1'}`}
+                  className={`${isMain ? 'md:col-span-2' : 'md:col-span-1'}`}
                 >
                   <BlogCard
                     post={post}
