@@ -10,14 +10,15 @@ create table if not exists public.site_settings (
 alter table public.site_settings enable row level security;
 
 -- Admin can manage site settings
+-- Using user_roles table instead of profiles column
 create policy "Admins can manage site settings"
   on public.site_settings
   for all
   using (
     exists (
-      select 1 from public.profiles
-      where profiles.id = auth.uid()
-      and profiles.role = 'admin'
+      select 1 from public.user_roles
+      where user_roles.user_id = auth.uid()
+      and user_roles.role = 'admin'
     )
   );
 
@@ -46,9 +47,9 @@ create policy "Admins can manage announcements"
   for all
   using (
     exists (
-      select 1 from public.profiles
-      where profiles.id = auth.uid()
-      and profiles.role = 'admin'
+      select 1 from public.user_roles
+      where user_roles.user_id = auth.uid()
+      and user_roles.role = 'admin'
     )
   );
 
