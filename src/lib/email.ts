@@ -12,8 +12,8 @@ interface EmailData {
 }
 
 async function invokeEmailFunction(type: string, data: Record<string, unknown>) {
-  console.log(`[Email Service] Initiating email request for type: '${type}'`);
-  console.log(`[Email Service] Payload:`, data);
+  // console.log(`[Email Service] Initiating email request for type: '${type}'`);
+  // console.log(`[Email Service] Payload:`, data);
 
   try {
     const { data: responseData, error } = await supabase.functions.invoke('send-email', {

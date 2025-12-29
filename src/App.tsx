@@ -8,7 +8,7 @@ import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { AuthProvider, useAuth } from "@/hooks/useAuth";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, m, LazyMotion, domAnimation } from "framer-motion";
 import ScrollToTop from "@/components/utils/ScrollToTop";
 import { PageSkeleton } from "@/components/layout/PageSkeleton";
 import { lazyWithRetry } from "@/utils/lazyWithRetry";
@@ -37,42 +37,50 @@ const Tools = lazyWithRetry(() => import("./pages/Tools"));
 
 const queryClient = new QueryClient();
 
+import { featureLoaders } from "@/utils/featureLoaders";
+
 function AnimatedRoutes() {
   const location = useLocation();
 
   return (
     <AnimatePresence mode="wait" initial={false}>
-      <motion.div
-        key={location.pathname}
-        initial={{ opacity: 0, scale: 0.98 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.98 }}
-        transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-      >
-        <Suspense fallback={<PageSkeleton />}>
-          <Routes location={location}>
-            <Route path="/" element={<Index />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/admin" element={<Admin />} />
-            <Route path="/blog" element={<Blog />} />
-            <Route path="/blog/:slug" element={<BlogPost />} />
-            <Route path="/podcasts" element={<Podcasts />} />
-            <Route path="/resources" element={<Resources />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/book" element={<Book />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/quiz" element={<Quiz />} />
-            <Route path="/services" element={<Services />} />
-            <Route path="/checkout" element={<Checkout />} />
-            <Route path="/stories" element={<Stories />} />
-            <Route path="/community" element={<CommunitySupport />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/tools" element={<Tools />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </Suspense>
-      </motion.div>
+      {/* 
+        Using LazyMotion with domAnimation significantly reduces bundle size 
+        by checking features only when needed. 
+      */}
+      <LazyMotion features={domAnimation}>
+        <m.div
+          key={location.pathname}
+          initial={{ opacity: 0, scale: 0.98 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.98 }}
+          transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <Suspense fallback={<PageSkeleton />}>
+            <Routes location={location}>
+              <Route path="/" element={<Index />} />
+              <Route path="/auth" element={<Auth />} />
+              <Route path="/admin" element={<Admin />} />
+              <Route path="/blog" element={<Blog />} />
+              <Route path="/blog/:slug" element={<BlogPost />} />
+              <Route path="/podcasts" element={<Podcasts />} />
+              <Route path="/resources" element={<Resources />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/book" element={<Book />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/quiz" element={<Quiz />} />
+              <Route path="/services" element={<Services />} />
+              <Route path="/checkout" element={<Checkout />} />
+              <Route path="/stories" element={<Stories />} />
+              <Route path="/community" element={<CommunitySupport />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/tools" element={<Tools />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Suspense>
+        </m.div>
+      </LazyMotion>
     </AnimatePresence>
   );
 }

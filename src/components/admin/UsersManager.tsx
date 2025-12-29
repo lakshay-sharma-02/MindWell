@@ -55,7 +55,7 @@ export function UsersManager() {
 
     const fetchUsers = async () => {
         try {
-            console.log("Fetching users list...");
+            // console.log("Fetching users list...");
             // Use the secure RPC function to get users with emails
             const { data, error } = await supabase.rpc('get_admin_users_list');
 
@@ -64,7 +64,7 @@ export function UsersManager() {
                 throw error;
             }
 
-            console.log("Users fetched successfully:", data);
+            // console.log("Users fetched successfully:", data);
             setUsers(data as UserData[]);
         } catch (error) {
             console.error("Error fetching users:", error);

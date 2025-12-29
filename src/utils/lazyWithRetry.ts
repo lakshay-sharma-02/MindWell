@@ -23,7 +23,7 @@ export const lazyWithRetry = (
                 const hasReloaded = sessionStorage.getItem(storageKey);
 
                 if (!hasReloaded) {
-                    console.log("Chunk load failed, forcing reload to get new version...");
+                    // console.log("Chunk load failed, forcing reload to get new version...");
                     sessionStorage.setItem(storageKey, "true");
                     window.location.reload();
                     // Return a never-resolving promise to wait for reload
