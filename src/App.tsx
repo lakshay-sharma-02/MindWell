@@ -100,28 +100,59 @@ function GlobalOverlays() {
   );
 }
 
-const App = () => (
-  <HelmetProvider>
-    <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
-      <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
-          <SmoothScroll />
-          <ScrollToTop />
-          <AuthProvider>
-            <TooltipProvider>
-              <AdminProvider>
-                <Toaster />
-                <Sonner />
-                <AuthPopup />
-                <GlobalOverlays />
-                <AnimatedRoutes />
-              </AdminProvider>
-            </TooltipProvider>
-          </AuthProvider>
-        </BrowserRouter>
-      </QueryClientProvider>
-    </ThemeProvider>
-  </HelmetProvider>
-);
+import MaintenancePage from "@/pages/MaintenancePage";
+import { useSiteSettings } from "@/hooks/useSiteSettings";
+
+const App = () => {
+  const { settings, loading: settingsLoading } = useSiteSettings();
+  // Move user/auth check to a wrapper or use inside App content if possible, 
+  // but typically we need it here. However, AuthProvider is inside.
+  // We might need to lift the logic or create a wrapper component inside AuthProvider.
+  // For now, let's create a MainContent component that has access to auth context.
+
+  return (
+    <HelmetProvider>
+      <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
+        <QueryClientProvider client={queryClient}>
+          <BrowserRouter>
+            <SmoothScroll />
+            <ScrollToTop />
+            <AuthProvider>
+              <TooltipProvider>
+                <AdminProvider>
+                  <Toaster />
+                  <Sonner />
+                  <AuthPopup />
+                  <GlobalOverlays />
+                  <AppContent />
+                </AdminProvider>
+              </TooltipProvider>
+            </AuthProvider>
+          </BrowserRouter>
+        </QueryClientProvider>
+      </ThemeProvider>
+    </HelmetProvider>
+  )
+};
+
+// Extract content to use contexts
+function AppContent() {
+  const { settings, loading: settingsLoading } = useSiteSettings();
+  const { user, isAdmin } = useAuth();
+  const location = useLocation();
+
+  // Show loading skeleton while settings load
+  if (settingsLoading) return <PageSkeleton />;
+
+  // Check strict maintenance mode
+  // Allow access to /auth and /admin even in maintenance mode for admins to login
+  const isRestrictedPath = !['/auth', '/admin'].includes(location.pathname);
+
+  if (settings.features.maintenance_mode && isRestrictedPath && !isAdmin) {
+    return <MaintenancePage />;
+  }
+
+  return <AnimatedRoutes />;
+}
 
 export default App;

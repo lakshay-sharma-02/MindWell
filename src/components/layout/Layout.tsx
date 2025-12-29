@@ -10,6 +10,7 @@ import { NewsletterModal } from "@/components/engagement/NewsletterModal";
 import { CookieBanner } from "@/components/engagement/CookieBanner";
 import { AudioPlayer } from "@/components/audio/AudioPlayer";
 import { AdminFloatingPanel } from "@/components/admin/AdminFloatingPanel";
+import { AnnouncementBanner } from "@/components/layout/AnnouncementBanner";
 import { PodcastEpisode } from "@/data/podcasts";
 
 interface LayoutProps {
@@ -33,12 +34,10 @@ export const useAudioPlayer = () => {
   return context;
 };
 
-
 export function Layout({ children }: LayoutProps) {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [currentEpisode, setCurrentEpisode] = useState<PodcastEpisode | null>(null);
   const [isPlayerMinimized, setIsPlayerMinimized] = useState(false);
-
 
   // Global keyboard shortcut for search
   useEffect(() => {
@@ -60,6 +59,7 @@ export function Layout({ children }: LayoutProps) {
   return (
     <AudioContext.Provider value={{ playEpisode }}>
       <div className="min-h-screen flex flex-col relative">
+        <AnnouncementBanner />
         <CursorGlow />
         <ScrollProgress />
         <Header onSearchClick={() => setIsSearchOpen(true)} />
