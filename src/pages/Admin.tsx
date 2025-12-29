@@ -15,7 +15,8 @@ import {
   Users,
   Menu,
   X,
-  ShieldCheck
+  ShieldCheck,
+  Settings
 } from "lucide-react";
 import { Calendar } from "lucide-react";
 import { BlogsManager } from "@/components/admin/BlogsManager";
@@ -29,6 +30,8 @@ import { StoriesManager } from "@/components/admin/StoriesManager";
 import { AdminOverview } from "@/components/admin/AdminOverview";
 import { UsersManager } from "@/components/admin/UsersManager";
 import { CommunityManager } from "@/components/admin/CommunityManager";
+import { SiteSettings } from "@/components/admin/SiteSettings";
+import { CommunicationsManager } from "@/components/admin/CommunicationsManager";
 import { motion, AnimatePresence } from "framer-motion";
 
 const Admin = () => {
@@ -60,6 +63,8 @@ const Admin = () => {
     { id: "bookings", label: "Bookings", icon: Calendar },
     { id: "testimonials", label: "Testimonials", icon: MessageSquare }, // Reusing icon or change if needed
     { id: "faqs", label: "FAQs", icon: HelpCircle },
+    { id: "communications", label: "Communications", icon: MessageSquare },
+    { id: "settings", label: "Settings", icon: Settings },
   ];
 
   const renderContent = () => {
@@ -75,6 +80,8 @@ const Admin = () => {
       case "bookings": return <BookingsManager />;
       case "testimonials": return <TestimonialsManager />;
       case "faqs": return <FaqsManager />;
+      case "communications": return <CommunicationsManager />;
+      case "settings": return <SiteSettings />;
       default: return <AdminOverview />;
     }
   };

@@ -193,6 +193,54 @@ export interface Database {
           created_at?: string
         }
       }
+      announcements: {
+        Row: {
+          id: string
+          title: string
+          content: string
+          is_active: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          title: string
+          content: string
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          title?: string
+          content?: string
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      site_settings: {
+        Row: {
+          key: string
+          value: any // Using any for JSONB flexibility
+          description: string | null
+          updated_at: string
+        }
+        Insert: {
+          key: string
+          value: any
+          description?: string | null
+          updated_at?: string
+        }
+        Update: {
+          key?: string
+          value?: any
+          description?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       faqs: {
         Row: {
           id: string
