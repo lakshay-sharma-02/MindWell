@@ -11,6 +11,8 @@ import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Tables } from "@/types/database";
+import { format } from "date-fns";
+import { BookingCalendar } from "@/components/booking/BookingCalendar";
 
 type Service = Tables<"booking_services">;
 
@@ -371,33 +373,17 @@ ${quizResult.report.map((r, i) => `${i + 1}. ${r.question}\n   Answer: ${r.answe
                   </div>
                 </div>
 
-                {/* Date & Time */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-3">
-                    <label className="text-sm font-medium text-foreground">Preferred Date *</label>
-                    <Input
-                      type="date"
-                      value={selectedDate}
-                      onChange={(e) => setSelectedDate(e.target.value)}
-                      min={new Date().toISOString().split('T')[0]}
-                      className="h-12"
-                      required
-                    />
-                  </div>
-                  <div className="space-y-3">
-                    <label className="text-sm font-medium text-foreground">Preferred Time *</label>
-                    <select
-                      value={selectedTime}
-                      onChange={(e) => setSelectedTime(e.target.value)}
-                      className="w-full h-12 px-4 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20"
-                      required
-                    >
-                      <option value="">Select a time</option>
-                      {timeSlots.map((time) => (
-                        <option key={time} value={time}>{time}</option>
-                      ))}
-                    </select>
-                  </div>
+                {/* Date & Time Calendar */}
+                <div className="rounded-3xl border border-border/50 bg-background/50 p-6 md:p-8">
+                  <BookingCalendar
+                    selectedDate={selectedDate ? new Date(selectedDate) : undefined}
+                    onDateSelect={(date) => setSelectedDate(date ? format(date, "yyyy-MM-dd") : "")}
+                    selectedTime={selectedTime}
+                    onTimeSelect={setSelectedTime}
+                  />
+                  {/* Hidden inputs to maintain form validity if needed, or rely on state check in handleSubmit */}
+                  <input type="hidden" name="date" value={selectedDate} required />
+                  <input type="hidden" name="time" value={selectedTime} required />
                 </div>
 
                 {/* Contact Info */}
