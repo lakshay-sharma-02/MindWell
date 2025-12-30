@@ -15,7 +15,7 @@ export function CTASection() {
     <section className="section-padding relative overflow-hidden">
       {/* Subtle gradient background that blends with the page */}
       <div className="absolute inset-0 bg-gradient-to-b from-background via-secondary/50 to-background" />
-      
+
       {/* Soft ambient orbs */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-1/4 left-0 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[120px] -translate-x-1/2" />
@@ -35,7 +35,7 @@ export function CTASection() {
             {/* Card background with gradient border effect */}
             <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-accent/10 rounded-3xl" />
             <div className="absolute inset-[1px] bg-card rounded-3xl" />
-            
+
             <div className="relative p-8 md:p-12 lg:p-16">
               <div className="grid lg:grid-cols-2 gap-12 items-center">
                 {/* Left: Content */}
@@ -69,7 +69,7 @@ export function CTASection() {
                     transition={{ duration: 0.5, delay: 0.3 }}
                     className="text-muted-foreground text-lg mb-8 max-w-lg mx-auto lg:mx-0"
                   >
-                    Take the first step toward a healthier mind. Book a confidential 
+                    Take the first step toward a healthier mind. Book a confidential
                     session and discover personalized strategies for your wellbeing.
                   </motion.p>
 
@@ -80,8 +80,8 @@ export function CTASection() {
                     transition={{ duration: 0.5, delay: 0.4 }}
                     className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start"
                   >
-                    <Button 
-                      size="lg" 
+                    <Button
+                      size="lg"
                       className="group shadow-card hover:shadow-elevated"
                       asChild
                     >
@@ -91,9 +91,9 @@ export function CTASection() {
                         <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-0.5 transition-transform" />
                       </Link>
                     </Button>
-                    <Button 
-                      size="lg" 
-                      variant="outline" 
+                    <Button
+                      size="lg"
+                      variant="outline"
                       asChild
                     >
                       <Link to="/about">Learn More</Link>
@@ -116,12 +116,12 @@ export function CTASection() {
                       whileInView={{ opacity: 1, y: 0 }}
                       viewport={{ once: true }}
                       transition={{ duration: 0.4, delay: 0.4 + index * 0.08 }}
-                      className="group p-5 rounded-2xl bg-secondary/50 hover:bg-secondary border border-border/50 hover:border-primary/20 transition-all duration-300"
+                      className="group p-3 sm:p-5 rounded-2xl bg-secondary/50 hover:bg-secondary border border-border/50 hover:border-primary/20 transition-all duration-300"
                     >
                       <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
                         <feature.icon className="w-5 h-5 text-primary" />
                       </div>
-                      <h3 className="font-medium text-foreground mb-1">{feature.title}</h3>
+                      <h3 className="font-medium text-sm sm:text-base text-foreground mb-1 break-words">{feature.title}</h3>
                       <p className="text-sm text-muted-foreground">{feature.description}</p>
                     </motion.div>
                   ))}
