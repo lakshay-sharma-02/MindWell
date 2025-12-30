@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
-import { format, addMonths, isSameDay, isToday, isBefore, startOfToday } from "date-fns";
+import { format, addMonths, isSameDay, isToday, isBefore, startOfToday, parseISO } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ChevronRight, ChevronLeft, Clock, Calendar as CalendarIcon, Sun, Moon, Sunrise } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { Input } from "@/components/ui/input";
 
 interface BookingCalendarProps {
     selectedDate: Date | undefined;
@@ -48,6 +49,19 @@ export function BookingCalendar({
     const afternoonSlots = timeSlots.filter(s => s.period === "afternoon");
     const eveningSlots = timeSlots.filter(s => s.period === "evening");
 
+    const handleNativeDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const dateString = e.target.value;
+        if (!dateString) {
+            onDateSelect(undefined);
+            return;
+        }
+
+        // Parse the YYYY-MM-DD string correctly
+        const [year, month, day] = dateString.split('-').map(Number);
+        const newDate = new Date(year, month - 1, day);
+        onDateSelect(newDate);
+    };
+
     return (
         <div className="flex flex-col lg:flex-row gap-8">
             {/* Date Selection */}
@@ -60,32 +74,52 @@ export function BookingCalendar({
                 </div>
 
                 <div className="p-2 sm:p-4 rounded-3xl border border-border/50 bg-card/50 shadow-sm backdrop-blur-sm">
-                    <Calendar
-                        mode="single"
-                        selected={selectedDate}
-                        onSelect={onDateSelect}
-                        month={month}
-                        onMonthChange={setMonth}
-                        disabled={(date) => isBefore(date, startOfToday()) || date.getDay() === 0 || date.getDay() === 6}
-                        className="rounded-xl border-none w-full"
-                        classNames={{
-                            month: "space-y-4 w-full",
-                            caption: "flex justify-center pt-1 relative items-center mb-4",
-                            caption_label: "text-base font-display font-medium",
-                            nav: "space-x-1 flex items-center",
-                            head_row: "flex w-full mt-2",
-                            head_cell: "text-muted-foreground rounded-md w-8 sm:w-9 font-normal text-[0.8rem] flex-1",
-                            row: "flex w-full mt-2",
-                            cell: "text-center text-xs sm:text-sm p-0 relative [&:has([aria-selected])]:bg-primary/5 first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20 flex-1",
-                            day: cn(
-                                "h-8 w-8 sm:h-10 sm:w-10 p-0 font-normal aria-selected:opacity-100 hover:bg-primary/10 rounded-full transition-all mx-auto flex items-center justify-center data-[selected]:bg-primary data-[selected]:text-primary-foreground data-[selected]:hover:bg-primary data-[selected]:hover:text-primary-foreground shadow-sm"
-                            ),
-                            day_today: "bg-accent/10 text-accent font-bold",
-                            day_outside: "text-muted-foreground opacity-50",
-                            day_disabled: "text-muted-foreground opacity-30",
-                            day_hidden: "invisible",
-                        }}
-                    />
+                    {/* Native Date Picker for Mobile (Portrait) */}
+                    <div className="block md:hidden px-2 mb-4">
+                        <label className="text-sm font-medium text-muted-foreground mb-1.5 block">
+                            Tap to open calendar
+                        </label>
+                        <div className="relative">
+                            <Input
+                                type="date"
+                                className="w-full text-base py-6 pl-10 bg-background/50 border-input"
+                                min={format(new Date(), 'yyyy-MM-dd')}
+                                value={selectedDate ? format(selectedDate, 'yyyy-MM-dd') : ''}
+                                onChange={handleNativeDateChange}
+                            />
+                            <CalendarIcon className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+                        </div>
+                    </div>
+
+                    {/* Custom Calendar for Desktop/Tablet */}
+                    <div className="hidden md:block">
+                        <Calendar
+                            mode="single"
+                            selected={selectedDate}
+                            onSelect={onDateSelect}
+                            month={month}
+                            onMonthChange={setMonth}
+                            disabled={(date) => isBefore(date, startOfToday()) || date.getDay() === 0 || date.getDay() === 6}
+                            className="rounded-xl border-none w-full"
+                            classNames={{
+                                month: "space-y-4 w-full",
+                                caption: "flex justify-center pt-1 relative items-center mb-4",
+                                caption_label: "text-base font-display font-medium",
+                                nav: "space-x-1 flex items-center",
+                                head_row: "flex w-full mt-2",
+                                head_cell: "text-muted-foreground rounded-md w-8 sm:w-9 font-normal text-[0.8rem] flex-1",
+                                row: "flex w-full mt-2",
+                                cell: "text-center text-xs sm:text-sm p-0 relative [&:has([aria-selected])]:bg-primary/5 first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20 flex-1",
+                                day: cn(
+                                    "h-8 w-8 sm:h-10 sm:w-10 p-0 font-normal aria-selected:opacity-100 hover:bg-primary/10 rounded-full transition-all mx-auto flex items-center justify-center data-[selected]:bg-primary data-[selected]:text-primary-foreground data-[selected]:hover:bg-primary data-[selected]:hover:text-primary-foreground shadow-sm"
+                                ),
+                                day_today: "bg-accent/10 text-accent font-bold",
+                                day_outside: "text-muted-foreground opacity-50",
+                                day_disabled: "text-muted-foreground opacity-30",
+                                day_hidden: "invisible",
+                            }}
+                        />
+                    </div>
                 </div>
 
                 {/* Selected Date Summary */}
