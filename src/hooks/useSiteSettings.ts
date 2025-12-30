@@ -69,9 +69,26 @@ const defaultSettings: SiteSettings = {
     },
 };
 
+const CACHE_KEY = 'site_settings_cache';
+
 export const useSiteSettings = () => {
-    const [settings, setSettings] = useState<SiteSettings>(defaultSettings);
-    const [loading, setLoading] = useState(true);
+    const [settings, setSettings] = useState<SiteSettings>(() => {
+        // Try to load from cache first
+        try {
+            const cached = localStorage.getItem(CACHE_KEY);
+            if (cached) {
+                return JSON.parse(cached);
+            }
+        } catch (e) {
+            console.error('Error parsing site settings cache:', e);
+        }
+        return defaultSettings;
+    });
+
+    // If we loaded from cache, we're not technically "loading" in a UI blocking sense,
+    // but we still want to fetch fresh data.
+    // However, for the purpose of "should I show a spinner", if we have cache, we don't need a spinner.
+    const [loading, setLoading] = useState(!localStorage.getItem(CACHE_KEY));
 
     useEffect(() => {
         fetchSettings();
@@ -87,30 +104,20 @@ export const useSiteSettings = () => {
 
             if (data) {
                 const newSettings = { ...defaultSettings };
+
                 data.forEach(setting => {
-                    // branding is part of global_info in my interface change above, 
-                    // BUT in DB it might be a separate key if I want it to be. 
-                    // However, my interface put it INSIDE global_info. 
-                    // Let's re-read the interface.
-                    // Interface: global_info: { ..., branding: { ... } }
-                    // Implementation below expects 'global_info' key from DB to contain entire object.
-                    // So if I update global_info in DB, it will automatically include branding if I save it there.
-                    // But wait, if I want to manage it separately?
-                    // Let's stick to putting it inside global_info for simplicity IF global_info is a JSONB.
-                    // If global_info is a row with key='global_info', value={...}, then adding branding to defaultSettings works, 
-                    // provided the MERGE logic works.
-                    // Currently fetchSettings does: newSettings.global_info = setting.value as any; 
-                    // This OVERWRITES everything.
-                    // So if DB global_info doesn't have branding, it will be lost?
-                    // Yes. So I should merge it.
+                    const value = setting.value as any;
                     if (setting.key === 'global_info') {
-                        newSettings.global_info = { ...newSettings.global_info, ...setting.value };
+                        newSettings.global_info = { ...newSettings.global_info, ...value };
                     }
-                    if (setting.key === 'features') newSettings.features = { ...newSettings.features, ...setting.value };
-                    if (setting.key === 'social_links') newSettings.social_links = { ...newSettings.social_links, ...setting.value };
-                    if (setting.key === 'landing_page') newSettings.landing_page = { ...newSettings.landing_page, ...setting.value };
+                    if (setting.key === 'features') newSettings.features = { ...newSettings.features, ...value };
+                    if (setting.key === 'social_links') newSettings.social_links = { ...newSettings.social_links, ...value };
+                    if (setting.key === 'landing_page') newSettings.landing_page = { ...newSettings.landing_page, ...value };
                 });
+
                 setSettings(newSettings);
+                // Update cache
+                localStorage.setItem(CACHE_KEY, JSON.stringify(newSettings));
             }
         } catch (error) {
             console.error('Error fetching site settings:', error);

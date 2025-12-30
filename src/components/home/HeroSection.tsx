@@ -1,13 +1,39 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { MagneticButton } from "@/components/ui/magnetic-button";
 import { ArrowRight, Heart, Sparkles, Users, BookOpen, Headphones, Star } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, useSpring, useTransform } from "framer-motion";
 import { AnimatedCounter } from "@/components/shared/AnimatedCounter";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
+import { useMousePosition } from "@/hooks/useMousePosition";
+import { useEffect } from "react";
 
 export function HeroSection() {
   const { settings } = useSiteSettings();
   const hero = settings.landing_page.hero;
+  const { x, y } = useMousePosition();
+
+  // Smooth out mouse movements for parallax
+  const springConfig = { damping: 25, stiffness: 120 };
+  const mouseX = useSpring(0, springConfig);
+  const mouseY = useSpring(0, springConfig);
+
+  useEffect(() => {
+    const centerX = window.innerWidth / 2;
+    const centerY = window.innerHeight / 2;
+    mouseX.set(x - centerX);
+    mouseY.set(y - centerY);
+  }, [x, y, mouseX, mouseY]);
+
+  // Parallax transforms - different elements move at different speeds
+  const moveX1 = useTransform(mouseX, [-500, 500], [20, -20]);
+  const moveY1 = useTransform(mouseY, [-500, 500], [20, -20]);
+
+  const moveX2 = useTransform(mouseX, [-500, 500], [-30, 30]);
+  const moveY2 = useTransform(mouseY, [-500, 500], [-30, 30]);
+
+  const moveX3 = useTransform(mouseX, [-500, 500], [15, -15]);
+  const moveY3 = useTransform(mouseY, [-500, 500], [15, -15]);
 
   const stats = [
     { icon: Users, value: 1200, suffix: "+", label: "Clients Helped" },
@@ -16,7 +42,7 @@ export function HeroSection() {
   ];
 
   return (
-    <section className="relative min-h-[95vh] flex items-center overflow-hidden">
+    <section className="relative min-h-[95vh] flex items-center overflow-hidden bg-noise">
       {/* Elegant mesh gradient background */}
       <div className="absolute inset-0">
         <div className="absolute inset-0 bg-gradient-to-br from-background via-background to-secondary/40" />
@@ -26,31 +52,31 @@ export function HeroSection() {
           <div className="absolute top-0 right-0 w-full h-full bg-mesh-gradient dark:bg-dark-mesh" />
         </div>
 
-        {/* Primary glowing orb */}
+        {/* Primary glowing orb - Parallax Layer 1 */}
         <motion.div
+          style={{ x: moveX1, y: moveY1 }}
           animate={{
             scale: [1, 1.15, 1],
             opacity: [0.15, 0.25, 0.15],
-            x: [0, 30, 0],
-            y: [0, -20, 0]
           }}
           transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
           className="absolute top-[5%] right-[5%] w-[600px] h-[600px] bg-primary/25 dark:bg-primary/35 rounded-full blur-[150px]"
         />
 
-        {/* Accent orb */}
+        {/* Accent orb - Parallax Layer 2 */}
         <motion.div
+          style={{ x: moveX2, y: moveY2 }}
           animate={{
             scale: [1.1, 1, 1.1],
             opacity: [0.1, 0.2, 0.1],
-            x: [0, -20, 0]
           }}
           transition={{ duration: 18, repeat: Infinity, ease: "easeInOut", delay: 5 }}
           className="absolute bottom-[0%] left-[0%] w-[500px] h-[500px] bg-accent/20 dark:bg-accent/30 rounded-full blur-[130px]"
         />
 
-        {/* Tertiary glow */}
+        {/* Tertiary glow - Parallax Layer 3 */}
         <motion.div
+          style={{ x: moveX3, y: moveY3 }}
           animate={{
             scale: [1, 1.1, 1],
             opacity: [0.08, 0.15, 0.08]
@@ -76,32 +102,31 @@ export function HeroSection() {
           className="absolute top-[30%] right-[18%] w-px bg-gradient-to-b from-transparent via-accent/25 to-transparent"
         />
 
-        {/* Floating particles */}
+        {/* Floating particles - React to mouse */}
         {[...Array(8)].map((_, i) => (
           <motion.div
             key={i}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{
-              opacity: [0, 0.6, 0],
-              y: [0, -40, 0],
-              x: [0, Math.sin(i) * 15, 0]
-            }}
-            transition={{
-              duration: 5 + Math.random() * 3,
-              repeat: Infinity,
-              delay: i * 0.7,
-              ease: "easeInOut"
-            }}
-            className="absolute w-1.5 h-1.5 rounded-full bg-primary/40"
+            className="absolute"
             style={{
               left: `${10 + i * 12}%`,
               top: `${35 + Math.sin(i * 2) * 25}%`
             }}
-          />
+          >
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: [0.3, 0.7, 0.3] }}
+              transition={{ duration: 4 + Math.random() * 2, repeat: Infinity, delay: i }}
+              style={{
+                x: useTransform(mouseX, [-500, 500], [i * 3, i * -3]),
+                y: useTransform(mouseY, [-500, 500], [i * 3, i * -3]),
+              }}
+              className="w-1.5 h-1.5 rounded-full bg-primary/40"
+            />
+          </motion.div>
         ))}
       </div>
 
-      <div className="container-wide relative">
+      <div className="container-wide relative z-10">
         <div className="max-w-4xl mx-auto text-center py-16 md:py-20">
           {/* Trust indicator badge */}
           <motion.div
@@ -136,9 +161,16 @@ export function HeroSection() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.4, duration: 0.8 }}
-              className="text-gradient-animate"
+              className="text-gradient-animate relative inline-block"
             >
               {hero.title_highlight}
+              {/* Underline decoration */}
+              <motion.div
+                initial={{ width: 0 }}
+                animate={{ width: "100%" }}
+                transition={{ delay: 1, duration: 1, ease: "easeOut" }}
+                className="absolute -bottom-2 left-0 h-[6px] bg-accent/20 rounded-full -rotate-1"
+              />
             </motion.span>
           </motion.h1>
 
@@ -157,25 +189,30 @@ export function HeroSection() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
-            className="flex flex-col sm:flex-row gap-4 justify-center mb-16"
+            className="flex flex-col sm:flex-row gap-4 justify-center mb-16 items-center"
           >
-            <Button variant="hero" size="xl" className="btn-glow group" asChild>
-              <Link to="/book">
-                {hero.cta_primary}
-                <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
-              </Link>
-            </Button>
-            <Button
-              variant="ghost" 
-              size="xl"
-              className="bg-primary/5 text-primary hover:bg-primary/10 border-none group"
-              asChild
-            >
-              <Link to="/resources">
-                <Sparkles className="w-5 h-5 mr-2 group-hover:rotate-12 transition-transform" />
-                {hero.cta_secondary}
-              </Link>
-            </Button>
+            <MagneticButton strength={0.4}>
+              <Button variant="hero" size="xl" className="btn-glow group" asChild>
+                <Link to="/book">
+                  {hero.cta_primary}
+                  <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                </Link>
+              </Button>
+            </MagneticButton>
+
+            <MagneticButton strength={0.2}>
+              <Button
+                variant="ghost"
+                size="xl"
+                className="bg-primary/5 text-primary hover:bg-primary/10 border-none group"
+                asChild
+              >
+                <Link to="/resources">
+                  <Sparkles className="w-5 h-5 mr-2 group-hover:rotate-12 transition-transform" />
+                  {hero.cta_secondary}
+                </Link>
+              </Button>
+            </MagneticButton>
           </motion.div>
 
           {/* Animated Stats */}

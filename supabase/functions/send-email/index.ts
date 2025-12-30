@@ -10,10 +10,46 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type",
 };
 
-interface EmailRequest {
-  type: "contact" | "booking" | "newsletter" | "story";
-  data: Record<string, unknown>;
+interface ContactData {
+  name: string;
+  email: string;
+  phone?: string;
+  subject?: string;
+  message: string;
 }
+
+interface BookingData {
+  name: string;
+  email: string;
+  phone?: string;
+  sessionType: string;
+  format: string;
+  date: string;
+  time: string;
+  notes?: string;
+  paymentDetails?: {
+    method?: string;
+    transactionId?: string;
+  };
+}
+
+interface NewsletterData {
+  email: string;
+}
+
+interface StoryData {
+  name: string;
+  email: string;
+  title: string;
+  story: string;
+  anonymous?: boolean;
+}
+
+type EmailRequest =
+  | { type: "contact"; data: ContactData }
+  | { type: "booking"; data: BookingData }
+  | { type: "newsletter"; data: NewsletterData }
+  | { type: "story"; data: StoryData };
 
 async function sendEmail(to: string[], subject: string, html: string) {
   if (!RESEND_API_KEY) {
@@ -49,32 +85,35 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { type, data }: EmailRequest = await req.json();
-    console.log(`Processing ${type} form submission:`, data);
+    const body: EmailRequest = await req.json();
+    console.log(`Processing ${body.type} form submission:`, body.data);
 
     let subject = "";
     let htmlContent = "";
     let userEmail = "";
 
-    switch (type) {
-      case "contact":
+    switch (body.type) {
+      case "contact": {
+        const data = body.data;
         subject = `New Contact Form: ${data.subject || "General Inquiry"}`;
-        userEmail = data.email as string;
+        userEmail = data.email;
         htmlContent = `
           <h2>New Contact Form Submission</h2>
           <table style="border-collapse: collapse; width: 100%;">
             <tr><td style="padding: 8px; border: 1px solid #ddd;"><strong>Name:</strong></td><td style="padding: 8px; border: 1px solid #ddd;">${data.name}</td></tr>
             <tr><td style="padding: 8px; border: 1px solid #ddd;"><strong>Email:</strong></td><td style="padding: 8px; border: 1px solid #ddd;">${data.email}</td></tr>
             <tr><td style="padding: 8px; border: 1px solid #ddd;"><strong>Phone:</strong></td><td style="padding: 8px; border: 1px solid #ddd;">${data.phone || "Not provided"}</td></tr>
-            <tr><td style="padding: 8px; border: 1px solid #ddd;"><strong>Subject:</strong></td><td style="padding: 8px; border: 1px solid #ddd;">${data.subject}</td></tr>
+            <tr><td style="padding: 8px; border: 1px solid #ddd;"><strong>Subject:</strong></td><td style="padding: 8px; border: 1px solid #ddd;">${data.subject || "General Inquiry"}</td></tr>
             <tr><td style="padding: 8px; border: 1px solid #ddd;"><strong>Message:</strong></td><td style="padding: 8px; border: 1px solid #ddd;">${data.message}</td></tr>
           </table>
         `;
         break;
+      }
 
-      case "booking":
+      case "booking": {
+        const data = body.data;
         subject = `New Booking Request: ${data.sessionType}`;
-        userEmail = data.email as string;
+        userEmail = data.email;
         htmlContent = `
           <h2>New Booking Request</h2>
           <table style="border-collapse: collapse; width: 100%;">
@@ -86,24 +125,28 @@ Deno.serve(async (req) => {
             <tr><td style="padding: 8px; border: 1px solid #ddd;"><strong>Date:</strong></td><td style="padding: 8px; border: 1px solid #ddd;">${data.date}</td></tr>
             <tr><td style="padding: 8px; border: 1px solid #ddd;"><strong>Time:</strong></td><td style="padding: 8px; border: 1px solid #ddd;">${data.time}</td></tr>
             <tr><td style="padding: 8px; border: 1px solid #ddd;"><strong>Notes:</strong></td><td style="padding: 8px; border: 1px solid #ddd;">${data.notes || "None"}</td></tr>
-            <tr><td style="padding: 8px; border: 1px solid #ddd;"><strong>Payment Method:</strong></td><td style="padding: 8px; border: 1px solid #ddd;">${(data.paymentDetails as any)?.method?.toUpperCase() || "N/A"}</td></tr>
-            ${(data.paymentDetails as any)?.transactionId ? `<tr><td style="padding: 8px; border: 1px solid #ddd;"><strong>Transaction ID:</strong></td><td style="padding: 8px; border: 1px solid #ddd;">${(data.paymentDetails as any).transactionId}</td></tr>` : ""}
+            <tr><td style="padding: 8px; border: 1px solid #ddd;"><strong>Payment Method:</strong></td><td style="padding: 8px; border: 1px solid #ddd;">${data.paymentDetails?.method?.toUpperCase() || "N/A"}</td></tr>
+            ${data.paymentDetails?.transactionId ? `<tr><td style="padding: 8px; border: 1px solid #ddd;"><strong>Transaction ID:</strong></td><td style="padding: 8px; border: 1px solid #ddd;">${data.paymentDetails.transactionId}</td></tr>` : ""}
           </table>
         `;
         break;
+      }
 
-      case "newsletter":
+      case "newsletter": {
+        const data = body.data;
         subject = "New Newsletter Subscription";
-        userEmail = data.email as string;
+        userEmail = data.email;
         htmlContent = `
           <h2>New Newsletter Subscription</h2>
           <p><strong>Email:</strong> ${data.email}</p>
         `;
         break;
+      }
 
-      case "story":
+      case "story": {
+        const data = body.data;
         subject = `Story Submission: ${data.title}`;
-        userEmail = data.email as string;
+        userEmail = data.email;
         htmlContent = `
           <h2>New Story Submission</h2>
           <table style="border-collapse: collapse; width: 100%;">
@@ -113,10 +156,11 @@ Deno.serve(async (req) => {
           </table>
           <h3>Story:</h3>
           <div style="background: #f9f9f9; padding: 16px; border-radius: 8px;">
-            ${(data.story as string).replace(/\n/g, "<br>")}
+            ${data.story.replace(/\n/g, "<br>")}
           </div>
         `;
         break;
+      }
 
       default:
         throw new Error("Invalid form type");
@@ -134,11 +178,11 @@ Deno.serve(async (req) => {
     let confirmationResponse = null;
 
     // Send confirmation email to user (if applicable)
-    if (userEmail && type !== "newsletter") {
+    if (userEmail && body.type !== "newsletter") {
       confirmationResponse = await sendEmail(
         [userEmail],
-        getConfirmationSubject(type),
-        getConfirmationHtml(type, data)
+        getConfirmationSubject(body.type),
+        getConfirmationHtml(body.type, body.data)
       );
       console.log("Confirmation email sent:", confirmationResponse);
     }
@@ -149,7 +193,7 @@ Deno.serve(async (req) => {
         message: "Email request processed",
         details: {
           admin: adminEmailResponse,
-          user: userEmail ? (type !== "newsletter" ? confirmationResponse : "skipped-newsletter") : "skipped-no-email"
+          user: userEmail ? (body.type !== "newsletter" ? confirmationResponse : "skipped-newsletter") : "skipped-no-email"
         }
       }),
       {
@@ -183,8 +227,10 @@ function getConfirmationSubject(type: string): string {
   }
 }
 
-function getConfirmationHtml(type: string, data: Record<string, unknown>): string {
-  const name = (data.name as string) || "there";
+// Using any for data here to handle the discriminated union generically without complex overloads
+// The specific type safety corresponds to the 'type' field, but inside this helper we trust the correlation.
+function getConfirmationHtml(type: string, data: any): string {
+  const name = data.name || "there";
 
   switch (type) {
     case "contact":
@@ -197,6 +243,7 @@ function getConfirmationHtml(type: string, data: Record<string, unknown>): strin
         </div>
       `;
     case "booking":
+      // BookingData has properties: date, time, sessionType
       return `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h1 style="color: #5d7a5d;">Booking Request Received!</h1>
@@ -207,6 +254,7 @@ function getConfirmationHtml(type: string, data: Record<string, unknown>): strin
         </div>
       `;
     case "story":
+      // StoryData has: anonymous, title
       return `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h1 style="color: #5d7a5d;">Thank you for sharing your story!</h1>

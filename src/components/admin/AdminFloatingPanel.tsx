@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { createPortal } from "react-dom";
-import { Plus, Settings, Eye, EyeOff, LogOut, User, Shield, X, LayoutDashboard, FileText, Mic, BookOpen, MessageSquare, HelpCircle, Calendar } from "lucide-react";
+import { Plus, Settings, Eye, EyeOff, LogOut, User, Shield, X, LayoutDashboard, FileText, Mic, BookOpen, MessageSquare, HelpCircle, Calendar, Palette, Check } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/hooks/useAuth";
 import { useAdminEdit } from "@/hooks/useAdminEdit";
@@ -16,6 +16,9 @@ import { Switch } from "@/components/ui/switch";
 import { getErrorMessage } from "@/lib/getErrorMessage";
 import { Loader2 } from "lucide-react";
 import { lazy, Suspense } from "react";
+import { useSiteSettings } from "@/hooks/useSiteSettings";
+import { hexToHsl, hslToHex } from "@/lib/utils";
+import { Json } from "@/types/database";
 
 // Lazy load admin components
 const SiteSettings = lazy(() => import("@/components/admin/SiteSettings").then(module => ({ default: module.SiteSettings })));
@@ -35,6 +38,11 @@ export function AdminFloatingPanel() {
   const [addingType, setAddingType] = useState<ContentType>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+
+  // Design Mode State
+  const [isDesignMode, setIsDesignMode] = useState(false);
+  const { settings } = useSiteSettings();
+
   const { toast } = useToast();
   const location = useLocation();
 
@@ -49,11 +57,6 @@ export function AdminFloatingPanel() {
   const handleQuickAdd = async (type: ContentType, data: Record<string, unknown>) => {
     if (!type) return;
     setIsSubmitting(true);
-
-    const isMissingPublishedColumn = (err: unknown) => {
-      const msg = err instanceof Error ? err.message : String(err);
-      return /column\s+"published"\s+does\s+not\s+exist/i.test(msg);
-    };
 
     try {
       let table = "";
@@ -166,14 +169,6 @@ export function AdminFloatingPanel() {
           break;
         case "service":
           table = "booking_services";
-          // ServiceForm.tsx returns 'features' as string mostly unless I parsed it there?
-          // Wait, ServiceForm.tsx I wrote returns the `data` state which has features as string (Textarea).
-          // And in Services.tsx I parsed it.
-          // But here in AdminFloatingPanel I am doing raw insert.
-          // I need to parse features string to array here too if table expects array!
-          // Supabase 'booking_services' 'features' column is typically text[] or jsonb.
-          // Looking at AdminFloatingPanel original code (Step 1098 line 170):
-          // features: (data.features as string).split("\n").filter(f => f.trim() !== "")
           {
             const featuresVal = typeof data.features === 'string'
               ? data.features.split("\n").filter((f: string) => f.trim() !== "")
@@ -208,6 +203,44 @@ export function AdminFloatingPanel() {
     }
   };
 
+  const handleQuickDesignUpdate = async (colorHex: string, title?: string) => {
+    try {
+      const updates: any[] = [];
+
+      if (colorHex) {
+        const currentBranding = settings.global_info.branding;
+        updates.push({
+          key: 'global_info',
+          value: {
+            ...settings.global_info,
+            branding: { ...currentBranding, primary_color: hexToHsl(colorHex) }
+          } as unknown as Json
+        });
+      }
+
+      if (title) {
+        updates.push({
+          key: 'global_info',
+          value: {
+            ...settings.global_info,
+            title: title
+          } as unknown as Json
+        });
+      }
+
+      const { error } = await supabase.from('site_settings').upsert(updates);
+      if (error) throw error;
+
+      toast({ title: "Design updated", description: "Refresh to see changes fully applied." });
+      // Optional: Force reload or rely on real-time if implemented.
+      setTimeout(() => window.location.reload(), 500);
+
+    } catch (error) {
+      console.error("Error updating design:", error);
+      toast({ title: "Update failed", variant: "destructive" });
+    }
+  };
+
   const handleSignOut = async () => {
     await signOut();
     toast({ title: "Signed out", description: "You have been logged out." });
@@ -239,7 +272,7 @@ export function AdminFloatingPanel() {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 20, scale: 0.95 }}
               transition={{ duration: 0.2 }}
-              className="absolute bottom-16 right-0 w-72 bg-card border border-border rounded-2xl shadow-2xl overflow-hidden"
+              className="absolute bottom-16 right-0 w-80 bg-card border border-border rounded-2xl shadow-2xl overflow-hidden"
             >
               {/* Header */}
               <div className="p-4 bg-primary/5 border-b border-border">
@@ -254,53 +287,114 @@ export function AdminFloatingPanel() {
                 </div>
               </div>
 
-              {/* Quick Actions */}
-              <div className="p-3 space-y-1">
-                <p className="text-xs font-medium text-muted-foreground px-2 mb-2">Quick Add</p>
-                <div className="grid grid-cols-2 gap-2">
-                  {contentTypes.map((item) => (
-                    <button
-                      key={item.type}
-                      onClick={() => setAddingType(item.type)}
-                      className="flex items-center gap-2 p-2.5 rounded-lg hover:bg-secondary transition-colors text-left"
-                    >
-                      <item.icon className={`w-4 h-4 ${item.color}`} />
-                      <span className="text-xs font-medium text-foreground">{item.label}</span>
-                    </button>
-                  ))}
-                </div>
+              {/* Mode Switcher */}
+              <div className="flex border-b border-border">
+                <button
+                  onClick={() => setIsDesignMode(false)}
+                  className={`flex-1 py-2 text-xs font-medium transition-colors ${!isDesignMode ? "bg-primary/5 text-primary" : "text-muted-foreground hover:bg-secondary"}`}
+                >
+                  Content
+                </button>
+                <button
+                  onClick={() => setIsDesignMode(true)}
+                  className={`flex-1 py-2 text-xs font-medium transition-colors ${isDesignMode ? "bg-primary/5 text-primary" : "text-muted-foreground hover:bg-secondary"}`}
+                >
+                  Design
+                </button>
               </div>
 
-              {/* Navigation */}
-              <div className="p-3 border-t border-border space-y-1">
-                <Link
-                  to="/admin"
-                  className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-secondary transition-colors w-full"
-                >
-                  <LayoutDashboard className="w-4 h-4 text-muted-foreground" />
-                  <span className="text-sm text-foreground">Full Dashboard</span>
-                </Link>
-                <button
-                  onClick={toggleEditMode}
-                  className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-secondary transition-colors w-full"
-                >
-                  {isEditMode ? (
-                    <EyeOff className="w-4 h-4 text-amber-500" />
-                  ) : (
-                    <Eye className="w-4 h-4 text-muted-foreground" />
-                  )}
-                  <span className="text-sm text-foreground">
-                    {isEditMode ? "Exit Edit Mode" : "Edit Mode"}
-                  </span>
-                </button>
-                <button
-                  onClick={() => setSettingsOpen(true)}
-                  className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-secondary transition-colors w-full"
-                >
-                  <Settings className="w-4 h-4 text-muted-foreground" />
-                  <span className="text-sm text-foreground">Site Settings</span>
-                </button>
-              </div>
+              {/* Panel Content based on Mode */}
+              {!isDesignMode ? (
+                /* CONTENT MODE */
+                <>
+                  <div className="p-3 space-y-1">
+                    <p className="text-xs font-medium text-muted-foreground px-2 mb-2">Quick Add</p>
+                    <div className="grid grid-cols-2 gap-2">
+                      {contentTypes.map((item) => (
+                        <button
+                          key={item.type}
+                          onClick={() => setAddingType(item.type)}
+                          className="flex items-center gap-2 p-2.5 rounded-lg hover:bg-secondary transition-colors text-left"
+                        >
+                          <item.icon className={`w-4 h-4 ${item.color}`} />
+                          <span className="text-xs font-medium text-foreground">{item.label}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="p-3 border-t border-border space-y-1">
+                    <Link
+                      to="/admin"
+                      className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-secondary transition-colors w-full"
+                    >
+                      <LayoutDashboard className="w-4 h-4 text-muted-foreground" />
+                      <span className="text-sm text-foreground">Full Dashboard</span>
+                    </Link>
+                    <button
+                      onClick={toggleEditMode}
+                      className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-secondary transition-colors w-full"
+                    >
+                      {isEditMode ? (
+                        <EyeOff className="w-4 h-4 text-amber-500" />
+                      ) : (
+                        <Eye className="w-4 h-4 text-muted-foreground" />
+                      )}
+                      <span className="text-sm text-foreground">
+                        {isEditMode ? "Exit Edit Mode" : "Edit Mode"}
+                      </span>
+                    </button>
+                    <button
+                      onClick={() => setSettingsOpen(true)}
+                      className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-secondary transition-colors w-full"
+                    >
+                      <Settings className="w-4 h-4 text-muted-foreground" />
+                      <span className="text-sm text-foreground">Site Settings</span>
+                    </button>
+                  </div>
+                </>
+              ) : (
+                /* DESIGN MODE */
+                <div className="p-4 space-y-4">
+                  <div className="space-y-3">
+                    <Label className="text-xs">Quick Stying</Label>
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="text-sm text-muted-foreground">Primary Color</span>
+                      <div className="relative w-8 h-8 rounded-full overflow-hidden border border-border shadow-sm ring-2 ring-primary/20">
+                        <input
+                          type="color"
+                          className="absolute inset-0 w-[150%] h-[150%] -top-1/4 -left-1/4 p-0 border-0 cursor-pointer"
+                          value={hslToHex(settings.global_info.branding.primary_color)}
+                          onChange={(e) => handleQuickDesignUpdate(e.target.value)}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="space-y-3 pt-2">
+                    <Label className="text-xs">Site Identity</Label>
+                    <Input
+                      placeholder="Site Title"
+                      className="h-8 text-sm"
+                      defaultValue={settings.global_info.title}
+                      onBlur={(e) => {
+                        if (e.target.value !== settings.global_info.title) {
+                          handleQuickDesignUpdate("", e.target.value);
+                        }
+                      }}
+                    />
+                  </div>
+
+                  <div className="pt-2 border-t border-border">
+                    <button
+                      onClick={() => setSettingsOpen(true)}
+                      className="flex items-center justify-center gap-2 w-full px-3 py-2 rounded-lg bg-secondary text-secondary-foreground text-xs font-medium hover:bg-secondary/80 transition-colors"
+                    >
+                      <Palette className="w-3.5 h-3.5" />
+                      Open Full Designer
+                    </button>
+                  </div>
+                </div>
+              )}
 
               {/* Footer */}
               <div className="p-3 border-t border-border">
@@ -382,5 +476,3 @@ export function AdminFloatingPanel() {
     document.body
   );
 }
-
-

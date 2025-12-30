@@ -7,7 +7,7 @@ import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { Save, Globe, Settings, Share2, Loader2 } from "lucide-react";
+import { Save, Globe, Settings, Share2, Loader2, LayoutTemplate } from "lucide-react";
 import { Json } from "@/types/database";
 import { hexToHsl, hslToHex } from "@/lib/utils";
 
@@ -20,6 +20,18 @@ interface GlobalInfo {
     branding: {
         primary_color: string;
     };
+}
+
+interface LandingPage {
+    hero: {
+        badge_text: string;
+        badge_rating: string;
+        title_line_1: string;
+        title_highlight: string;
+        description: string;
+        cta_primary: string;
+        cta_secondary: string;
+    }
 }
 
 interface Features {
@@ -47,6 +59,18 @@ export function SiteSettings() {
         branding: {
             primary_color: "170 55% 32%",
         },
+    });
+
+    const [landingPage, setLandingPage] = useState<LandingPage>({
+        hero: {
+            badge_text: "",
+            badge_rating: "",
+            title_line_1: "",
+            title_highlight: "",
+            description: "",
+            cta_primary: "",
+            cta_secondary: ""
+        }
     });
 
     const [features, setFeatures] = useState<Features>({
@@ -81,6 +105,9 @@ export function SiteSettings() {
                         case 'global_info':
                             setGlobalInfo(value);
                             break;
+                        case 'landing_page':
+                            setLandingPage(value);
+                            break;
                         case 'features':
                             setFeatures(value);
                             break;
@@ -104,6 +131,7 @@ export function SiteSettings() {
 
             const updates = [
                 { key: 'global_info', value: globalInfo as unknown as Json, description: 'Global site information' },
+                { key: 'landing_page', value: landingPage as unknown as Json, description: 'Landing page configuration' },
                 { key: 'features', value: features as unknown as Json, description: 'Feature toggles' },
                 { key: 'social_links', value: socialLinks as unknown as Json, description: 'Social media links' },
             ];
@@ -115,6 +143,8 @@ export function SiteSettings() {
             if (error) throw error;
 
             toast.success("Settings saved successfully");
+            // Reload to apply changes (especially colors)
+            // setTimeout(() => window.location.reload(), 1000); // Optional: if we want auto reload
         } catch (error) {
             console.error('Error saving settings:', error);
             toast.error("Failed to save settings");
@@ -223,6 +253,88 @@ export function SiteSettings() {
                                 </span>
                             </div>
                             <p className="text-xs text-muted-foreground">Select a brand color. It will be applied globally.</p>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                {/* Landing Page Settings */}
+                <Card>
+                    <CardHeader>
+                        <div className="flex items-center gap-2">
+                            <LayoutTemplate className="w-5 h-5 text-primary" />
+                            <CardTitle>Landing Page</CardTitle>
+                        </div>
+                        <CardDescription>
+                            Customize the hero section and landing page content.
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="grid gap-2">
+                                <Label htmlFor="badge-text">Badge Text</Label>
+                                <Input
+                                    id="badge-text"
+                                    value={landingPage.hero.badge_text}
+                                    onChange={(e) => setLandingPage(prev => ({ ...prev, hero: { ...prev.hero, badge_text: e.target.value } }))}
+                                    placeholder="Trusted by clients"
+                                />
+                            </div>
+                            <div className="grid gap-2">
+                                <Label htmlFor="badge-rating">Badge Rating</Label>
+                                <Input
+                                    id="badge-rating"
+                                    value={landingPage.hero.badge_rating}
+                                    onChange={(e) => setLandingPage(prev => ({ ...prev, hero: { ...prev.hero, badge_rating: e.target.value } }))}
+                                    placeholder="4.9"
+                                />
+                            </div>
+                        </div>
+                        <div className="grid gap-2">
+                            <Label htmlFor="hero-title">Hero Title (Line 1)</Label>
+                            <Input
+                                id="hero-title"
+                                value={landingPage.hero.title_line_1}
+                                onChange={(e) => setLandingPage(prev => ({ ...prev, hero: { ...prev.hero, title_line_1: e.target.value } }))}
+                                placeholder="You Deserve to Feel"
+                            />
+                        </div>
+                        <div className="grid gap-2">
+                            <Label htmlFor="hero-highlight">Hero Highlight Text</Label>
+                            <Input
+                                id="hero-highlight"
+                                value={landingPage.hero.title_highlight}
+                                onChange={(e) => setLandingPage(prev => ({ ...prev, hero: { ...prev.hero, title_highlight: e.target.value } }))}
+                                placeholder="Whole Again"
+                            />
+                        </div>
+                        <div className="grid gap-2">
+                            <Label htmlFor="hero-desc">Hero Description</Label>
+                            <Textarea
+                                id="hero-desc"
+                                value={landingPage.hero.description}
+                                onChange={(e) => setLandingPage(prev => ({ ...prev, hero: { ...prev.hero, description: e.target.value } }))}
+                                placeholder="Subtext..."
+                            />
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="grid gap-2">
+                                <Label htmlFor="cta-primary">Primary CTA</Label>
+                                <Input
+                                    id="cta-primary"
+                                    value={landingPage.hero.cta_primary}
+                                    onChange={(e) => setLandingPage(prev => ({ ...prev, hero: { ...prev.hero, cta_primary: e.target.value } }))}
+                                    placeholder="Start Your Journey"
+                                />
+                            </div>
+                            <div className="grid gap-2">
+                                <Label htmlFor="cta-secondary">Secondary CTA</Label>
+                                <Input
+                                    id="cta-secondary"
+                                    value={landingPage.hero.cta_secondary}
+                                    onChange={(e) => setLandingPage(prev => ({ ...prev, hero: { ...prev.hero, cta_secondary: e.target.value } }))}
+                                    placeholder="Free Resources"
+                                />
+                            </div>
                         </div>
                     </CardContent>
                 </Card>
