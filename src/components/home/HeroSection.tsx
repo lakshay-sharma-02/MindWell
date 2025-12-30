@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { MagneticButton } from "@/components/ui/magnetic-button";
 import { ArrowRight, Heart, Sparkles, Users, BookOpen, Headphones, Star } from "lucide-react";
 import { motion, useSpring, useTransform } from "framer-motion";
 import { AnimatedCounter } from "@/components/shared/AnimatedCounter";
@@ -104,8 +103,8 @@ export function HeroSection() {
 
         {/* Floating particles - React to mouse */}
         {[...Array(8)].map((_, i) => (
-          <motion.div
-            key={i}
+          <div
+            key={`particle-wrapper-${i}`}
             className="absolute"
             style={{
               left: `${10 + i * 12}%`,
@@ -122,7 +121,7 @@ export function HeroSection() {
               }}
               className="w-1.5 h-1.5 rounded-full bg-primary/40"
             />
-          </motion.div>
+          </div>
         ))}
       </div>
 
@@ -191,28 +190,24 @@ export function HeroSection() {
             transition={{ duration: 0.6, delay: 0.4 }}
             className="flex flex-col sm:flex-row gap-4 justify-center mb-16 items-center"
           >
-            <MagneticButton strength={0.4}>
-              <Button variant="hero" size="xl" className="btn-glow group" asChild>
-                <Link to="/book">
-                  {hero.cta_primary}
-                  <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
-                </Link>
-              </Button>
-            </MagneticButton>
+            <Button variant="hero" size="xl" className="btn-glow group" asChild>
+              <Link to="/book">
+                {hero.cta_primary}
+                <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+              </Link>
+            </Button>
 
-            <MagneticButton strength={0.2}>
-              <Button
-                variant="ghost"
-                size="xl"
-                className="bg-primary/5 text-primary hover:bg-primary/10 border-none group"
-                asChild
-              >
-                <Link to="/resources">
-                  <Sparkles className="w-5 h-5 mr-2 group-hover:rotate-12 transition-transform" />
-                  {hero.cta_secondary}
-                </Link>
-              </Button>
-            </MagneticButton>
+            <Button
+              variant="ghost"
+              size="xl"
+              className="bg-primary/5 text-primary hover:bg-primary/10 border-none group"
+              asChild
+            >
+              <Link to="/resources">
+                <Sparkles className="w-5 h-5 mr-2 group-hover:rotate-12 transition-transform" />
+                {hero.cta_secondary}
+              </Link>
+            </Button>
           </motion.div>
 
           {/* Animated Stats */}
