@@ -59,7 +59,7 @@ export function BookingCalendar({
                     <h3 className="font-display font-semibold text-lg text-foreground">Select Date</h3>
                 </div>
 
-                <div className="p-4 rounded-3xl border border-border/50 bg-card/50 shadow-sm backdrop-blur-sm">
+                <div className="p-2 sm:p-4 rounded-3xl border border-border/50 bg-card/50 shadow-sm backdrop-blur-sm">
                     <Calendar
                         mode="single"
                         selected={selectedDate}
@@ -74,11 +74,11 @@ export function BookingCalendar({
                             caption_label: "text-base font-display font-medium",
                             nav: "space-x-1 flex items-center",
                             head_row: "flex w-full mt-2",
-                            head_cell: "text-muted-foreground rounded-md w-9 font-normal text-[0.8rem] flex-1",
+                            head_cell: "text-muted-foreground rounded-md w-8 sm:w-9 font-normal text-[0.8rem] flex-1",
                             row: "flex w-full mt-2",
-                            cell: "text-center text-sm p-0 relative [&:has([aria-selected])]:bg-primary/5 first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20 flex-1",
+                            cell: "text-center text-xs sm:text-sm p-0 relative [&:has([aria-selected])]:bg-primary/5 first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20 flex-1",
                             day: cn(
-                                "h-10 w-10 p-0 font-normal aria-selected:opacity-100 hover:bg-primary/10 rounded-full transition-all mx-auto flex items-center justify-center data-[selected]:bg-primary data-[selected]:text-primary-foreground data-[selected]:hover:bg-primary data-[selected]:hover:text-primary-foreground shadow-sm"
+                                "h-8 w-8 sm:h-10 sm:w-10 p-0 font-normal aria-selected:opacity-100 hover:bg-primary/10 rounded-full transition-all mx-auto flex items-center justify-center data-[selected]:bg-primary data-[selected]:text-primary-foreground data-[selected]:hover:bg-primary data-[selected]:hover:text-primary-foreground shadow-sm"
                             ),
                             day_today: "bg-accent/10 text-accent font-bold",
                             day_outside: "text-muted-foreground opacity-50",
