@@ -75,7 +75,7 @@ export function BookingCalendar({
 
                 <div className="p-2 sm:p-4 rounded-3xl border border-border/50 bg-card/50 shadow-sm backdrop-blur-sm">
                     {/* Native Date Picker for Mobile (Portrait) */}
-                    <div className="block md:hidden px-2 mb-4">
+                    <div className="block lg:hidden px-2 mb-4">
                         <label className="text-sm font-medium text-muted-foreground mb-1.5 block">
                             Tap to open calendar
                         </label>
@@ -92,7 +92,7 @@ export function BookingCalendar({
                     </div>
 
                     {/* Custom Calendar for Desktop/Tablet */}
-                    <div className="hidden md:block">
+                    <div className="hidden lg:block">
                         <Calendar
                             mode="single"
                             selected={selectedDate}
