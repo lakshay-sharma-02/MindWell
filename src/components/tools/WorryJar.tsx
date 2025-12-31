@@ -1,16 +1,17 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Flame, Sparkles, Trash2, History } from "lucide-react";
+import { Flame, Sparkles, History, Wind } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
 
 export const WorryJar = () => {
     const [worry, setWorry] = useState("");
     const [isBurning, setIsBurning] = useState(false);
-    const [particles, setParticles] = useState<number[]>([]);
     const [burnCount, setBurnCount] = useState(0);
+    const [showFire, setShowFire] = useState(false);
     const { toast } = useToast();
+    const textareaRef = useRef<HTMLTextAreaElement>(null);
 
     useEffect(() => {
         const savedCount = localStorage.getItem("mindwell_burn_count");
@@ -21,121 +22,186 @@ export const WorryJar = () => {
         if (!worry.trim()) return;
 
         setIsBurning(true);
-
-        // Generate particles
-        const newParticles = Array.from({ length: 30 }, (_, i) => i);
-        setParticles(newParticles);
+        
+        // Sequence: Crumple -> Drop -> Fire -> Done
+        setTimeout(() => setShowFire(true), 600); // Start fire as it drops
 
         setTimeout(() => {
             setWorry("");
             setIsBurning(false);
-            setParticles([]);
+            setShowFire(false);
             const newCount = burnCount + 1;
             setBurnCount(newCount);
             localStorage.setItem("mindwell_burn_count", newCount.toString());
             toast({
                 title: "Worry Released",
-                description: "You've let it go. Take a deep breath.",
+                description: "It looks beautiful when it burns, doesn't it?",
             });
-        }, 2000);
+        }, 3500);
     };
 
     return (
-        <Card className="relative overflow-hidden border-none shadow-2xl bg-gradient-to-b from-orange-50/50 to-orange-100/30 dark:from-orange-950/20 dark:to-orange-900/10 p-8 min-h-[500px] flex flex-col items-center justify-center text-center">
+        <div className="relative min-h-[600px] w-full flex flex-col items-center justify-center p-4 perspective-1000">
+            
+            {/* Ambient Background */}
+            <div className="absolute inset-0 bg-gradient-to-b from-orange-50/30 to-slate-900/5 dark:from-orange-950/10 dark:to-slate-950/50 rounded-3xl -z-10" />
 
-            {/* Ambient Background Glow */}
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-orange-200/20 via-transparent to-transparent pointer-events-none animate-pulse" style={{ animationDuration: '4s' }} />
-
-            <div className="max-w-md w-full relative z-10">
-                <div className="mb-8">
-                    <div className="w-16 h-16 bg-orange-100 dark:bg-orange-900/30 rounded-full flex items-center justify-center mx-auto mb-4 animate-bounce-slow">
-                        <Flame className="w-8 h-8 text-orange-500" />
-                    </div>
-                    <h2 className="text-3xl font-display font-bold mb-2">The Worry Jar</h2>
-                    <p className="text-muted-foreground">
-                        Type out what's troubling you. When you're ready, cast it into the fire and watch it fade away.
-                    </p>
+            {/* The Jar Container */}
+            <div className="relative w-full max-w-sm aspect-[3/4] group">
+                
+                {/* Jar Glass Effect */}
+                <div className="absolute inset-0 rounded-t-[50px] rounded-b-[30px] border-4 border-white/30 dark:border-white/10 bg-gradient-to-br from-white/20 to-white/5 dark:from-white/10 dark:to-transparent backdrop-blur-sm shadow-2xl overflow-hidden z-20 pointer-events-none">
+                    {/* Glass Reflections */}
+                    <div className="absolute top-8 left-4 w-4 h-32 rounded-full bg-gradient-to-b from-white/40 to-transparent" />
+                    <div className="absolute top-8 right-6 w-2 h-16 rounded-full bg-gradient-to-b from-white/20 to-transparent" />
                 </div>
 
-                <div className="relative">
-                    <AnimatePresence>
+                {/* Jar Lid/Rim Area */}
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-48 h-8 bg-slate-200 dark:bg-slate-800 rounded-full border border-slate-300 dark:border-slate-700 shadow-lg z-10" />
+
+                {/* Content Area Inside Jar */}
+                <div className="absolute inset-2 rounded-t-[45px] rounded-b-[25px] flex flex-col items-center justify-end pb-8 overflow-hidden z-10">
+                    
+                    {/* Interaction Layer */}
+                    <AnimatePresence mode="wait">
                         {!isBurning ? (
                             <motion.div
-                                initial={{ opacity: 0, scale: 0.9 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                exit={{ opacity: 0, scale: 1.1, filter: "blur(10px)" }}
-                                transition={{ duration: 0.5 }}
-                                className="relative"
+                                key="paper-input"
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, scale: 0.5, transition: { duration: 0.3 } }}
+                                className="w-full h-full flex flex-col items-center p-6 pt-16"
                             >
-                                <textarea
-                                    value={worry}
-                                    onChange={(e) => setWorry(e.target.value)}
-                                    placeholder="I am worried about..."
-                                    className="w-full h-40 p-6 rounded-2xl bg-background/50 backdrop-blur-sm border-2 border-orange-100 dark:border-orange-900/50 focus:border-orange-300 focus:ring-4 focus:ring-orange-100/50 transition-all resize-none text-lg text-center placeholder:text-muted-foreground/50 shadow-inner"
-                                />
-                                <div className="absolute -bottom-14 left-0 right-0 flex justify-center">
-                                    <Button
-                                        size="lg"
-                                        onClick={handleBurn}
-                                        disabled={!worry.trim()}
-                                        className="rounded-full px-8 py-6 text-lg bg-orange-500 hover:bg-orange-600 text-white shadow-lg shadow-orange-500/20 hover:shadow-orange-500/40 transition-all hover:scale-105 active:scale-95"
-                                    >
-                                        <Flame className="w-5 h-5 mr-2" />
-                                        Let it Go
-                                    </Button>
+                                <div className="relative w-full aspect-[4/5] max-h-[300px]">
+                                    {/* Paper Visual */}
+                                    <textarea
+                                        ref={textareaRef}
+                                        value={worry}
+                                        onChange={(e) => setWorry(e.target.value)}
+                                        placeholder="Write your worry on this paper..."
+                                        className="w-full h-full p-6 text-lg bg-[#fdfbf7] dark:bg-[#1a1614] text-slate-800 dark:text-slate-200 font-handwriting leading-relaxed resize-none shadow-md rotate-1 border-none focus:ring-0 focus:outline-none [mask-image:url('https://grainy-gradients.vercel.app/noise.svg')] paper-texture"
+                                        style={{
+                                            boxShadow: "1px 2px 4px rgba(0,0,0,0.1)",
+                                            clipPath: "polygon(0% 0%, 100% 2%, 98% 100%, 2% 98%)"
+                                        }}
+                                    />
+                                    {/* Paper Lines Overlay */}
+                                    <div className="absolute inset-0 pointer-events-none p-6 pt-[3.5rem] bg-[linear-gradient(transparent_27px,#94a3b8_28px)] bg-[length:100%_28px] opacity-20" />
                                 </div>
+
+                                <Button
+                                    onClick={handleBurn}
+                                    disabled={!worry.trim()}
+                                    className="mt-8 rounded-full px-8 py-6 bg-orange-600 hover:bg-orange-700 text-white font-display text-lg shadow-lg hover:shadow-orange-500/30 transition-all hover:scale-105 z-50 pointer-events-auto"
+                                >
+                                    <Flame className="w-5 h-5 mr-2 fill-orange-200" />
+                                    Cast into Fire
+                                </Button>
                             </motion.div>
                         ) : (
-                            <div className="h-40 flex items-center justify-center relative">
-                                <motion.div
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    className="text-orange-500 font-display text-2xl font-bold"
-                                >
-                                    Releasing...
-                                </motion.div>
-                                {particles.map((_, i) => (
-                                    <Particle key={i} index={i} />
-                                ))}
+                            // The Crumpled Paper Falling
+                            <motion.div
+                                key="crumpled-paper"
+                                initial={{ y: -100, scale: 1, rotate: 0 }}
+                                animate={{ 
+                                    y: 200, 
+                                    scale: 0.2, 
+                                    rotate: 720,
+                                    opacity: [1, 1, 0]
+                                }}
+                                transition={{ 
+                                    duration: 2,
+                                    ease: "easeIn",
+                                    opacity: { delay: 1.5, duration: 0.5 }
+                                }}
+                                className="absolute top-20 w-32 h-32 bg-[#fdfbf7] dark:bg-[#1a1614] rounded-full shadow-lg flex items-center justify-center z-20"
+                            >
+                                <div className="w-full h-full border-2 border-slate-200 dark:border-slate-800 rounded-full bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-slate-100 to-slate-300 dark:from-slate-800 dark:to-slate-900" />
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+
+                    {/* Fire Effect */}
+                    <AnimatePresence>
+                        {showFire && (
+                            <div className="absolute bottom-0 inset-x-0 h-64 z-30 flex justify-center items-end pointer-events-none">
+                                <FireParticles />
                             </div>
                         )}
                     </AnimatePresence>
                 </div>
-
-                <div className="mt-24 flex items-center justify-center gap-2 text-sm text-muted-foreground/60">
-                    <History className="w-4 h-4" />
-                    <span>{burnCount} worries released</span>
-                </div>
             </div>
-        </Card>
+
+            <div className="mt-8 text-center animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300">
+                <p className="font-display font-medium text-xl text-muted-foreground flex items-center justify-center gap-2">
+                    <History className="w-4 h-4" />
+                    {burnCount} worries burned away
+                </p>
+                <div className="h-1 w-24 mx-auto bg-gradient-to-r from-transparent via-orange-300 to-transparent mt-4 opacity-50" />
+            </div>
+        </div>
     );
 };
 
-// Particle Component for the burning effect
+// Realistic Fire Component
+const FireParticles = () => {
+    // Generate static particle definitions to avoid re-renders causing jumps
+    const particles = Array.from({ length: 40 });
+
+    return (
+        <div className="relative w-full h-full overflow-hidden">
+             {/* Glow base */}
+             <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="absolute bottom-0 left-1/2 -translate-x-1/2 w-48 h-32 bg-orange-500/40 blur-[50px] rounded-full"
+            />
+            
+            {particles.map((_, i) => (
+                <Particle key={i} index={i} />
+            ))}
+        </div>
+    );
+};
+
 const Particle = ({ index }: { index: number }) => {
-    const randomX = Math.random() * 200 - 100;
-    const randomY = Math.random() * -150 - 50;
-    const duration = 1 + Math.random();
+    // Randomize physics for each particle
+    const randomXStart = Math.random() * 100 - 50; // -50 to 50
+    const delay = Math.random() * 2;
+    const duration = 1 + Math.random() * 1.5;
+    const scaleConfig = Math.random() > 0.7 ? 1.5 : 1; // Some large flames
 
     return (
         <motion.div
-            initial={{
-                opacity: 1,
-                x: 0,
-                y: 0,
-                scale: Math.random() * 0.5 + 0.5
+            initial={{ 
+                y: 100, 
+                x: randomXStart, 
+                opacity: 0, 
+                scale: 0 
             }}
-            animate={{
-                opacity: 0,
-                x: randomX,
-                y: randomY,
+            animate={{ 
+                y: -150, 
+                x: randomXStart + (Math.random() * 60 - 30), // Drift
+                opacity: [0, 1, 0.8, 0],
+                scale: [0, scaleConfig, scaleConfig * 0.5, 0],
                 rotate: Math.random() * 360
             }}
             transition={{
                 duration: duration,
+                repeat: Infinity,
+                delay: delay,
                 ease: "easeOut"
             }}
-            className="absolute w-3 h-3 bg-gradient-to-tr from-orange-400 to-red-500 rounded-full blur-[1px]"
+            className={cn(
+                "absolute bottom-0 left-1/2 rounded-full blur-[2px]",
+                index % 3 === 0 ? "w-6 h-6 bg-orange-500/80" : // Core flame
+                index % 3 === 1 ? "w-4 h-4 bg-yellow-400/80" : // Highlights
+                "w-3 h-3 bg-red-600/60" // Smoke/Embers
+            )}
+            style={{
+                boxShadow: index % 3 === 0 ? "0 0 20px 5px rgba(249, 115, 22, 0.4)" : "none"
+            }}
         />
     );
 };
