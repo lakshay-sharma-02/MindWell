@@ -47,92 +47,109 @@ export const WorryJar = () => {
             <div className="absolute inset-0 bg-gradient-to-b from-orange-50/30 to-slate-900/5 dark:from-orange-950/10 dark:to-slate-950/50 rounded-3xl -z-10" />
 
             {/* The Jar Container */}
-            <div className="relative w-full max-w-sm aspect-[3/4] group">
+            <div className="relative w-full max-w-sm aspect-[3/4] group flex items-end justify-center pb-4">
 
-                {/* Jar Glass Effect (Foreground Reflection) - pointer-events-none ensures clicks pass through */}
-                <div className="absolute inset-0 rounded-t-[50px] rounded-b-[30px] border-4 border-white/30 dark:border-white/10 bg-gradient-to-br from-white/20 to-white/5 dark:from-white/10 dark:to-transparent backdrop-blur-[2px] shadow-2xl overflow-hidden z-20 pointer-events-none">
-                    {/* Glass Reflections */}
-                    <div className="absolute top-8 left-4 w-4 h-32 rounded-full bg-gradient-to-b from-white/40 to-transparent" />
-                    <div className="absolute top-8 right-6 w-2 h-16 rounded-full bg-gradient-to-b from-white/20 to-transparent" />
+                {/* 1. Jar Back Layer (Behind interactions) */}
+                <div className="absolute inset-x-0 bottom-0 top-12 rounded-b-[40px] rounded-t-[10px] bg-gradient-to-b from-white/5 to-white/10 border-x-2 border-b-4 border-white/20 dark:border-white/10 shadow-2xl z-10" />
+
+                {/* 2. Fire Effect (Inside Jar) */}
+                <AnimatePresence>
+                    {showFire && (
+                        <div className="absolute bottom-4 inset-x-8 h-48 z-20 flex justify-center items-end pointer-events-none fade-up-enter">
+                            <FireParticles />
+                        </div>
+                    )}
+                </AnimatePresence>
+
+                {/* 3. Falling Crumpled Ball (Inside/Behind Glass) */}
+                <AnimatePresence>
+                    {isBurning && (
+                        <motion.div
+                            key="crumpled-paper"
+                            initial={{ y: -300, scale: 1, rotate: 0, zIndex: 50 }}
+                            animate={{
+                                y: 150,
+                                scale: 0.2,
+                                rotate: 720,
+                                opacity: [1, 1, 0],
+                                zIndex: 15 // Drops "inside"
+                            }}
+                            transition={{
+                                duration: 1.5,
+                                ease: "easeIn",
+                                times: [0, 0.6, 1],
+                                opacity: { delay: 1, duration: 0.5 }
+                            }}
+                            className="absolute top-0 w-32 h-32 bg-[#fdfbf7] dark:bg-[#1a1614] rounded-full shadow-lg flex items-center justify-center pointer-events-none"
+                        >
+                            <div className="w-full h-full border-2 border-slate-200 dark:border-slate-800 rounded-full bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-slate-100 to-slate-300 dark:from-slate-800 dark:to-slate-900" />
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+
+                {/* 4. Jar Front Glass Layer (Reflections & Blur) - z-30 */}
+                <div className="absolute inset-x-0 bottom-0 top-12 rounded-b-[40px] rounded-t-[10px] border-x border-b border-white/30 bg-gradient-to-tr from-white/10 to-transparent backdrop-blur-[1px] z-30 pointer-events-none overflow-hidden">
+                    <div className="absolute top-4 left-4 w-2 h-full bg-gradient-to-b from-white/30 to-transparent opacity-50 blur-[2px] rounded-full" />
+                    <div className="absolute bottom-4 right-8 w-24 h-24 bg-orange-500/10 blur-[30px] rounded-full" />
                 </div>
 
-                {/* Jar Lid/Rim Area */}
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-48 h-8 bg-slate-200 dark:bg-slate-800 rounded-full border border-slate-300 dark:border-slate-700 shadow-lg z-10" />
+                {/* Jar Rim */}
+                <div className="absolute top-8 left-1/2 -translate-x-1/2 w-48 h-8 bg-slate-200/50 dark:bg-slate-800/50 rounded-full border-2 border-slate-300/50 dark:border-slate-700/50 shadow-sm z-30 backdrop-blur-sm" />
 
-                {/* Content Area Inside Jar - Increased z-index for visibility */}
-                <div className="absolute inset-2 rounded-t-[45px] rounded-b-[25px] flex flex-col items-center justify-center overflow-hidden z-10">
 
-                    {/* Interaction Layer */}
-                    <AnimatePresence mode="wait">
-                        {!isBurning ? (
-                            <motion.div
-                                key="paper-input"
-                                initial={{ opacity: 0, scale: 0.95 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                exit={{ opacity: 0, scale: 0.5, transition: { duration: 0.3 } }}
-                                className="w-full flex flex-col items-center p-6 space-y-6"
-                            >
-                                <div className="relative w-full aspect-[4/5] max-h-[280px]">
-                                    {/* Paper Visual */}
+                {/* 5. Active Input Layer (Outside/Front of Jar) - z-50 */}
+                <AnimatePresence>
+                    {!isBurning && (
+                        <motion.div
+                            key="input-chit"
+                            initial={{ opacity: 0, y: 50, scale: 0.9 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{
+                                opacity: 0,
+                                scale: 0.5,
+                                y: 100,
+                                rotate: 10,
+                                transition: { duration: 0.3 }
+                            }}
+                            className="absolute z-50 bottom-12 w-64 h-64"
+                        >
+                            <div className="relative w-full h-full group">
+                                {/* The Paper Chit */}
+                                <div className="absolute inset-0 bg-[#fff9e6] dark:bg-[#1c1917] rounded-sm shadow-xl transform rotate-1 transition-transform group-hover:rotate-0 duration-300 border border-stone-200 dark:border-stone-800">
+                                    {/* Texture */}
+                                    <div className="absolute inset-0 opacity-40 bg-[url('https://www.transparenttextures.com/patterns/cream-paper.png')]" />
+
                                     <textarea
                                         ref={textareaRef}
                                         value={worry}
                                         onChange={(e) => setWorry(e.target.value)}
-                                        placeholder="Write your worry on this paper..."
-                                        className="w-full h-full p-6 text-xl bg-[#fdfbf7] dark:bg-[#1a1614] text-slate-800 dark:text-slate-200 font-handwriting leading-relaxed resize-none shadow-md rotate-1 border-none focus:ring-0 focus:outline-none [mask-image:url('https://grainy-gradients.vercel.app/noise.svg')] paper-texture cursor-text relative z-30"
-                                        style={{
-                                            boxShadow: "1px 2px 4px rgba(0,0,0,0.1)",
-                                            clipPath: "polygon(0% 0%, 100% 2%, 98% 100%, 2% 98%)"
-                                        }}
+                                        placeholder="Write your worry on this chit..."
+                                        className="relative w-full h-full p-6 bg-transparent border-none resize-none focus:ring-0 text-stone-800 dark:text-stone-200 font-handwriting text-2xl leading-relaxed text-center placeholder:text-stone-400 dark:placeholder:text-stone-600 focus:outline-none z-10"
                                     />
-                                    {/* Paper Lines Overlay */}
-                                    <div className="absolute inset-0 pointer-events-none p-6 pt-[3.5rem] bg-[linear-gradient(transparent_27px,#94a3b8_28px)] bg-[length:100%_28px] opacity-20 z-30" />
+
+                                    {/* Action Button (Sticker style) */}
+                                    <div className="absolute -bottom-6 -right-6 z-20">
+                                        <Button
+                                            onClick={handleBurn}
+                                            disabled={!worry.trim()}
+                                            size="icon"
+                                            className="h-14 w-14 rounded-full bg-orange-600 hover:bg-orange-700 shadow-lg hover:shadow-orange-500/40 transition-all hover:scale-110 active:scale-95 border-4 border-white dark:border-slate-950"
+                                        >
+                                            <Flame className="w-6 h-6 fill-orange-100 text-orange-100" />
+                                        </Button>
+                                    </div>
                                 </div>
 
-                                <Button
-                                    onClick={handleBurn}
-                                    disabled={!worry.trim()}
-                                    className="rounded-full px-8 py-6 bg-orange-600 hover:bg-orange-700 text-white font-display text-lg shadow-lg hover:shadow-orange-500/30 transition-all hover:scale-105 z-30 relative"
-                                >
-                                    <Flame className="w-5 h-5 mr-2 fill-orange-200" />
-                                    Cast into Fire
-                                </Button>
-                            </motion.div>
-                        ) : (
-                            // The Crumpled Paper Falling
-                            <motion.div
-                                key="crumpled-paper"
-                                initial={{ y: -100, scale: 1, rotate: 0 }}
-                                animate={{
-                                    y: 200,
-                                    scale: 0.2,
-                                    rotate: 720,
-                                    opacity: [1, 1, 0]
-                                }}
-                                transition={{
-                                    duration: 2,
-                                    ease: "easeIn",
-                                    opacity: { delay: 1.5, duration: 0.5 }
-                                }}
-                                className="absolute top-20 w-32 h-32 bg-[#fdfbf7] dark:bg-[#1a1614] rounded-full shadow-lg flex items-center justify-center z-20"
-                            >
-                                <div className="w-full h-full border-2 border-slate-200 dark:border-slate-800 rounded-full bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-slate-100 to-slate-300 dark:from-slate-800 dark:to-slate-900" />
-                            </motion.div>
-                        )}
-                    </AnimatePresence>
-
-                    {/* Fire Effect */}
-                    <AnimatePresence>
-                        {showFire && (
-                            <div className="absolute bottom-0 inset-x-0 h-64 z-40 flex justify-center items-end pointer-events-none">
-                                <FireParticles />
+                                {/* Pin/Tape visual */}
+                                <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-8 h-8 bg-black/10 rounded-full blur-[1px]" />
+                                <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-24 h-6 bg-red-500/80 -rotate-2 transform shadow-sm" />
                             </div>
-                        )}
-                    </AnimatePresence>
-                </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
             </div>
 
-            <div className="mt-8 text-center animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300">
+            <div className="mt-12 text-center animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300 z-10">
                 <p className="font-display font-medium text-xl text-muted-foreground flex items-center justify-center gap-2">
                     <History className="w-4 h-4" />
                     {burnCount} worries burned away
