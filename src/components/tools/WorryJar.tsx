@@ -18,40 +18,52 @@ interface CrumpledPaper {
 // --- Procedural Assets ---
 
 const ProceduralCrumpledPaper = ({ seed, className }: { seed: number, className?: string }) => {
-    // Generate a unique filter ID to avoid conflicts
-    const filterId = `crumple-noise-${seed}`;
+    // Unique IDs for SVG gradients/filters to prevent conflicts
+    const paperId = `paper-${seed}`;
+    const foldId = `folds-${seed}`;
 
     return (
         <div className={className}>
             <svg viewBox="0 0 100 100" className="w-full h-full overflow-visible drop-shadow-md">
                 <defs>
-                    <filter id={filterId}>
-                        <feTurbulence
-                            type="turbulence"
-                            baseFrequency="0.03"
-                            numOctaves="5"
-                            seed={seed}
-                            result="noise"
-                        />
-                        <feDiffuseLighting in="noise" lightingColor="#fff" surfaceScale="2">
-                            <feDistantLight azimuth="45" elevation="60" />
-                        </feDiffuseLighting>
-                        <feDisplacementMap in="SourceGraphic" in2="noise" scale="15" xChannelSelector="R" yChannelSelector="G" />
+                    {/* 1. Micro-texture (Grain) - High frequency noise */}
+                    <filter id={paperId}>
+                        <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3" seed={seed} result="texture" />
+                        <feColorMatrix type="saturate" values="0" in="texture" />
+                        <feComponentTransfer>
+                            {/* Make it subtle */}
+                            <feFuncA type="linear" slope="0.4" />
+                        </feComponentTransfer>
+                        <feComposite operator="in" in2="SourceGraphic" result="texturedSource" />
+                    </filter>
+
+                    {/* 2. Macro-structure (Deep Folds) - Low frequency displacement */}
+                    <filter id={foldId}>
+                        <feTurbulence type="turbulence" baseFrequency="0.04" numOctaves="2" seed={seed + 100} result="folds" />
+                        <feDisplacementMap in="SourceGraphic" in2="folds" scale="12" xChannelSelector="R" yChannelSelector="G" />
+                        <feComposite operator="in" in2="SourceGraphic" />
                     </filter>
                 </defs>
 
-                <g filter={`url(#${filterId})`}>
-                    {/* Base Paper Ball Shape - irregular polygon approximation */}
+                <g filter={`url(#${foldId})`}>
+                    {/* Base Shape with Grain */}
                     <path
-                        d="M50 10 L80 30 L90 60 L70 90 L30 90 L10 60 L20 30 Z"
-                        fill="#f7f7f5"
-                        stroke="#e5e5e0"
-                        strokeWidth="1"
+                        filter={`url(#${paperId})`}
+                        d="M50 8 L85 25 L92 65 L70 92 L30 92 L8 65 L15 25 Z"
+                        fill="#fdfdfc"
+                        stroke="#d4d4d4"
+                        strokeWidth="0.5"
                     />
-                    {/* Scribbles / Lines to suggest it was written on */}
-                    <path d="M30 40 Q50 35 70 45" stroke="#cbd5e1" strokeWidth="2" fill="none" opacity="0.6" />
-                    <path d="M25 55 Q45 60 75 50" stroke="#cbd5e1" strokeWidth="2" fill="none" opacity="0.6" />
-                    <path d="M35 70 Q55 65 65 75" stroke="#cbd5e1" strokeWidth="2" fill="none" opacity="0.6" />
+
+                    {/* Structural Creases - manually defined "random" lines that get deformed by the displacement map */}
+                    <path d="M25 25 L75 75" stroke="#a3a3a3" strokeWidth="0.5" fill="none" opacity="0.4" />
+                    <path d="M75 25 L25 75" stroke="#a3a3a3" strokeWidth="0.5" fill="none" opacity="0.4" />
+                    <path d="M50 10 L50 90" stroke="#a3a3a3" strokeWidth="0.5" fill="none" opacity="0.3" />
+                    <path d="M10 50 L90 50" stroke="#a3a3a3" strokeWidth="0.5" fill="none" opacity="0.3" />
+
+                    {/* Scribbles */}
+                    <path d="M30 40 Q50 35 70 45" stroke="#94a3b8" strokeWidth="2" fill="none" opacity="0.5" />
+                    <path d="M25 55 Q45 60 75 50" stroke="#94a3b8" strokeWidth="2" fill="none" opacity="0.5" />
                 </g>
             </svg>
         </div>
@@ -60,36 +72,55 @@ const ProceduralCrumpledPaper = ({ seed, className }: { seed: number, className?
 
 const ProceduralAshPile = () => {
     return (
-        <svg viewBox="0 0 200 120" className="w-full h-full overflow-visible drop-shadow-[0_4px_6px_rgba(0,0,0,0.3)]">
+        <svg viewBox="0 0 200 120" className="w-full h-full overflow-visible drop-shadow-xl">
             <defs>
-                {/* Fine powdery noise for ash texture */}
-                <filter id="ash-texture" x="-20%" y="-20%" width="140%" height="140%">
-                    <feTurbulence type="fractalNoise" baseFrequency="1.5" numOctaves="6" result="noise" />
-                    <feColorMatrix type="saturate" values="0" />
-                    <feComposite operator="in" in2="SourceGraphic" />
+                {/* Ash Noise - rough and crumbly edges */}
+                <filter id="ash-roughness" x="-20%" y="-20%" width="140%" height="140%">
+                    <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="4" seed="5" result="noise" />
+                    <feDisplacementMap in="SourceGraphic" in2="noise" scale="8" />
                 </filter>
 
-                {/* Gradient: Lighter gray peak to slightly darker base */}
-                <linearGradient id="ash-gradient" x1="0.5" y1="0" x2="0.5" y2="1">
-                    <stop offset="0%" stopColor="#e5e5e5" /> {/* Lightest gray at top */}
-                    <stop offset="40%" stopColor="#a3a3a3" />
-                    <stop offset="100%" stopColor="#525252" /> {/* Darker gray at bottom */}
+                {/* Stratified Gradients */}
+                <linearGradient id="ash-dark" x1="0" y1="1" x2="0" y2="0">
+                    <stop offset="0%" stopColor="#1c1917" />
+                    <stop offset="100%" stopColor="#44403c" />
+                </linearGradient>
+                <linearGradient id="ash-medium" x1="0" y1="1" x2="0" y2="0">
+                    <stop offset="0%" stopColor="#292524" />
+                    <stop offset="100%" stopColor="#57534e" />
+                </linearGradient>
+                <linearGradient id="ash-light" x1="0" y1="1" x2="0" y2="0">
+                    <stop offset="0%" stopColor="#78716c" />
+                    <stop offset="100%" stopColor="#a8a29e" />
                 </linearGradient>
             </defs>
 
-            <g filter="url(#ash-texture)">
-                {/* Main Pyramidal Pile / Cone Shape */}
+            <g filter="url(#ash-roughness)">
+                {/* Stratum 1: Base (Wide, dark) */}
                 <path
-                    d="M100,10 Q110,20 130,50 Q160,90 190,110 L10,110 Q40,90 70,50 Q90,20 100,10 Z"
-                    fill="url(#ash-gradient)"
+                    d="M10 115 Q50 100 100 110 Q150 100 190 115 Z"
+                    fill="url(#ash-dark)"
+                    opacity="0.9"
                 />
 
-                {/* Textured details / uneven surface layers for realism */}
+                {/* Stratum 2: Mid-pile (Irregular, chunky) */}
                 <path
-                    d="M100,25 Q115,50 140,80 L60,80 Q85,50 100,25 Z"
-                    fill="#d4d4d4"
-                    opacity="0.5"
+                    d="M30 115 Q60 80 90 95 Q140 60 170 115 Z"
+                    fill="url(#ash-medium)"
+                    opacity="0.8"
                 />
+
+                {/* Stratum 3: Peak (Lighter ash, collapsed structure) */}
+                <path
+                    d="M70 115 L85 70 L95 85 L115 50 L125 115 Z"
+                    fill="url(#ash-light)"
+                    opacity="0.7"
+                />
+
+                {/* Loose debris particles for granularity */}
+                <circle cx="50" cy="110" r="4" fill="#57534e" />
+                <circle cx="160" cy="105" r="5" fill="#44403c" />
+                <path d="M120 100 L130 95 L125 110 Z" fill="#292524" />
             </g>
         </svg>
     );
@@ -154,86 +185,97 @@ const WorryInput = ({
 
 const RealisticFireSystem = ({ intensity }: { intensity: number }) => {
     // Dynamic intensity scaling
-    // intensity 1 = small fire, intensity 10 = raging fire
     const safeIntensity = Math.max(1, intensity);
     const flameCount = Math.min(8 + safeIntensity, 25);
     const heightScale = Math.min(1 + safeIntensity * 0.15, 2.0);
 
+    // Generate randomized flame parameters to break periodicity and look chaotic
+    const flames = useMemo(() => Array.from({ length: flameCount }).map((_, i) => ({
+        id: i,
+        // Chaotic motion paths using keyframes
+        xKeyframes: Array.from({ length: 5 }, () => (Math.random() - 0.5) * (60 * heightScale)),
+        heightKeyframes: Array.from({ length: 5 }, () => (40 + Math.random() * 100) * heightScale),
+        duration: 0.8 + Math.random() * 0.6,
+        delay: Math.random() * 0.5
+    })), [flameCount, heightScale]);
+
     return (
         <div className="relative w-full h-[140%] -bottom-4 pointer-events-none flex justify-center z-50">
-            {/* 1. Smoke */}
+            {/* 1. Smoke (Darker, more turbulent) */}
             <div className="absolute inset-0 flex justify-center">
-                {Array.from({ length: 8 }).map((_, i) => (
+                {Array.from({ length: 6 }).map((_, i) => (
                     <motion.div
                         key={`smoke-${i}`}
                         initial={{ opacity: 0, y: 50, scale: 0.5 }}
                         animate={{
-                            opacity: [0, 0.3, 0],
-                            y: -300 - (safeIntensity * 20), // Smoke rises higher with more fire
-                            x: (Math.random() - 0.5) * 80,
-                            scale: 2.5
+                            opacity: [0, 0.4, 0],
+                            y: -350 - (safeIntensity * 25),
+                            x: (Math.random() - 0.5) * 120,
+                            scale: 3,
+                            rotate: Math.random() * 360
                         }}
                         transition={{
-                            duration: 2 + Math.random(),
+                            duration: 3 + Math.random(),
                             repeat: Infinity,
                             delay: Math.random() * 2,
                             ease: "easeOut"
                         }}
-                        className="absolute bottom-20 w-24 h-24 rounded-full bg-zinc-800/20 blur-[40px]"
+                        className="absolute bottom-20 w-32 h-32 rounded-full bg-stone-900/30 blur-[50px]"
                     />
                 ))}
             </div>
 
-            {/* 2. Flames */}
-            {Array.from({ length: flameCount }).map((_, i) => (
+            {/* 2. Flames (Chaotic & Hot) */}
+            {flames.map((flame) => (
                 <motion.div
-                    key={`flame-${i}`}
-                    initial={{ height: 20, opacity: 0 }}
+                    key={`flame-${flame.id}`}
                     animate={{
-                        height: [40 * heightScale, (140 + Math.random() * 60) * heightScale, 40 * heightScale],
-                        opacity: [0.4, 1, 0.4],
-                        scaleX: [0.8, 1.2, 0.8],
-                        x: (Math.random() - 0.5) * (40 * heightScale)
+                        height: flame.heightKeyframes,
+                        opacity: [0.6, 1, 0.6],
+                        scaleX: [0.9, 1.2, 0.8, 1],
+                        x: flame.xKeyframes
                     }}
                     transition={{
-                        duration: 0.5 + Math.random() * 0.5,
+                        duration: flame.duration,
                         repeat: Infinity,
-                        delay: Math.random(),
-                        ease: "easeInOut"
+                        repeatType: "mirror",
+                        ease: "easeInOut",
+                        delay: flame.delay
                     }}
                     style={{ transformOrigin: "bottom center" }}
-                    className="absolute bottom-4 w-12 bg-gradient-to-t from-orange-600 via-red-500 to-transparent blur-[12px] rounded-full mix-blend-screen"
+                    // Gradient: Blue core -> Orange body -> Transparent tip
+                    className="absolute bottom-4 w-12 bg-gradient-to-t from-blue-500 via-orange-500 to-transparent blur-[8px] rounded-full mix-blend-screen"
                 />
             ))}
 
-            {/* 3. Core Glow */}
+            {/* 3. Core Heat (Intense) */}
             <motion.div
                 animate={{
-                    scale: [1, 1.05 + (safeIntensity * 0.05), 1],
+                    scale: [1, 1.1 + (safeIntensity * 0.05), 0.95, 1],
                     opacity: [0.8, 0.9, 0.8]
                 }}
-                transition={{ duration: 0.2, repeat: Infinity }}
-                className="absolute bottom-4 w-32 h-40 bg-gradient-to-t from-yellow-100 via-orange-300 to-transparent blur-[20px] rounded-full mix-blend-add"
+                transition={{ duration: 0.3, repeat: Infinity }}
+                className="absolute bottom-4 w-28 h-32 bg-gradient-to-t from-blue-200 via-orange-300 to-transparent blur-[25px] rounded-full mix-blend-add"
             />
 
-            {/* 4. Embers/Sparks */}
+            {/* 4. Embers/Sparks (Fast & erratic) */}
             {Array.from({ length: 10 + safeIntensity * 2 }).map((_, i) => (
                 <motion.div
                     key={`ember-${i}`}
                     initial={{ y: 0, x: 0, opacity: 1, scale: 1 }}
                     animate={{
-                        y: -350 - (safeIntensity * 30),
-                        x: (Math.random() - 0.5) * 300,
-                        opacity: 0,
-                        scale: 0
+                        y: -400 - (safeIntensity * 30),
+                        x: (Math.random() - 0.5) * 400,
+                        opacity: [1, 1, 0],
+                        scale: [1, 0.5, 0]
                     }}
                     transition={{
-                        duration: 1.5 + Math.random(),
+                        duration: 1 + Math.random(),
                         repeat: Infinity,
                         delay: Math.random() * 2,
                         ease: "easeOut"
                     }}
-                    className="absolute bottom-10 w-1 h-1 bg-yellow-200 rounded-full shadow-[0_0_8px_#fbbf24] z-50"
+                    className="absolute bottom-10 w-1 h-1 bg-gradient-to-t from-yellow-200 to-white rounded-full shadow-[0_0_10px_#fbbf24] z-50"
                 />
             ))}
         </div>
