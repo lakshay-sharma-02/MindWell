@@ -60,32 +60,37 @@ const ProceduralCrumpledPaper = ({ seed, className }: { seed: number, className?
 
 const ProceduralAshPile = () => {
     return (
-        <svg viewBox="0 0 200 100" className="w-full h-full overflow-visible">
+        <svg viewBox="0 0 200 120" className="w-full h-full overflow-visible drop-shadow-[0_4px_6px_rgba(0,0,0,0.3)]">
             <defs>
-                <filter id="ash-noise" x="-20%" y="-20%" width="140%" height="140%">
-                    <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" result="noise" />
-                    <feColorMatrix type="matrix" values="0 0 0 0 0.2  0 0 0 0 0.2  0 0 0 0 0.2  0 0 0 1 0" />
+                {/* Fine powdery noise for ash texture */}
+                <filter id="ash-texture" x="-20%" y="-20%" width="140%" height="140%">
+                    <feTurbulence type="fractalNoise" baseFrequency="1.5" numOctaves="6" result="noise" />
+                    <feColorMatrix type="saturate" values="0" />
+                    <feComposite operator="in" in2="SourceGraphic" />
                 </filter>
-                <linearGradient id="ash-gradient" x1="0" y1="1" x2="0" y2="0">
-                    <stop offset="0%" stopColor="#1c1917" />
-                    <stop offset="100%" stopColor="#44403c" />
+
+                {/* Gradient: Lighter gray peak to slightly darker base */}
+                <linearGradient id="ash-gradient" x1="0.5" y1="0" x2="0.5" y2="1">
+                    <stop offset="0%" stopColor="#e5e5e5" /> {/* Lightest gray at top */}
+                    <stop offset="40%" stopColor="#a3a3a3" />
+                    <stop offset="100%" stopColor="#525252" /> {/* Darker gray at bottom */}
                 </linearGradient>
             </defs>
 
-            {/* Main Pile */}
-            <path
-                d="M20,100 Q60,40 100,60 Q140,20 180,100 Z"
-                fill="url(#ash-gradient)"
-                filter="url(#ash-noise)"
-                opacity="0.9"
-            />
-            {/* Secondary darker overlap */}
-            <path
-                d="M40,100 Q80,60 120,90 Q140,70 160,100 Z"
-                fill="#000"
-                filter="url(#ash-noise)"
-                opacity="0.7"
-            />
+            <g filter="url(#ash-texture)">
+                {/* Main Pyramidal Pile / Cone Shape */}
+                <path
+                    d="M100,10 Q110,20 130,50 Q160,90 190,110 L10,110 Q40,90 70,50 Q90,20 100,10 Z"
+                    fill="url(#ash-gradient)"
+                />
+
+                {/* Textured details / uneven surface layers for realism */}
+                <path
+                    d="M100,25 Q115,50 140,80 L60,80 Q85,50 100,25 Z"
+                    fill="#d4d4d4"
+                    opacity="0.5"
+                />
+            </g>
         </svg>
     );
 };
@@ -361,7 +366,7 @@ export const WorryJar = () => {
                             initial={{ opacity: 0, scale: 0.8 }}
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0, duration: 2 }}
-                            className="absolute bottom-2 left-1/2 -translate-x-1/2 w-48 h-20 z-20 pointer-events-none"
+                            className="absolute bottom-6 left-1/2 -translate-x-1/2 w-48 h-28 z-20 pointer-events-none"
                             style={{ transform: "translateZ(0px)" }}
                         >
                             <ProceduralAshPile />
