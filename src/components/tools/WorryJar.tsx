@@ -1,86 +1,67 @@
 import { useState, useEffect, useRef } from "react";
-import { motion, AnimatePresence, useDragControls } from "framer-motion";
-import { Flame, Move } from "lucide-react";
+import { motion, AnimatePresence, useMotionValue, useTransform, useSpring } from "framer-motion";
+import { Flame, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { cn } from "@/lib/utils";
 
 // --- Types & Constants ---
 
-interface FoldedItem {
+interface CrumpledPaper {
     id: string;
     x: number;
     y: number;
     rotation: number;
-    color: string;
     scale: number;
+    imageIndex: number;
 }
-
-const PASTEL_COLORS = [
-    "bg-yellow-200", // Yellow
-    "bg-pink-200",   // Pink
-    "bg-sky-200",    // Blue
-    "bg-green-200",  // Green
-    "bg-orange-200", // Orange
-    "bg-violet-200", // Purple
-];
 
 // --- Sub-Components ---
 
-const DraggablePaper = ({
-    worry,
-    setWorry,
+const WorryInput = ({
     onToss,
     containerRef
 }: {
-    worry: string,
-    setWorry: (v: string) => void,
-    onToss: () => void,
+    onToss: (text: string) => void,
     containerRef: React.RefObject<HTMLDivElement>
 }) => {
-    const controls = useDragControls();
+    const [text, setText] = useState("");
+
+    const handleToss = () => {
+        if (!text.trim()) return;
+        onToss(text);
+        setText("");
+    };
 
     return (
         <motion.div
-            drag
-            dragControls={controls}
-            dragConstraints={containerRef}
-            dragElastic={0.1}
-            whileDrag={{ scale: 1.05, rotate: 5, boxShadow: "0px 20px 40px rgba(0,0,0,0.2)" }}
-            initial={{ y: -200, opacity: 0, rotate: -5 }}
-            animate={{ y: -150, opacity: 1, rotate: -2 }}
-            exit={{ y: 200, scale: 0.1, opacity: 0, rotate: 45, transition: { duration: 0.4 } }}
-            className="absolute z-[60] top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/3 touch-none"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+            className="absolute z-50 top-[5%] sm:top-[10%] left-1/2 -translate-x-1/2 w-full max-w-md px-4"
         >
-            <div className="relative w-80 h-80 bg-[#fdfbf7] dark:bg-[#1a1614] shadow-xl rotate-1 rounded-sm overflow-hidden border border-stone-200 dark:border-stone-800">
-                {/* Paper Visuals */}
-                <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cream-paper.png')] opacity-50" />
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-32 h-8 bg-yellow-200/50 -rotate-1 skew-x-12 blur-[1px]" /> {/* Tape look */}
-
-                {/* Drag Handle */}
-                <div
-                    className="absolute top-2 right-2 p-2 cursor-grab active:cursor-grabbing text-stone-400 hover:text-stone-600 dark:hover:text-stone-200 transition-colors z-20"
-                    onPointerDown={(e) => controls.start(e)}
-                >
-                    <Move className="w-5 h-5" />
+            <div className="bg-white dark:bg-zinc-900 shadow-2xl rounded-lg overflow-hidden border border-zinc-200 dark:border-zinc-800 transform rotate-1 transition-transform hover:rotate-0">
+                {/* Header / Tape effect */}
+                <div className="bg-yellow-100 dark:bg-yellow-900/30 h-3 w-32 mx-auto mt-2 mb-4 opacity-50 rotate-1 relative">
+                    <div className="absolute inset-0 bg-yellow-200/40 opacity-50 blur-[1px]" />
                 </div>
 
-                <div className="p-8 h-full flex flex-col justify-between relative z-10">
+                <div className="p-6">
                     <textarea
-                        value={worry}
-                        onChange={(e) => setWorry(e.target.value)}
-                        placeholder="Write what's weighing on you..."
-                        className="w-full h-48 bg-transparent border-none resize-none font-handwriting text-3xl leading-relaxed text-stone-800 dark:text-stone-200 focus:outline-none text-center placeholder:text-stone-300 dark:placeholder:text-stone-600"
+                        value={text}
+                        onChange={(e) => setText(e.target.value)}
+                        placeholder="Write your worry here..."
+                        className="w-full h-32 bg-transparent border-none resize-none font-handwriting text-2xl leading-relaxed text-zinc-800 dark:text-zinc-200 focus:outline-none placeholder:text-zinc-300 dark:placeholder:text-zinc-700"
                         autoFocus
                     />
 
-                    <div className="flex justify-center pb-2">
+                    <div className="flex justify-end pt-4">
                         <Button
-                            onClick={onToss}
-                            disabled={!worry.trim()}
-                            className="rounded-full w-full py-6 bg-stone-800 hover:bg-black text-stone-100 dark:bg-stone-200 dark:text-stone-900 font-display text-lg shadow-lg hover:scale-[1.02] transition-all disabled:opacity-50 disabled:hover:scale-100"
+                            onClick={handleToss}
+                            disabled={!text.trim()}
+                            className="rounded-full px-6 bg-zinc-800 hover:bg-black text-zinc-100 dark:bg-zinc-200 dark:text-zinc-900 shadow-lg hover:shadow-xl hover:scale-105 transition-all group"
                         >
-                            Toss In Jar
+                            <span className="mr-2">Toss it away</span>
+                            <Send className="w-4 h-4 group-hover:-translate-y-1 group-hover:translate-x-1 transition-transform" />
                         </Button>
                     </div>
                 </div>
@@ -92,83 +73,87 @@ const DraggablePaper = ({
 // --- Realistic Fire System ---
 
 const RealisticFireSystem = ({ intensity }: { intensity: number }) => {
-    // Determine fire scale based on intensity (number of items)
-    const scale = Math.min(1 + (intensity * 0.1), 2); // Cap at 2x size
+    // Dynamic intensity scaling
+    // intensity 1 = small fire, intensity 10 = raging fire
+    const safeIntensity = Math.max(1, intensity);
+    const flameCount = Math.min(8 + safeIntensity, 25);
+    const heightScale = Math.min(1 + safeIntensity * 0.15, 2.0);
 
     return (
-        <div className="relative w-full h-[120%] -bottom-10 pointer-events-none flex justify-center">
-            {/* 1. Smoke (Rise high and fade) */}
+        <div className="relative w-full h-[140%] -bottom-4 pointer-events-none flex justify-center z-50">
+            {/* 1. Smoke */}
             <div className="absolute inset-0 flex justify-center">
-                {Array.from({ length: 12 }).map((_, i) => (
+                {Array.from({ length: 8 }).map((_, i) => (
                     <motion.div
                         key={`smoke-${i}`}
-                        initial={{ opacity: 0, y: 50, x: 0, scale: 0.5 }}
+                        initial={{ opacity: 0, y: 50, scale: 0.5 }}
                         animate={{
-                            opacity: [0, 0.4, 0],
-                            y: -250,
-                            x: (Math.random() - 0.5) * 100,
-                            scale: 2 + Math.random()
+                            opacity: [0, 0.3, 0],
+                            y: -300 - (safeIntensity * 20), // Smoke rises higher with more fire
+                            x: (Math.random() - 0.5) * 80,
+                            scale: 2.5
                         }}
                         transition={{
-                            duration: 2 + Math.random() * 2,
+                            duration: 2 + Math.random(),
                             repeat: Infinity,
-                            ease: "easeOut",
-                            delay: Math.random() * 2
+                            delay: Math.random() * 2,
+                            ease: "easeOut"
                         }}
-                        className="absolute bottom-10 w-20 h-20 rounded-full bg-stone-700/30 blur-[30px]"
+                        className="absolute bottom-20 w-24 h-24 rounded-full bg-zinc-800/20 blur-[40px]"
                     />
                 ))}
             </div>
 
-            {/* 2. Outer Flame (Orange loops) */}
-            <div className="absolute bottom-0 w-full flex justify-center mix-blend-screen">
-                {Array.from({ length: 15 }).map((_, i) => (
-                    <motion.div
-                        key={`flame-outer-${i}`}
-                        initial={{ height: 10, opacity: 0 }}
-                        animate={{
-                            height: [20, 100 + Math.random() * 80, 20],
-                            opacity: [0.2, 0.8, 0.2],
-                            x: (Math.random() - 0.5) * 60,
-                            scaleX: [1, 0.8, 1]
-                        }}
-                        transition={{
-                            duration: 0.6 + Math.random() * 0.4,
-                            repeat: Infinity,
-                            ease: "easeInOut",
-                            delay: Math.random()
-                        }}
-                        style={{ transformOrigin: "bottom" }}
-                        className="absolute bottom-4 w-12 bg-gradient-to-t from-orange-600 via-red-500 to-transparent blur-[8px] rounded-t-full"
-                    />
-                ))}
-            </div>
+            {/* 2. Flames */}
+            {Array.from({ length: flameCount }).map((_, i) => (
+                <motion.div
+                    key={`flame-${i}`}
+                    initial={{ height: 20, opacity: 0 }}
+                    animate={{
+                        height: [40 * heightScale, (140 + Math.random() * 60) * heightScale, 40 * heightScale],
+                        opacity: [0.4, 1, 0.4],
+                        scaleX: [0.8, 1.2, 0.8],
+                        x: (Math.random() - 0.5) * (40 * heightScale)
+                    }}
+                    transition={{
+                        duration: 0.5 + Math.random() * 0.5,
+                        repeat: Infinity,
+                        delay: Math.random(),
+                        ease: "easeInOut"
+                    }}
+                    style={{ transformOrigin: "bottom center" }}
+                    className="absolute bottom-4 w-12 bg-gradient-to-t from-orange-600 via-red-500 to-transparent blur-[12px] rounded-full mix-blend-screen"
+                />
+            ))}
 
-            {/* 3. Core Flame (Bright Yellow/White) */}
+            {/* 3. Core Glow */}
             <motion.div
-                animate={{ scale: [1, 1.1, 0.95, 1], opacity: [0.8, 1, 0.8] }}
+                animate={{
+                    scale: [1, 1.05 + (safeIntensity * 0.05), 1],
+                    opacity: [0.8, 0.9, 0.8]
+                }}
                 transition={{ duration: 0.2, repeat: Infinity }}
-                className="absolute bottom-4 w-24 h-32 bg-gradient-to-t from-yellow-200 via-orange-400 to-transparent blur-[15px] rounded-full mix-blend-hard-light"
+                className="absolute bottom-4 w-32 h-40 bg-gradient-to-t from-yellow-100 via-orange-300 to-transparent blur-[20px] rounded-full mix-blend-add"
             />
 
-            {/* 4. Sparks (Fast erratic dots) */}
-            {Array.from({ length: 20 }).map((_, i) => (
+            {/* 4. Embers/Sparks */}
+            {Array.from({ length: 10 + safeIntensity * 2 }).map((_, i) => (
                 <motion.div
-                    key={`spark-${i}`}
+                    key={`ember-${i}`}
                     initial={{ y: 0, x: 0, opacity: 1, scale: 1 }}
                     animate={{
-                        y: -300,
-                        x: (Math.random() - 0.5) * 200,
+                        y: -350 - (safeIntensity * 30),
+                        x: (Math.random() - 0.5) * 300,
                         opacity: 0,
                         scale: 0
                     }}
                     transition={{
-                        duration: 1 + Math.random(),
+                        duration: 1.5 + Math.random(),
                         repeat: Infinity,
-                        ease: "easeOut",
-                        delay: Math.random() * 2
+                        delay: Math.random() * 2,
+                        ease: "easeOut"
                     }}
-                    className="absolute bottom-10 w-1 h-1 bg-yellow-100 rounded-full shadow-[0_0_5px_#fff]"
+                    className="absolute bottom-10 w-1 h-1 bg-yellow-200 rounded-full shadow-[0_0_8px_#fbbf24] z-50"
                 />
             ))}
         </div>
@@ -178,66 +163,76 @@ const RealisticFireSystem = ({ intensity }: { intensity: number }) => {
 // --- Main Component ---
 
 export const WorryJar = () => {
-    const [worry, setWorry] = useState("");
-    const [items, setItems] = useState<FoldedItem[]>([]);
+    const [items, setItems] = useState<CrumpledPaper[]>([]);
     const [isBurning, setIsBurning] = useState(false);
     const [showAsh, setShowAsh] = useState(false);
     const [burnCount, setBurnCount] = useState(0);
-    const [isInputOpen, setIsInputOpen] = useState(true); // Is the paper currently available to write on?
+    const [showInput, setShowInput] = useState(true);
 
-    // Drag constraints reference
     const containerRef = useRef<HTMLDivElement>(null);
     const { toast } = useToast();
 
-    // Load persisted count
+    // 3D Tilt Effect
+    const mouseX = useMotionValue(0);
+    const mouseY = useMotionValue(0);
+
+    const rotateX = useSpring(useTransform(mouseY, [-0.5, 0.5], [10, -10]), { damping: 15, stiffness: 100 });
+    const rotateY = useSpring(useTransform(mouseX, [-0.5, 0.5], [-10, 10]), { damping: 15, stiffness: 100 });
+
+    const handleMouseMove = (e: React.MouseEvent) => {
+        const { width, height, left, top } = e.currentTarget.getBoundingClientRect();
+        const x = (e.clientX - left) / width - 0.5;
+        const y = (e.clientY - top) / height - 0.5;
+        mouseX.set(x);
+        mouseY.set(y);
+    };
+
+    const handleMouseLeave = () => {
+        mouseX.set(0);
+        mouseY.set(0);
+    };
+
     useEffect(() => {
         const saved = localStorage.getItem("mindwell_burn_count");
         if (saved) setBurnCount(parseInt(saved));
     }, []);
 
-    // Add a new worry to the jar
-    const handleToss = () => {
-        if (!worry.trim()) return;
-
-        // Create a new "folded" visual item
-        const newItem: FoldedItem = {
+    const handleToss = (text: string) => {
+        // Add new paper with randomized properties
+        const newItem: CrumpledPaper = {
             id: Date.now().toString(),
-            x: Math.random() * 60 - 30, // Random spread inside jar
-            y: Math.random() * 40 - 20, // Vertical randomness
+            x: Math.random() * 40 - 20, // Spread within jar width percent
+            y: -10 + Math.random() * 10, // Slight vertical pile variation
             rotation: Math.random() * 360,
-            color: PASTEL_COLORS[Math.floor(Math.random() * PASTEL_COLORS.length)],
-            scale: 0.8 + Math.random() * 0.4
+            scale: 0.9 + Math.random() * 0.2,
+            imageIndex: 0
         };
 
         setItems(prev => [...prev, newItem]);
-        setWorry("");
 
-        // Brief animation reset for input
-        setIsInputOpen(false);
-        setTimeout(() => setIsInputOpen(true), 400);
-
+        // Feedback
         toast({
             title: "Tossed In",
-            description: "It joins the others in the jar.",
-            duration: 1000,
+            description: "Your worry is in the jar now.",
+            duration: 1500,
         });
     };
 
-    // Ignite everything
     const handleBurnAll = () => {
         if (items.length === 0) return;
+
+        setShowInput(false);
         setIsBurning(true);
 
-        // Timeline:
-        // 0s: Fire starts
-        // 2.5s: Papers disappear (consumed) + Ash appears
-        // 5s: Fire dies down
+        // Sequence: Fire -> Papers vanish -> Ash appears -> Fire dies -> Reset
 
+        // 2s: Papers consume visuals
         setTimeout(() => {
             setItems([]);
             setShowAsh(true);
         }, 2500);
 
+        // 5s: Fire stops
         setTimeout(() => {
             setIsBurning(false);
             const newCount = burnCount + items.length;
@@ -245,65 +240,74 @@ export const WorryJar = () => {
             localStorage.setItem("mindwell_burn_count", newCount.toString());
 
             toast({
-                title: "Released",
-                description: "The fire has cleansed them. They are gone.",
+                title: "Gone",
+                description: "The fire has cleansed them.",
             });
+        }, 6000);
 
-            // Fade ash eventually
-            setTimeout(() => setShowAsh(false), 8000);
-        }, 5500);
+        // 8s: Restore input, hide ash slowly
+        setTimeout(() => {
+            setShowInput(true);
+            setShowAsh(false);
+        }, 9000);
     };
 
     return (
-        <div ref={containerRef} className="relative min-h-[700px] w-full flex flex-col items-center justify-center p-4 overflow-hidden">
+        <div
+            ref={containerRef}
+            className="relative min-h-[700px] w-full flex flex-col items-center justify-center p-4 overflow-hidden bg-slate-50 dark:bg-slate-950/50"
+            onMouseMove={handleMouseMove}
+            onMouseLeave={handleMouseLeave}
+        >
 
-            {/* Ambient Room Lighting */}
-            <div className="absolute inset-0 bg-gradient-to-b from-slate-50/50 to-slate-200/50 dark:from-slate-900/50 dark:to-slate-950/80 -z-20" />
-
-            {/* The Draggable Paper Input (Floating) */}
+            {/* Input Area */}
             <AnimatePresence>
-                {isInputOpen && !isBurning && (
-                    <DraggablePaper
-                        worry={worry}
-                        setWorry={setWorry}
-                        onToss={handleToss}
-                        containerRef={containerRef}
-                    />
+                {showInput && !isBurning && (
+                    <WorryInput onToss={handleToss} containerRef={containerRef} />
                 )}
             </AnimatePresence>
 
+            {/* --- JAR ASSEMBLY --- */}
+            <motion.div
+                style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
+                className="relative w-72 h-96 mt-32 sm:mt-24 group z-10 transition-all duration-700"
+            >
 
-            {/* --- THE JAR --- */}
-            <div className="relative w-64 h-80 sm:w-72 sm:h-96 mt-20 group perspective-1000">
+                {/* 1. Back Glass */}
+                <div
+                    className="absolute inset-0 rounded-[3rem] rounded-t-[1rem] bg-gradient-to-br from-white/20 to-white/5 border border-white/20 shadow-2xl backdrop-blur-[1px] z-10"
+                    style={{ transform: "translateZ(-20px)" }}
+                />
 
-                {/* 1. Back Glass (Darker/Reflective) */}
-                <div className="absolute inset-0 rounded-[3rem] rounded-t-[1rem] bg-gradient-to-br from-white/10 to-white/5 border-2 border-white/20 shadow-2xl backdrop-blur-[2px] z-10" />
-
-                {/* 2. Ash Pile (Bottom Layer) */}
+                {/* 2. Ash Pile */}
                 <AnimatePresence>
                     {showAsh && (
                         <motion.div
-                            initial={{ opacity: 0, scale: 0.5 }}
+                            initial={{ opacity: 0, scale: 0.8 }}
                             animate={{ opacity: 1, scale: 1 }}
-                            exit={{ opacity: 0, transition: { duration: 2 } }}
-                            className="absolute bottom-4 left-1/2 -translate-x-1/2 w-48 h-24 z-20"
+                            exit={{ opacity: 0, duration: 2 }}
+                            className="absolute bottom-2 left-1/2 -translate-x-1/2 w-48 h-32 z-20 pointer-events-none"
+                            style={{ transform: "translateZ(0px)" }}
                         >
-                            <div className="w-full h-full bg-stone-800 dark:bg-black blur-xl rounded-[100%] opacity-80" />
-                            {/* Ash particles static */}
-                            <div className="absolute top-1/2 left-1/2 w-2 h-2 bg-stone-600 rounded-full blur-[1px] translate-x-4 -translate-y-2" />
-                            <div className="absolute top-1/2 left-1/2 w-3 h-3 bg-stone-700 rounded-full blur-[1px] -translate-x-6 translate-y-1" />
+                            <img
+                                src="/assets/ash-pile.png"
+                                alt="Ash"
+                                className="w-full h-full object-contain opacity-90 drop-shadow-2xl mix-blend-multiply dark:mix-blend-normal dark:opacity-80"
+                            />
                         </motion.div>
                     )}
                 </AnimatePresence>
 
-                {/* 3. The Content Pile (Folded Chits) */}
-                <div className="absolute bottom-4 inset-x-4 h-56 z-30 flex items-end justify-center pointer-events-none">
+                {/* 3. Paper Pile */}
+                <div
+                    className="absolute bottom-4 inset-x-4 h-64 z-30 flex items-end justify-center pointer-events-none"
+                    style={{ transform: "translateZ(10px)" }}
+                >
                     <AnimatePresence>
                         {items.map((item) => (
                             <motion.div
                                 key={item.id}
-                                layoutId={item.id}
-                                initial={{ y: -400, x: 0, rotate: 0, scale: 1.2 }}
+                                initial={{ y: -600, x: 0, rotate: item.rotation * 0.1, scale: 1 }}
                                 animate={{
                                     y: item.y,
                                     x: item.x,
@@ -311,75 +315,88 @@ export const WorryJar = () => {
                                     scale: item.scale
                                 }}
                                 exit={{
-                                    scale: [item.scale, item.scale * 0.9, 0],
-                                    rotate: item.rotation + 20,
-                                    opacity: 0,
-                                    filter: "brightness(0)", // Turning to char
-                                    transition: { duration: 2, ease: "easeInOut" }
+                                    scale: [item.scale, item.scale * 0.8, 0],
+                                    opacity: [1, 1, 0],
+                                    filter: ["brightness(1)", "brightness(0.3)", "brightness(0)"], // Charring
+                                    transition: { duration: 2, ease: "anticipate" }
                                 }}
-                                transition={{ type: "spring", damping: 20 }}
-                                className={cn(
-                                    "absolute bottom-0 w-16 h-16 shadow-md border-[0.5px] border-black/10 flex items-center justify-center",
-                                    item.color
-                                )}
-                                style={{
-                                    borderRadius: "2px",
-                                    clipPath: "polygon(0 0, 100% 0, 100% 80%, 80% 100%, 0 100%)" // Folded corner
+                                transition={{
+                                    type: "spring",
+                                    damping: 20,
+                                    stiffness: 120,
+                                    mass: 0.8
                                 }}
+                                className="absolute bottom-0 w-24 h-24 flex items-center justify-center origin-center"
                             >
-                                <div className="absolute bottom-0 right-0 w-[20%] h-[20%] bg-black/10 backdrop-brightness-75" />
+                                <img
+                                    src="/assets/crumpled-paper-1.png"
+                                    alt="Crumpled Worry"
+                                    className="w-full h-full object-contain drop-shadow-md"
+                                    style={{ clipPath: "inset(5% round 50%)" }}
+                                />
                             </motion.div>
                         ))}
                     </AnimatePresence>
                 </div>
 
-                {/* 4. Realistic Fire System */}
+                {/* 4. Fire System */}
                 <AnimatePresence>
                     {isBurning && (
-                        <div className="absolute bottom-0 inset-x-0 h-full z-40 flex justify-center items-end pointer-events-none">
+                        <div
+                            className="absolute bottom-0 inset-x-0 h-full z-40 pointer-events-none"
+                            style={{ transform: "translateZ(30px)" }}
+                        >
                             <RealisticFireSystem intensity={items.length} />
                         </div>
                     )}
                 </AnimatePresence>
 
-                {/* 5. Front Glass (Specular Highlights & Rim) */}
-                <div className="absolute inset-0 rounded-[3rem] rounded-t-[1rem] border border-white/30 bg-gradient-to-tr from-white/5 to-transparent pointer-events-none z-50 overflow-hidden">
-                    {/* Highlights */}
-                    <div className="absolute top-8 left-4 w-4 h-[70%] bg-gradient-to-b from-white/40 to-transparent blur-[3px] rounded-full opacity-70" />
+                {/* 5. Front Glass - with reflection */}
+                <div
+                    className="absolute inset-0 rounded-[3rem] rounded-t-[1rem] border border-white/20 bg-gradient-to-tr from-white/10 to-transparent pointer-events-none z-50 overflow-hidden"
+                    style={{ transform: "translateZ(50px)" }}
+                >
+                    <div className="absolute top-6 left-6 w-8 h-[60%] bg-gradient-to-b from-white/40 to-transparent blur-md rounded-full opacity-60" />
                     <div className="absolute bottom-8 right-6 w-16 h-16 bg-white/10 blur-[20px] rounded-full" />
                 </div>
 
-                {/* Lid / Rim */}
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-48 h-8 bg-slate-100/90 dark:bg-slate-800/90 border border-white/50 shadow-md rounded-full z-40 backdrop-blur-sm" />
+                {/* Lid/Rim */}
+                <div
+                    className="absolute -top-3 left-1/2 -translate-x-1/2 w-52 h-8 bg-slate-200/50 dark:bg-slate-700/50 border border-white/40 shadow-sm rounded-full z-[45] backdrop-blur-md"
+                    style={{ transform: "translateZ(20px)" }}
+                />
 
-                {/* Burn All Trigger */}
-                <AnimatePresence>
-                    {items.length > 0 && !isBurning && (
-                        <motion.div
-                            initial={{ scale: 0, y: 20 }}
-                            animate={{ scale: 1, y: 0 }}
-                            exit={{ scale: 0, opacity: 0 }}
-                            className="absolute -bottom-20 left-1/2 -translate-x-1/2 z-50"
+            </motion.div>
+
+            {/* Burn Button */}
+            <AnimatePresence>
+                {items.length > 0 && !isBurning && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 30 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 20 }}
+                        className="absolute bottom-20 z-50"
+                    >
+                        <Button
+                            onClick={handleBurnAll}
+                            size="lg"
+                            className="bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white font-display text-xl px-12 py-7 rounded-full shadow-[0_0_30px_rgba(239,68,68,0.4)] hover:shadow-[0_0_50px_rgba(239,68,68,0.6)] hover:scale-110 transition-all border border-red-400/30 active:scale-95"
                         >
-                            <Button
-                                onClick={handleBurnAll}
-                                className="bg-red-600 hover:bg-red-700 text-white font-display text-lg px-8 py-6 rounded-full shadow-lg shadow-red-500/30 hover:shadow-red-500/50 hover:scale-105 transition-all"
-                            >
-                                <Flame className="w-5 h-5 mr-2 fill-yellow-200 animate-pulse" />
-                                Burn All
-                            </Button>
-                        </motion.div>
-                    )}
-                </AnimatePresence>
+                            <Flame className="w-6 h-6 mr-2 fill-yellow-200 animate-pulse" />
+                            Burn It All
+                        </Button>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
-            </div>
-
-            {/* Stats Footer */}
-            <div className="absolute bottom-8 text-center opacity-60">
-                <p className="font-display font-medium text-sm">
-                    {burnCount > 0 ? `${burnCount} burdens released into the ashes` : "Start by writing a worry above"}
+            {/* Footer Stats */}
+            <div className="absolute bottom-6 text-center opacity-40 hover:opacity-100 transition-opacity">
+                <p className="font-display text-sm tracking-wide text-zinc-500 dark:text-zinc-400">
+                    {burnCount > 0 ? `${burnCount} burdens released` : "The jar awaits"}
                 </p>
+                {burnCount > 0 && <Button variant="link" size="sm" onClick={() => { setBurnCount(0); localStorage.removeItem("mindwell_burn_count"); }} className="text-xs h-auto p-0 text-red-500">Reset Count</Button>}
             </div>
+
         </div>
     );
 };
