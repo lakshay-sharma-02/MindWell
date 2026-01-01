@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { motion, AnimatePresence, useMotionValue, useTransform, useSpring } from "framer-motion";
 import { Flame, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -12,8 +12,83 @@ interface CrumpledPaper {
     y: number;
     rotation: number;
     scale: number;
-    imageIndex: number;
+    seed: number; // For randomizing the SVG noise
 }
+
+// --- Procedural Assets ---
+
+const ProceduralCrumpledPaper = ({ seed, className }: { seed: number, className?: string }) => {
+    // Generate a unique filter ID to avoid conflicts
+    const filterId = `crumple-noise-${seed}`;
+
+    return (
+        <div className={className}>
+            <svg viewBox="0 0 100 100" className="w-full h-full overflow-visible drop-shadow-md">
+                <defs>
+                    <filter id={filterId}>
+                        <feTurbulence
+                            type="turbulence"
+                            baseFrequency="0.03"
+                            numOctaves="5"
+                            seed={seed}
+                            result="noise"
+                        />
+                        <feDiffuseLighting in="noise" lightingColor="#fff" surfaceScale="2">
+                            <feDistantLight azimuth="45" elevation="60" />
+                        </feDiffuseLighting>
+                        <feDisplacementMap in="SourceGraphic" in2="noise" scale="15" xChannelSelector="R" yChannelSelector="G" />
+                    </filter>
+                </defs>
+
+                <g filter={`url(#${filterId})`}>
+                    {/* Base Paper Ball Shape - irregular polygon approximation */}
+                    <path
+                        d="M50 10 L80 30 L90 60 L70 90 L30 90 L10 60 L20 30 Z"
+                        fill="#f7f7f5"
+                        stroke="#e5e5e0"
+                        strokeWidth="1"
+                    />
+                    {/* Scribbles / Lines to suggest it was written on */}
+                    <path d="M30 40 Q50 35 70 45" stroke="#cbd5e1" strokeWidth="2" fill="none" opacity="0.6" />
+                    <path d="M25 55 Q45 60 75 50" stroke="#cbd5e1" strokeWidth="2" fill="none" opacity="0.6" />
+                    <path d="M35 70 Q55 65 65 75" stroke="#cbd5e1" strokeWidth="2" fill="none" opacity="0.6" />
+                </g>
+            </svg>
+        </div>
+    );
+};
+
+const ProceduralAshPile = () => {
+    return (
+        <svg viewBox="0 0 200 100" className="w-full h-full overflow-visible">
+            <defs>
+                <filter id="ash-noise" x="-20%" y="-20%" width="140%" height="140%">
+                    <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" result="noise" />
+                    <feColorMatrix type="matrix" values="0 0 0 0 0.2  0 0 0 0 0.2  0 0 0 0 0.2  0 0 0 1 0" />
+                </filter>
+                <linearGradient id="ash-gradient" x1="0" y1="1" x2="0" y2="0">
+                    <stop offset="0%" stopColor="#1c1917" />
+                    <stop offset="100%" stopColor="#44403c" />
+                </linearGradient>
+            </defs>
+
+            {/* Main Pile */}
+            <path
+                d="M20,100 Q60,40 100,60 Q140,20 180,100 Z"
+                fill="url(#ash-gradient)"
+                filter="url(#ash-noise)"
+                opacity="0.9"
+            />
+            {/* Secondary darker overlap */}
+            <path
+                d="M40,100 Q80,60 120,90 Q140,70 160,100 Z"
+                fill="#000"
+                filter="url(#ash-noise)"
+                opacity="0.7"
+            />
+        </svg>
+    );
+};
 
 // --- Sub-Components ---
 
@@ -205,7 +280,7 @@ export const WorryJar = () => {
             y: -10 + Math.random() * 10, // Slight vertical pile variation
             rotation: Math.random() * 360,
             scale: 0.9 + Math.random() * 0.2,
-            imageIndex: 0
+            seed: Math.floor(Math.random() * 1000)
         };
 
         setItems(prev => [...prev, newItem]);
@@ -286,14 +361,10 @@ export const WorryJar = () => {
                             initial={{ opacity: 0, scale: 0.8 }}
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0, duration: 2 }}
-                            className="absolute bottom-2 left-1/2 -translate-x-1/2 w-48 h-32 z-20 pointer-events-none"
+                            className="absolute bottom-2 left-1/2 -translate-x-1/2 w-48 h-20 z-20 pointer-events-none"
                             style={{ transform: "translateZ(0px)" }}
                         >
-                            <img
-                                src="/assets/ash-pile.png"
-                                alt="Ash"
-                                className="w-full h-full object-contain opacity-90 drop-shadow-2xl mix-blend-multiply dark:mix-blend-normal dark:opacity-80"
-                            />
+                            <ProceduralAshPile />
                         </motion.div>
                     )}
                 </AnimatePresence>
@@ -328,11 +399,9 @@ export const WorryJar = () => {
                                 }}
                                 className="absolute bottom-0 w-24 h-24 flex items-center justify-center origin-center"
                             >
-                                <img
-                                    src="/assets/crumpled-paper-1.png"
-                                    alt="Crumpled Worry"
-                                    className="w-full h-full object-contain drop-shadow-md"
-                                    style={{ clipPath: "inset(5% round 50%)" }}
+                                <ProceduralCrumpledPaper
+                                    seed={item.seed}
+                                    className="w-full h-full"
                                 />
                             </motion.div>
                         ))}
