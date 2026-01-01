@@ -18,7 +18,6 @@ interface CrumpledPaper {
 // --- Procedural Assets ---
 
 const ProceduralCrumpledPaper = ({ seed, className }: { seed: number, className?: string }) => {
-    // Unique IDs for SVG gradients/filters to prevent conflicts
     const paperId = `paper-${seed}`;
     const foldId = `folds-${seed}`;
 
@@ -26,18 +25,17 @@ const ProceduralCrumpledPaper = ({ seed, className }: { seed: number, className?
         <div className={className}>
             <svg viewBox="0 0 100 100" className="w-full h-full overflow-visible drop-shadow-md">
                 <defs>
-                    {/* 1. Micro-texture (Grain) - High frequency noise */}
+                    {/* 1. Micro-texture (Grain) */}
                     <filter id={paperId}>
                         <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3" seed={seed} result="texture" />
                         <feColorMatrix type="saturate" values="0" in="texture" />
                         <feComponentTransfer>
-                            {/* Make it subtle */}
                             <feFuncA type="linear" slope="0.4" />
                         </feComponentTransfer>
                         <feComposite operator="in" in2="SourceGraphic" result="texturedSource" />
                     </filter>
 
-                    {/* 2. Macro-structure (Deep Folds) - Low frequency displacement */}
+                    {/* 2. Macro-structure (Deep Folds) */}
                     <filter id={foldId}>
                         <feTurbulence type="turbulence" baseFrequency="0.04" numOctaves="2" seed={seed + 100} result="folds" />
                         <feDisplacementMap in="SourceGraphic" in2="folds" scale="12" xChannelSelector="R" yChannelSelector="G" />
@@ -55,7 +53,7 @@ const ProceduralCrumpledPaper = ({ seed, className }: { seed: number, className?
                         strokeWidth="0.5"
                     />
 
-                    {/* Structural Creases - manually defined "random" lines that get deformed by the displacement map */}
+                    {/* Structural Creases */}
                     <path d="M25 25 L75 75" stroke="#a3a3a3" strokeWidth="0.5" fill="none" opacity="0.4" />
                     <path d="M75 25 L25 75" stroke="#a3a3a3" strokeWidth="0.5" fill="none" opacity="0.4" />
                     <path d="M50 10 L50 90" stroke="#a3a3a3" strokeWidth="0.5" fill="none" opacity="0.3" />
@@ -74,7 +72,7 @@ const ProceduralAshPile = () => {
     return (
         <svg viewBox="0 0 200 120" className="w-full h-full overflow-visible drop-shadow-xl">
             <defs>
-                {/* Ash Noise - rough and crumbly edges */}
+                {/* Ash Noise */}
                 <filter id="ash-roughness" x="-20%" y="-20%" width="140%" height="140%">
                     <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="4" seed="5" result="noise" />
                     <feDisplacementMap in="SourceGraphic" in2="noise" scale="8" />
@@ -96,28 +94,28 @@ const ProceduralAshPile = () => {
             </defs>
 
             <g filter="url(#ash-roughness)">
-                {/* Stratum 1: Base (Wide, dark) */}
+                {/* Stratum 1: Base */}
                 <path
                     d="M10 115 Q50 100 100 110 Q150 100 190 115 Z"
                     fill="url(#ash-dark)"
                     opacity="0.9"
                 />
 
-                {/* Stratum 2: Mid-pile (Irregular, chunky) */}
+                {/* Stratum 2: Mid-pile */}
                 <path
                     d="M30 115 Q60 80 90 95 Q140 60 170 115 Z"
                     fill="url(#ash-medium)"
                     opacity="0.8"
                 />
 
-                {/* Stratum 3: Peak (Lighter ash, collapsed structure) */}
+                {/* Stratum 3: Peak */}
                 <path
                     d="M70 115 L85 70 L95 85 L115 50 L125 115 Z"
                     fill="url(#ash-light)"
                     opacity="0.7"
                 />
 
-                {/* Loose debris particles for granularity */}
+                {/* Loose debris */}
                 <circle cx="50" cy="110" r="4" fill="#57534e" />
                 <circle cx="160" cy="105" r="5" fill="#44403c" />
                 <path d="M120 100 L130 95 L125 110 Z" fill="#292524" />
@@ -189,10 +187,10 @@ const RealisticFireSystem = ({ intensity }: { intensity: number }) => {
     const flameCount = Math.min(8 + safeIntensity, 25);
     const heightScale = Math.min(1 + safeIntensity * 0.15, 2.0);
 
-    // Generate randomized flame parameters to break periodicity and look chaotic
+    // Generate randomized flame parameters
     const flames = useMemo(() => Array.from({ length: flameCount }).map((_, i) => ({
         id: i,
-        // Chaotic motion paths using keyframes
+        // Chaotic motion paths
         xKeyframes: Array.from({ length: 5 }, () => (Math.random() - 0.5) * (60 * heightScale)),
         heightKeyframes: Array.from({ length: 5 }, () => (40 + Math.random() * 100) * heightScale),
         duration: 0.8 + Math.random() * 0.6,
@@ -201,7 +199,7 @@ const RealisticFireSystem = ({ intensity }: { intensity: number }) => {
 
     return (
         <div className="relative w-full h-[140%] -bottom-4 pointer-events-none flex justify-center z-50">
-            {/* 1. Smoke (Darker, more turbulent) */}
+            {/* 1. Smoke */}
             <div className="absolute inset-0 flex justify-center">
                 {Array.from({ length: 6 }).map((_, i) => (
                     <motion.div
@@ -225,7 +223,7 @@ const RealisticFireSystem = ({ intensity }: { intensity: number }) => {
                 ))}
             </div>
 
-            {/* 2. Flames (Chaotic & Hot) */}
+            {/* 2. Flames */}
             {flames.map((flame) => (
                 <motion.div
                     key={`flame-${flame.id}`}
@@ -248,7 +246,7 @@ const RealisticFireSystem = ({ intensity }: { intensity: number }) => {
                 />
             ))}
 
-            {/* 3. Core Heat (Intense) */}
+            {/* 3. Core Heat */}
             <motion.div
                 animate={{
                     scale: [1, 1.1 + (safeIntensity * 0.05), 0.95, 1],
@@ -258,7 +256,7 @@ const RealisticFireSystem = ({ intensity }: { intensity: number }) => {
                 className="absolute bottom-4 w-28 h-32 bg-gradient-to-t from-blue-200 via-orange-300 to-transparent blur-[25px] rounded-full mix-blend-add"
             />
 
-            {/* 4. Embers/Sparks (Fast & erratic) */}
+            {/* 4. Embers/Sparks */}
             {Array.from({ length: 10 + safeIntensity * 2 }).map((_, i) => (
                 <motion.div
                     key={`ember-${i}`}
@@ -320,7 +318,6 @@ export const WorryJar = () => {
     }, []);
 
     const handleToss = (text: string) => {
-        // Add new paper with randomized properties
         const newItem: CrumpledPaper = {
             id: Date.now().toString(),
             x: Math.random() * 40 - 20, // Spread within jar width percent
@@ -408,7 +405,8 @@ export const WorryJar = () => {
                             initial={{ opacity: 0, scale: 0.8 }}
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0, duration: 2 }}
-                            className="absolute bottom-6 left-1/2 -translate-x-1/2 w-48 h-28 z-20 pointer-events-none"
+                            // Fixed alignment: bottom-1 to sit on floor
+                            className="absolute bottom-1 left-1/2 -translate-x-1/2 w-56 h-32 z-20 pointer-events-none"
                             style={{ transform: "translateZ(0px)" }}
                         >
                             <ProceduralAshPile />
@@ -418,7 +416,8 @@ export const WorryJar = () => {
 
                 {/* 3. Paper Pile */}
                 <div
-                    className="absolute bottom-4 inset-x-4 h-64 z-30 flex items-end justify-center pointer-events-none"
+                    // Fixed alignment: bottom-2 to match ash floor
+                    className="absolute bottom-2 inset-x-4 h-64 z-30 flex items-end justify-center pointer-events-none"
                     style={{ transform: "translateZ(10px)" }}
                 >
                     <AnimatePresence>
@@ -459,7 +458,8 @@ export const WorryJar = () => {
                 <AnimatePresence>
                     {isBurning && (
                         <div
-                            className="absolute bottom-0 inset-x-0 h-full z-40 pointer-events-none"
+                            // Fixed alignment: -bottom-4 relative to container, properly layered
+                            className="absolute -bottom-4 inset-x-0 h-[120%] z-40 pointer-events-none"
                             style={{ transform: "translateZ(30px)" }}
                         >
                             <RealisticFireSystem intensity={items.length} />
