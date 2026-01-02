@@ -233,7 +233,7 @@ export default function Checkout() {
                 endTime: endDateTime.toISOString(),
                 organizer: {
                     name: 'Psyche Space Therapy',
-                    email: 'unheardpages.business@gmail.com'
+                    email: 'psychespaced@gmail.com'
                 }
             };
 

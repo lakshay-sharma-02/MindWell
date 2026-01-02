@@ -12,6 +12,7 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signUp: (email: string, password: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
+  updatePassword: (password: string) => Promise<{ error: Error | null }>;
   checkIsAdmin: () => Promise<boolean>;
 }
 
@@ -165,6 +166,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setHasSeenTour(true);
   };
 
+  const updatePassword = async (password: string) => {
+    const { error } = await supabase.auth.updateUser({ password });
+    return { error: error as Error | null };
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -177,6 +183,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         signIn,
         signUp,
         signOut,
+        updatePassword,
         checkIsAdmin: () => checkIsAdmin(),
       }}
     >
@@ -199,6 +206,7 @@ export function useAuth() {
       signIn: async () => ({ error: new Error('AuthProvider not found') }),
       signUp: async () => ({ error: new Error('AuthProvider not found') }),
       signOut: async () => { },
+      updatePassword: async () => ({ error: new Error('AuthProvider not found') }),
       checkIsAdmin: async () => false,
     };
   }

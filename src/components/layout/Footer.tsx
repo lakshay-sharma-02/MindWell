@@ -102,13 +102,13 @@ export function Footer() {
             {/* Contact Info */}
             <div className="space-y-3 mb-6">
               <a
-                href="mailto:unheardpages.business@gmail.com"
+                href="mailto:psychespaced@gmail.com"
                 className="flex items-center gap-3 text-sm text-muted-foreground hover:text-primary transition-colors group"
               >
                 <div className="w-9 h-9 rounded-xl bg-card dark:bg-secondary/50 border border-border/50 flex items-center justify-center group-hover:border-primary/30 group-hover:bg-primary/5 transition-all">
                   <Mail className="w-4 h-4" />
                 </div>
-                unheardpages.business@gmail.com
+                psychespaced@gmail.com
               </a>
               <div className="flex items-center gap-3 text-sm text-muted-foreground">
                 <div className="w-9 h-9 rounded-xl bg-card dark:bg-secondary/50 border border-border/50 flex items-center justify-center">

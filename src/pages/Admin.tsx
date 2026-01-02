@@ -33,6 +33,7 @@ import { CommunityManager } from "@/components/admin/CommunityManager";
 import { SiteSettings } from "@/components/admin/SiteSettings";
 import { ContentManager } from "@/components/admin/ContentManager";
 import { CommunicationsManager } from "@/components/admin/CommunicationsManager";
+import { AdminProfile } from "@/components/admin/AdminProfile";
 import { motion, AnimatePresence } from "framer-motion";
 
 const Admin = () => {
@@ -67,6 +68,7 @@ const Admin = () => {
     { id: "communications", label: "Communications", icon: MessageSquare },
     { id: "content", label: "Page Content", icon: FileText },
     { id: "settings", label: "Settings", icon: Settings },
+    { id: "profile", label: "Profile", icon: Users },
   ];
 
   const renderContent = () => {
@@ -85,6 +87,7 @@ const Admin = () => {
       case "communications": return <CommunicationsManager />;
       case "content": return <ContentManager />;
       case "settings": return <SiteSettings />;
+      case "profile": return <AdminProfile />;
       default: return <AdminOverview />;
     }
   };

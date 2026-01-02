@@ -212,7 +212,7 @@ export function SiteSettings() {
                                 type="email"
                                 value={globalInfo.contact_email}
                                 onChange={(e) => setGlobalInfo(prev => ({ ...prev, contact_email: e.target.value }))}
-                                placeholder="unheardpages.business@gmail.com"
+                                placeholder="psychespaced@gmail.com"
                             />
                         </div>
                         <div className="grid gap-2">

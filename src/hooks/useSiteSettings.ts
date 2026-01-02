@@ -39,7 +39,7 @@ const defaultSettings: SiteSettings = {
     global_info: {
         title: "Psyche Space",
         description: "A Space to Pause, Reflect, Heal",
-        contact_email: "unheardpages.business@gmail.com",
+        contact_email: "psychespaced@gmail.com",
         contact_phone: "",
         contact_address: "Gurugram, India",
         branding: {

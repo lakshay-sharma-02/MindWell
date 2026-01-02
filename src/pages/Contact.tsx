@@ -19,8 +19,8 @@ const Contact = () => {
     {
       icon: Mail,
       title: "Email",
-      value: "unheardpages.business@gmail.com",
-      href: "mailto:unheardpages.business@gmail.com",
+      value: "psychespaced@gmail.com",
+      href: "mailto:psychespaced@gmail.com",
       description: "We respond within 24 hours"
     },
     {
