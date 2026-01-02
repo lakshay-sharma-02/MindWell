@@ -11,7 +11,8 @@ import { SocialProofToast } from "@/components/engagement/SocialProofToast";
 import { NewsletterModal } from "@/components/engagement/NewsletterModal";
 import { CookieBanner } from "@/components/engagement/CookieBanner";
 import { AudioPlayer } from "@/components/audio/AudioPlayer";
-import { AdminFloatingPanel } from "@/components/admin/AdminFloatingPanel";
+
+import { CrisisBanner } from "@/components/shared/CrisisBanner";
 import { AnnouncementBanner } from "@/components/layout/AnnouncementBanner";
 import { PodcastEpisode } from "@/data/podcasts";
 
@@ -59,6 +60,7 @@ export function Layout({ children }: LayoutProps) {
     <AudioContext.Provider value={{ playEpisode }}>
       <AdminEditProvider>
         <div className="min-h-screen flex flex-col bg-background font-body relative">
+          <CrisisBanner />
           <AnnouncementBanner />
           <CursorGlow />
           <ScrollProgress />

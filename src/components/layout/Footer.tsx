@@ -237,8 +237,15 @@ export function Footer() {
           </div>
         </div>
 
+        {/* Medical Disclaimer */}
+        <div className="mt-12 pt-8 border-t border-border/50 text-center">
+          <p className="text-xs text-muted-foreground/60 max-w-4xl mx-auto leading-relaxed">
+            <span className="font-semibold">Medical Disclaimer:</span> The content provided on this website, including text, graphics, images, and other material, is for educational and informational purposes only. It is not intended to be a substitute for professional medical advice, diagnosis, or treatment. Always seek the advice of your physician or other qualified health provider with any questions you may have regarding a medical condition. Never disregard professional medical advice or delay in seeking it because of something you have read on this website. If you are in crisis, please call your local emergency services immediately.
+          </p>
+        </div>
+
         {/* Bottom */}
-        <div className="mt-16 pt-8 border-t border-border/50">
+        <div className="mt-8 pt-8 border-t border-border/50">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-sm text-muted-foreground text-center md:text-left">
               © {new Date().getFullYear()} {settings.global_info.title}. All rights reserved.

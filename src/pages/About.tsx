@@ -7,10 +7,9 @@ import { motion } from "framer-motion";
 import { FAQ } from "@/components/shared/FAQ";
 
 const credentials = [
-  { icon: GraduationCap, text: "Ph.D. Clinical Psychology, Stanford University" },
-  { icon: Award, text: "Licensed Clinical Psychologist (CA #PSY123456)" },
-  { icon: BookOpen, text: "Certified CBT & ACT Practitioner" },
-  { icon: Heart, text: "Member, American Psychological Association" }
+  { icon: GraduationCap, text: "MA in Psychology (Candidate)" },
+  { icon: BookOpen, text: "Mental Health Researcher" },
+  { icon: Heart, text: "Founder & Mental Health Advocate" }
 ];
 
 const values = [
@@ -40,9 +39,9 @@ const About = () => {
   return (
     <Layout>
       <SEOHead
-        title="About Us"
-        description="Learn about Dr. Sarah Mitchell and MindWell's approach to mental health care. Evidence-based therapy with warmth and understanding."
-        keywords="about mindwell, dr sarah mitchell, clinical psychologist, therapy approach, mental health professional"
+        title="About Us - MindWell"
+        description="Learn about Tamanna and MindWell's mission to provide accessible, research-backed mental health support and community."
+        keywords="about mindwell, tamanna, mental health researcher, psychology student, mental health support, anxiety resources"
       />
 
       {/* Hero Section */}
@@ -70,10 +69,10 @@ const About = () => {
                 <span className="text-gradient-animate block mt-2">You're Not Alone.</span>
               </h1>
               <p className="text-lg text-muted-foreground leading-relaxed mb-8 max-w-xl">
-                At MindWell, we believe that everyone deserves access to 
-                quality mental health support. Our mission is to provide 
-                evidence-based care with warmth, understanding, and respect 
-                for each person's unique journey.
+                At MindWell, we believe that mental health support should be accessible,
+                research-backed, and deeply empathetic. Our mission is to bridge the gap
+                between clinical science and everyday wellness, providing a safe harbor
+                for your unique journey.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Button variant="hero" size="lg" className="group" asChild>
@@ -103,8 +102,8 @@ const About = () => {
                 </div>
                 <div className="absolute bottom-0 inset-x-0 h-1/3 bg-gradient-to-t from-card to-transparent" />
                 <div className="absolute bottom-6 left-6 right-6 p-4 rounded-2xl bg-card/90 backdrop-blur-sm border border-border/50">
-                  <p className="font-display text-lg font-semibold text-foreground mb-1">Dr. Sarah Mitchell</p>
-                  <p className="text-sm text-muted-foreground">Licensed Clinical Psychologist</p>
+                  <p className="font-display text-lg font-semibold text-foreground mb-1">Tamanna</p>
+                  <p className="text-sm text-muted-foreground">Founder & Researcher</p>
                 </div>
               </div>
             </motion.div>
@@ -163,23 +162,23 @@ const About = () => {
               className="order-2 lg:order-1"
             >
               <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-6">
-                Meet Dr. Sarah Mitchell
+                Meet Tamanna
               </h2>
               <div className="prose-calm space-y-4 text-muted-foreground">
                 <p>
-                  With over 15 years of experience in clinical psychology, Dr. Mitchell 
-                  has helped hundreds of individuals navigate life's challenges and 
-                  discover their path to healing.
+                  Tamanna is a dedicated researcher and mental health advocate currently pursuing her
+                  Master's in Psychology. Driven by a passion for accessible mental healthcare, she
+                  founded MindWell to create a digital sanctuary for those seeking support.
                 </p>
                 <p>
-                  Her approach integrates cognitive-behavioral therapy (CBT), acceptance 
-                  and commitment therapy (ACT), and mindfulness-based techniques, 
-                  tailored to each client's unique needs and goals.
+                  Her work focuses on bridging the gap between clinical research and practical,
+                  everyday tools for emotional well-being. She believes in the power of evidence-based
+                  strategies combined with the warmth of human connection.
                 </p>
                 <p>
-                  Dr. Mitchell specializes in anxiety disorders, depression, relationship 
-                  issues, and life transitions. She creates a warm, non-judgmental 
-                  environment where clients feel safe to explore and grow.
+                  Through MindWell, Tamanna aims to de-stigmatize mental health conversations and
+                  provide resources that empower individuals to take charge of their emotional journey
+                  in a safe, non-judgmental space.
                 </p>
               </div>
 
@@ -214,16 +213,16 @@ const About = () => {
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="text-center">
                       <div className="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                        <span className="font-display text-4xl font-bold text-primary">SM</span>
+                        <span className="font-display text-4xl font-bold text-primary">T</span>
                       </div>
-                      <p className="font-display text-xl font-semibold text-foreground">15+ Years</p>
-                      <p className="text-sm text-muted-foreground">of Clinical Experience</p>
+                      <p className="font-display text-xl font-semibold text-foreground">Dedicated</p>
+                      <p className="text-sm text-muted-foreground">to your well-being</p>
                     </div>
                   </div>
                 </div>
                 {/* Floating badge */}
                 <div className="absolute -bottom-4 -right-4 px-4 py-2 rounded-xl bg-card border border-border/50 shadow-card">
-                  <p className="text-sm font-medium text-foreground">500+ Clients Helped</p>
+                  <p className="text-sm font-medium text-foreground">Research-Backed Approach</p>
                 </div>
               </div>
             </motion.div>
@@ -269,7 +268,7 @@ const About = () => {
               Ready to Start Your Journey?
             </h2>
             <p className="text-muted-foreground mb-8">
-              Take the first step toward healing. Book a free consultation to see 
+              Take the first step toward healing. Book a free consultation to see
               if we're the right fit for you.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">

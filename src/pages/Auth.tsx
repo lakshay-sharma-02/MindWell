@@ -6,6 +6,7 @@ import { Eye, EyeOff, Mail, Lock, ArrowRight, Sparkles, User } from 'lucide-reac
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { SEOHead } from '@/components/seo/SEOHead';
@@ -23,7 +24,8 @@ export default function Auth() {
   const [fullName, setFullName] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
+  const [errors, setErrors] = useState<{ email?: string; password?: string, terms?: string }>({});
 
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -38,6 +40,12 @@ export default function Auth() {
   const validateForm = () => {
     try {
       authSchema.parse({ email, password });
+
+      if (!isLogin && !agreedToTerms) {
+        setErrors({ terms: "You must agree to the Terms and Privacy Policy" });
+        return false;
+      }
+
       setErrors({});
       return true;
     } catch (err) {
@@ -47,7 +55,13 @@ export default function Auth() {
           if (error.path[0] === 'email') fieldErrors.email = error.message;
           if (error.path[0] === 'password') fieldErrors.password = error.message;
         });
-        setErrors(fieldErrors);
+
+        if (!isLogin && !agreedToTerms) {
+          // merge term error if needed, though usually zod handles schema first
+          setErrors({ ...fieldErrors, terms: "You must agree to the Terms and Privacy Policy" });
+        } else {
+          setErrors(fieldErrors);
+        }
       }
       return false;
     }
@@ -238,6 +252,20 @@ export default function Auth() {
                 )}
               </div>
 
+
+
+
+
+              {!isLogin && (
+                <div className="space-y-2">
+                  <div className="flex items-start space-x-2">
+                    <Checkbox id="terms" checked={agreedToTerms} onCheckedChange={(c) => setAgreedToTerms(c as boolean)} className={errors.terms ? "border-destructive" : ""} />
+                    <Label htmlFor="terms" className="text-sm font-normal text-muted-foreground">I agree to the <a href="/terms" className="text-primary hover:underline">Terms</a> and <a href="/privacy" className="text-primary hover:underline">Privacy Policy</a></Label>
+                  </div>
+                  {errors.terms && <p className="text-sm text-destructive pl-6">{errors.terms}</p>}
+                </div>
+              )}
+
               <Button
                 type="submit"
                 className="w-full btn-glow"
@@ -285,8 +313,8 @@ export default function Auth() {
               </button>
             </div>
           </div>
-        </motion.div>
-      </div>
+        </motion.div >
+      </div >
     </>
   );
 }
