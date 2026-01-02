@@ -12,7 +12,7 @@ import { useNavigate } from "react-router-dom";
 import { PageSkeleton } from "@/components/layout/PageSkeleton";
 import { supabase } from "@/integrations/supabase/client";
 
-import { m } from "framer-motion";
+import { motion, Variants } from "framer-motion";
 
 export default function Dashboard() {
     const { user, loading } = useAuth();
@@ -41,7 +41,7 @@ export default function Dashboard() {
         return <PageSkeleton />;
     }
 
-    const container = {
+    const container: Variants = {
         hidden: { opacity: 0 },
         show: {
             opacity: 1,
@@ -51,7 +51,7 @@ export default function Dashboard() {
         }
     };
 
-    const item = {
+    const item: Variants = {
         hidden: { opacity: 0, y: 20 },
         show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
     };
@@ -59,41 +59,41 @@ export default function Dashboard() {
     return (
         <Layout>
             <SEOHead
-                title="My Sanctuary | MindWell"
+                title="My Sanctuary | Psyche Space"
                 description="Your personalized mental wellness dashboard."
             />
 
             <div className="container-wide py-24 min-h-screen bg-secondary/5">
-                <m.div
+                <motion.div
                     className="max-w-6xl mx-auto space-y-6"
                     variants={container}
                     initial="hidden"
                     animate="show"
                 >
                     {/* Top Row: Welcome (Full Width) */}
-                    <m.div variants={item}>
+                    <motion.div variants={item}>
                         <WelcomeWidget userName={profile?.full_name} />
-                    </m.div>
+                    </motion.div>
 
-                    <m.div variants={item}>
+                    <motion.div variants={item}>
                         <DailyAffirmationWidget />
-                    </m.div>
+                    </motion.div>
 
                     {/* Middle Row: Mood & Actions */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <m.div variants={item} className="md:col-span-2 h-[300px]">
+                        <motion.div variants={item} className="md:col-span-2 h-[300px]">
                             <MoodSummaryWidget userId={user.id} />
-                        </m.div>
-                        <m.div variants={item} className="h-auto">
+                        </motion.div>
+                        <motion.div variants={item} className="h-auto">
                             <QuickActionsWidget />
-                        </m.div>
+                        </motion.div>
                     </div>
 
                     {/* Bottom Row: Recommendations */}
-                    <m.div variants={item} className="pt-2">
+                    <motion.div variants={item} className="pt-2">
                         <RecommendedWidget />
-                    </m.div>
-                </m.div>
+                    </motion.div>
+                </motion.div>
             </div>
         </Layout>
     );

@@ -17,10 +17,10 @@ const Index = () => {
     <Layout>
       <SEOHead
         title="Home"
-        description="MindWell is your trusted resource for mental health support, therapy sessions, evidence-based articles, and wellness podcasts. Start your journey to better mental health today."
+        description="Psyche Space is your trusted resource for mental health support, therapy sessions, evidence-based articles, and wellness podcasts. Start your journey to better mental health today."
         keywords="mental health, therapy, psychology, wellness, counseling, mindfulness, anxiety, depression, self-care"
       />
-      
+
       <HeroSection />
       <SocialProofBanner />
       <PressBar />

@@ -228,12 +228,12 @@ export default function Checkout() {
             const event: BookingEvent = {
                 title: `${bookingData.sessionType} with Dr. Sarah`,
                 description: `Format: ${bookingData.format}\n\nNotes: ${bookingData.notes || 'None'}`,
-                location: bookingData.format === 'virtual' ? 'Virtual (Link sent via email)' : '123 Healing St, San Francisco',
+                location: bookingData.format === 'virtual' ? 'Virtual (Link sent via email)' : 'Gurugram, India',
                 startTime: startDateTime.toISOString(),
                 endTime: endDateTime.toISOString(),
                 organizer: {
-                    name: 'MindWell Therapy',
-                    email: 'contact@mindwell.app'
+                    name: 'Psyche Space Therapy',
+                    email: 'unheardpages.business@gmail.com'
                 }
             };
 

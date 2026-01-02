@@ -32,7 +32,7 @@ export default function MaintenancePage() {
             </div>
 
             <div className="absolute bottom-8 text-center text-sm text-muted-foreground/60 max-w-md px-4">
-                &copy; {new Date().getFullYear()} MindWell. All rights reserved.
+                &copy; {new Date().getFullYear()} Psyche Space. All rights reserved.
             </div>
         </div>
     );

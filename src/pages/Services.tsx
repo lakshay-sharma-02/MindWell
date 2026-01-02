@@ -287,7 +287,7 @@ const Services = () => {
               {
                 step: "03",
                 title: "Begin Your Journey",
-                description: "Start your sessions in-person or via secure video call at your convenience.",
+                description: "Start your sessions via secure video call from the comfort of your home.",
                 icon: Heart
               }
             ].map((item, index) => (

@@ -193,7 +193,7 @@ export function SiteSettings() {
                                 id="site-title"
                                 value={globalInfo.title}
                                 onChange={(e) => setGlobalInfo(prev => ({ ...prev, title: e.target.value }))}
-                                placeholder="MindWell"
+                                placeholder="Psyche Space"
                             />
                         </div>
                         <div className="grid gap-2">
@@ -212,7 +212,7 @@ export function SiteSettings() {
                                 type="email"
                                 value={globalInfo.contact_email}
                                 onChange={(e) => setGlobalInfo(prev => ({ ...prev, contact_email: e.target.value }))}
-                                placeholder="hello@mindwell.com"
+                                placeholder="unheardpages.business@gmail.com"
                             />
                         </div>
                         <div className="grid gap-2">
@@ -222,7 +222,7 @@ export function SiteSettings() {
                                 type="tel"
                                 value={globalInfo.contact_phone}
                                 onChange={(e) => setGlobalInfo(prev => ({ ...prev, contact_phone: e.target.value }))}
-                                placeholder="(123) 456-7890"
+                                placeholder=""
                             />
                         </div>
                         <div className="grid gap-2">

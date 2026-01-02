@@ -52,7 +52,7 @@ export function NewsletterModal() {
       if (!result.success) throw new Error(result.error);
 
       toast({
-        title: "Welcome to MindWell! 🎉",
+        title: "Welcome to Psyche Space! 🎉",
         description: "You'll receive our latest insights and resources.",
       });
 

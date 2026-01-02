@@ -60,7 +60,7 @@ const Book = () => {
   const navigate = useNavigate();
   const [services, setServices] = useState<Service[]>([]);
   const [selectedSession, setSelectedSession] = useState<string | null>(null);
-  const [selectedFormat, setSelectedFormat] = useState<"virtual" | "in-person">("virtual");
+  const [selectedFormat, setSelectedFormat] = useState("virtual");
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedTime, setSelectedTime] = useState("");
   const [formData, setFormData] = useState({
@@ -162,8 +162,8 @@ ${quizResult.report.map((r, i) => `${i + 1}. ${r.question}\n   Answer: ${r.answe
     <Layout>
       <SEOHead
         title="Book a Session"
-        description="Schedule a therapy session with Dr. Sarah Mitchell. Choose from consultations, individual therapy, or intensive sessions. Virtual and in-person options available."
-        keywords="book therapy session, schedule appointment, psychologist appointment, online therapy"
+        description="Schedule a support session with Tamanna. Choose from consultations or individual sessions. All sessions are conducted virtually for your convenience."
+        keywords="book therapy session, schedule appointment, mental health support, online sessions"
       />
 
       {/* Hero Section */}
@@ -338,38 +338,15 @@ ${quizResult.report.map((r, i) => `${i + 1}. ${r.question}\n   Answer: ${r.answe
               </h2>
 
               <form onSubmit={handleSubmit} className="space-y-8">
-                {/* Format Selection */}
+                {/* Format Selection - Virtual Only */}
                 <div className="space-y-3">
                   <label className="text-sm font-medium text-foreground">Session Format</label>
-                  <div className="grid grid-cols-2 gap-4">
-                    <button
-                      type="button"
-                      onClick={() => setSelectedFormat("virtual")}
-                      className={`p-4 rounded-xl border-2 flex items-center gap-3 transition-all ${selectedFormat === "virtual"
-                        ? "border-primary bg-primary/5"
-                        : "border-border/50 hover:border-primary/30"
-                        }`}
-                    >
-                      <Video className={`w-5 h-5 ${selectedFormat === "virtual" ? "text-primary" : "text-muted-foreground"}`} />
-                      <div className="text-left">
-                        <p className={`font-medium ${selectedFormat === "virtual" ? "text-primary" : "text-foreground"}`}>Virtual</p>
-                        <p className="text-xs text-muted-foreground">Video call session</p>
-                      </div>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setSelectedFormat("in-person")}
-                      className={`p-4 rounded-xl border-2 flex items-center gap-3 transition-all ${selectedFormat === "in-person"
-                        ? "border-primary bg-primary/5"
-                        : "border-border/50 hover:border-primary/30"
-                        }`}
-                    >
-                      <MapPin className={`w-5 h-5 ${selectedFormat === "in-person" ? "text-primary" : "text-muted-foreground"}`} />
-                      <div className="text-left">
-                        <p className={`font-medium ${selectedFormat === "in-person" ? "text-primary" : "text-foreground"}`}>In-Person</p>
-                        <p className="text-xs text-muted-foreground">San Francisco office</p>
-                      </div>
-                    </button>
+                  <div className="p-4 rounded-xl border-2 border-primary bg-primary/5 flex items-center gap-3">
+                    <Video className="w-5 h-5 text-primary" />
+                    <div className="text-left">
+                      <p className="font-medium text-primary">Virtual Session</p>
+                      <p className="text-xs text-muted-foreground">Secure video call via Google Meet / Zoom</p>
+                    </div>
                   </div>
                 </div>
 

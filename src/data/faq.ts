@@ -14,11 +14,11 @@ export const faqData: FAQItem[] = [
   },
   {
     question: "Do you offer virtual sessions?",
-    answer: "Yes! I offer secure, HIPAA-compliant video sessions for clients throughout California. Virtual therapy provides the same quality care with added flexibility and convenience.",
+    answer: "Yes! We are a fully digital platform offering secure online sessions. This allows you to access support from the comfort of your own space, wherever you are.",
   },
   {
     question: "What forms of payment do you accept?",
-    answer: "I accept credit cards, FSA/HSA cards, and can provide superbills for out-of-network insurance reimbursement. Payment is due at the time of service.",
+    answer: "We accept credit/debit cards and UPI payments. All payments are processed securely online prior to the session.",
   },
   {
     question: "How often should I attend therapy?",

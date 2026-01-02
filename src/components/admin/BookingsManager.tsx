@@ -67,7 +67,7 @@ export function BookingsManager() {
         // 1. Construct Title and Details
         const text = encodeURIComponent(`${booking.session_type} with ${booking.customer_name}`);
         const details = encodeURIComponent(`Format: ${booking.format}\nEmail: ${booking.customer_email}`);
-        const location = encodeURIComponent(booking.format === 'virtual' ? 'Virtual Meeting' : 'MindWell Office');
+        const location = encodeURIComponent(booking.format === 'virtual' ? 'Virtual Meeting' : 'Psyche Space Office');
 
         // 2. Parse Date/Time to YYYYMMDDTHHMMSSZ format
         // Booking date: "2024-01-01", Time: "3:00 PM"

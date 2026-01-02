@@ -22,7 +22,7 @@ export const testimonials: Testimonial[] = [
     id: "2",
     name: "Michael Chen",
     role: "Software Engineer",
-    content: "The podcast episodes on managing workplace stress were a game-changer for me. Dr. Mitchell's evidence-based approach and warm delivery made me feel understood. I've recommended MindWell to all my colleagues.",
+    content: "The podcast episodes on managing workplace stress were a game-changer for me. The evidence-based approach and warm delivery made me feel understood. I've recommended Psyche Space to all my colleagues.",
     rating: 5,
     avatar: "MC",
     verified: true,

@@ -25,7 +25,7 @@ interface FeatureTourProps {
 
 const steps = [
     {
-        title: "Welcome to MindWell!",
+        title: "Welcome to Psyche Space!",
         description: "Your personal sanctuary for mental wellness. Let us show you around your new possibilities.",
         icon: <div className="text-4xl">👋</div>,
         path: "/"
@@ -56,7 +56,7 @@ const steps = [
     },
     {
         title: "Easy Booking",
-        description: "Schedule sessions with our experts easily. Choose between virtual or in-person visits.",
+        description: "Schedule sessions with our experts easily. Secure virtual visits available.",
         icon: <Calendar className="w-10 h-10 text-primary" />,
         path: "/book"
     },

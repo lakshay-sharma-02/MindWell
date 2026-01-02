@@ -53,7 +53,7 @@ export function Footer() {
       if (!result.success) throw new Error(result.error);
 
       toast({
-        title: "Welcome to MindWell! ✨",
+        title: "Welcome to Psyche Space! ✨",
         description: "You've been added to our newsletter.",
       });
 
@@ -102,28 +102,19 @@ export function Footer() {
             {/* Contact Info */}
             <div className="space-y-3 mb-6">
               <a
-                href={`mailto:${settings.global_info.contact_email}`}
+                href="mailto:unheardpages.business@gmail.com"
                 className="flex items-center gap-3 text-sm text-muted-foreground hover:text-primary transition-colors group"
               >
                 <div className="w-9 h-9 rounded-xl bg-card dark:bg-secondary/50 border border-border/50 flex items-center justify-center group-hover:border-primary/30 group-hover:bg-primary/5 transition-all">
                   <Mail className="w-4 h-4" />
                 </div>
-                {settings.global_info.contact_email}
-              </a>
-              <a
-                href="tel:+1234567890"
-                className="flex items-center gap-3 text-sm text-muted-foreground hover:text-primary transition-colors group"
-              >
-                <div className="w-9 h-9 rounded-xl bg-card dark:bg-secondary/50 border border-border/50 flex items-center justify-center group-hover:border-primary/30 group-hover:bg-primary/5 transition-all">
-                  <Phone className="w-4 h-4" />
-                </div>
-                (123) 456-7890
+                unheardpages.business@gmail.com
               </a>
               <div className="flex items-center gap-3 text-sm text-muted-foreground">
                 <div className="w-9 h-9 rounded-xl bg-card dark:bg-secondary/50 border border-border/50 flex items-center justify-center">
                   <MapPin className="w-4 h-4" />
                 </div>
-                San Francisco, CA
+                Gurugram, India
               </div>
             </div>
 
@@ -248,7 +239,7 @@ export function Footer() {
         <div className="mt-8 pt-8 border-t border-border/50">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-sm text-muted-foreground text-center md:text-left">
-              © {new Date().getFullYear()} {settings.global_info.title}. All rights reserved.
+              &copy; {new Date().getFullYear()} Psyche Space. All rights reserved.
             </p>
             <div className="flex flex-wrap justify-center gap-6">
               {footerLinks.legal.map((link) => (

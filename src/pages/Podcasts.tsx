@@ -76,7 +76,7 @@ const Podcasts = () => {
     <Layout>
       <SEOHead
         title="Podcasts"
-        description="Listen to The MindWell Podcast featuring deep conversations about mental health, personal growth, and practical strategies for living a more balanced life."
+        description="Listen to The Psyche Space Podcast featuring deep conversations about mental health, personal growth, and practical strategies for living a more balanced life."
         keywords="mental health podcast, psychology podcast, wellness podcast, therapy podcast, mindfulness audio"
       />
 
@@ -91,14 +91,14 @@ const Podcasts = () => {
           >
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-sage-light text-primary text-sm font-medium mb-6">
               <Headphones className="w-4 h-4" />
-              The MindWell Podcast
+              The Psyche Space Podcast
             </div>
             <h1 className="font-display text-4xl md:text-5xl font-semibold text-foreground mb-4">
               Listen & Learn
             </h1>
             <p className="text-lg text-muted-foreground mb-6">
-              Deep conversations about mental health, personal growth, and 
-              practical strategies for living a more balanced life. New 
+              Deep conversations about mental health, personal growth, and
+              practical strategies for living a more balanced life. New
               episodes every Thursday.
             </p>
             <div className="flex flex-wrap gap-3">
@@ -159,7 +159,7 @@ const Podcasts = () => {
               Never Miss an Episode
             </h2>
             <p className="text-muted-foreground mb-6">
-              Subscribe to our podcast and get new episodes delivered directly 
+              Subscribe to our podcast and get new episodes delivered directly
               to your favorite podcast app.
             </p>
             <div className="flex flex-wrap justify-center gap-3">

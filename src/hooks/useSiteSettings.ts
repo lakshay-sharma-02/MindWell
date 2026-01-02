@@ -37,11 +37,11 @@ interface SiteSettings {
 
 const defaultSettings: SiteSettings = {
     global_info: {
-        title: "MindWell",
-        description: "Mental Health & Wellness Platform",
-        contact_email: "hello@mindwell.com",
-        contact_phone: "(123) 456-7890",
-        contact_address: "San Francisco, CA",
+        title: "Psyche Space",
+        description: "A Space to Pause, Reflect, Heal",
+        contact_email: "unheardpages.business@gmail.com",
+        contact_phone: "",
+        contact_address: "Gurugram, India",
         branding: {
             primary_color: "170 55% 32%",
         }
@@ -63,9 +63,9 @@ const defaultSettings: SiteSettings = {
         blog_comments: true,
     },
     social_links: {
-        twitter: "https://twitter.com/mindwell",
-        instagram: "https://instagram.com/mindwell",
-        linkedin: "https://linkedin.com/company/mindwell",
+        twitter: "https://twitter.com/psychespace",
+        instagram: "https://instagram.com/psychespace",
+        linkedin: "https://linkedin.com/company/psychespace",
     },
 };
 

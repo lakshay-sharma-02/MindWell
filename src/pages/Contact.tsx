@@ -19,21 +19,21 @@ const Contact = () => {
     {
       icon: Mail,
       title: "Email",
-      value: settings.global_info.contact_email,
-      href: `mailto:${settings.global_info.contact_email}`,
+      value: "unheardpages.business@gmail.com",
+      href: "mailto:unheardpages.business@gmail.com",
       description: "We respond within 24 hours"
     },
     {
       icon: Phone,
       title: "Phone",
-      value: settings.global_info.contact_phone || "(123) 456-7890",
+      value: settings.global_info.contact_phone || "",
       href: `tel:${settings.global_info.contact_phone}`,
       description: "Mon-Fri, 9am-6pm PT"
     },
     {
       icon: MapPin,
       title: "Location",
-      value: settings.global_info.contact_address || "San Francisco, CA",
+      value: settings.global_info.contact_address || "Gurugram, India",
       href: null,
       description: "123 Wellness Way, Suite 456"
     },
@@ -84,8 +84,8 @@ const Contact = () => {
     <Layout>
       <SEOHead
         title="Contact Us"
-        description="Get in touch with MindWell Psychology. Schedule an appointment, ask questions, or learn more about our therapy services in San Francisco."
-        keywords="contact therapist, therapy appointment, mental health contact, psychologist san francisco"
+        description="Get in touch with Unheard Pages. Schedule an appointment, ask questions, or learn more about our support."
+        keywords="contact therapist, mental health contact, psychology support"
       />
 
       {/* Hero Section */}
@@ -334,8 +334,8 @@ const Contact = () => {
                 <div className="w-full h-full flex items-center justify-center">
                   <div className="text-center">
                     <MapPin className="w-8 h-8 text-primary mx-auto mb-2" />
-                    <p className="text-sm font-medium text-foreground">San Francisco, CA</p>
-                    <p className="text-xs text-muted-foreground">123 Wellness Way, Suite 456</p>
+                    <p className="text-sm font-medium text-foreground">Gurugram, India</p>
+                    <p className="text-xs text-muted-foreground"></p>
                   </div>
                 </div>
               </div>

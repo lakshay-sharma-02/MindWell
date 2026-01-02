@@ -21,7 +21,7 @@ export const generateICS = (event: BookingEvent): string => {
   const lines = [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',
-    'PRODID:-//MindWell//Booking//EN',
+    'PRODID:-//Psyche Space//Booking//EN',
     'CALSCALE:GREGORIAN',
     'METHOD:PUBLISH',
     'BEGIN:VEVENT',
@@ -31,7 +31,7 @@ export const generateICS = (event: BookingEvent): string => {
     `DESCRIPTION:${event.description.replace(/\n/g, '\\n')}`,
     `LOCATION:${event.location || 'Virtual'}`,
     `URL:${event.url || ''}`,
-    `UID:${new Date().getTime()}-${Math.random().toString(36).substr(2, 9)}@mindwell.app`,
+    `UID:${new Date().getTime()}-${Math.random().toString(36).substr(2, 9)}@psychespace.com`,
     `DTSTAMP:${formatDate(new Date().toISOString())}`,
     'STATUS:CONFIRMED',
     'END:VEVENT',

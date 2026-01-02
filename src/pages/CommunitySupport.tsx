@@ -104,7 +104,7 @@ const CommunitySupport = () => {
     return (
         <Layout>
             <SEOHead
-                title="Community Support - MindWell"
+                title="Community Support - Psyche Space"
                 description="A safe space to share challenges and find expert solutions for mental wellness."
             />
 
