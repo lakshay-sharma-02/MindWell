@@ -252,18 +252,29 @@ export function BlogsManager() {
                     size="sm"
                     className="h-8 gap-2 text-primary hover:text-primary hover:bg-primary/10"
                     onClick={async () => {
-                      if (!form.content) return;
-                      const { refineBlogContent } = await import("@/lib/gemini");
+                      if (!form.content) {
+                        toast({ title: "Content required", description: "Write a draft first!", variant: "destructive" });
+                        return;
+                      }
 
-                      // Show loading state (optimistic or toast)
+                      const apiKey = settings.api_keys.gemini;
+                      if (!apiKey) {
+                        toast({ title: "API Key Missing", description: "Please add your Gemini API Key in Settings > Integrations.", variant: "destructive" });
+                        return;
+                      }
+
                       const toastId = toast({ title: "Polishing...", description: "AI is refining your draft..." });
 
                       try {
-                        // We need settings here. Since this is a callback, we can't easily use the hook if it's not at top level.
-                        // But we can get it if we lift the hook up.
-                        // Let's assume we add useSiteSettings to the component body.
-                        // Wait, I need to add useSiteSettings to the component first.
-                      } catch (e) { }
+                        const { refineBlogContent } = await import("@/lib/gemini");
+                        const refined = await refineBlogContent(form.content, form.category || "General", apiKey);
+
+                        setForm(prev => ({ ...prev, content: refined }));
+                        toast({ title: "Polished!", description: "Your draft has been refined." });
+                      } catch (e: any) {
+                        console.error(e);
+                        toast({ title: "Error", description: e.message || "Failed to refine content", variant: "destructive" });
+                      }
                     }}
                   >
                     <Sparkles className="w-3 h-3" />
