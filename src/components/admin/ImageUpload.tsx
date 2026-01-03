@@ -107,6 +107,7 @@ export function ImageUpload({
           <img
             src={value}
             alt="Cover preview"
+            referrerPolicy="no-referrer"
             className="w-full h-48 object-cover rounded-lg border border-border"
           />
           <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-2">
@@ -169,23 +170,30 @@ export function ImageUpload({
         onChange={handleFileSelect}
       />
 
-      <Input
-        placeholder="Or paste image URL (Google Drive links supported)"
-        value={value}
-        onChange={(e) => {
-          let newValue = e.target.value;
-          // Auto-convert Google Drive links
-          if (newValue.includes("drive.google.com")) {
-            const idMatch = newValue.match(/\/d\/(.*?)\//) || newValue.match(/id=(.*?)(&|$)/);
-            if (idMatch && idMatch[1]) {
-              newValue = `https://drive.google.com/uc?export=view&id=${idMatch[1]}`;
-              toast({ title: "Link Converted", description: "Google Drive link optimized for display." });
+      <div className="space-y-1">
+        <Input
+          placeholder="Or paste image URL (Google Drive links supported)"
+          value={value}
+          onChange={(e) => {
+            let newValue = e.target.value;
+            // Auto-convert Google Drive links
+            if (newValue.includes("drive.google.com")) {
+              const idMatch = newValue.match(/\/d\/(.*?)\//) || newValue.match(/id=(.*?)(&|$)/);
+              if (idMatch && idMatch[1]) {
+                // Use lh3.googleusercontent.com for reliable hotlinking
+                newValue = `https://lh3.googleusercontent.com/d/${idMatch[1]}`;
+                toast({ title: "Link Converted", description: "Google Drive link optimized for display." });
+              }
             }
-          }
-          onChange(newValue);
-        }}
-        className="mt-2"
-      />
+            onChange(newValue);
+          }}
+          className="mt-2"
+        />
+        <p className="text-xs text-muted-foreground">
+          Note: For Google Drive images, ensure the file permission is set to <strong>"Anyone with the link"</strong>.
+        </p>
+      </div>
     </div>
   );
 }
+```
