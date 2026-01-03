@@ -107,15 +107,16 @@ export async function refineBlogContent(content: string, category: string, apiKe
 
     const prompt = `
 You are an expert mental health blog editor. 
-Refine the following blog draft to be more engaging, empathetic, and professional.
+Polish the following draft to be grammatically correct, smooth, and easy to read, while strictly preserving the author's original voice.
+
 Category: ${category}
 
 Rules:
-1. Improve flow and readability.
-2. Ensure a warm, supportive tone suitable for mental health.
-3. Use Markdown formatting (headings, bold, lists).
-4. Do NOT change the core meaning.
-5. Return ONLY the refined content (Markdown).
+1. **Preserve Tone:** Do NOT change the author's style, tone, or personality. Fix errors, but don't rewrite the "voice".
+2. **Improve Flow:** Fix grammar and spelling.
+3. **Smart Structure:** You MAY break long blocks of text into smaller, shorter paragraphs (stanzas) if it improves readability and impact.
+4. **Formatting:** Use Markdown. CRITICAL: Use **DOUBLE NEWLINES** between every paragraph to ensure proper distinct spacing.
+5. **Output:** Return ONLY the polished content.
 
 Draft:
 ${content}
