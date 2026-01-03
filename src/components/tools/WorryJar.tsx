@@ -146,7 +146,7 @@ const WorryInput = ({
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            className="absolute z-50 top-[5%] sm:top-[10%] left-1/2 -translate-x-1/2 w-full max-w-md px-4"
+            className="absolute z-50 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md px-4"
         >
             <div className="bg-white dark:bg-zinc-900 shadow-2xl rounded-lg overflow-hidden border border-zinc-200 dark:border-zinc-800 transform rotate-1 transition-transform hover:rotate-0">
                 {/* Header / Tape effect */}
@@ -374,7 +374,7 @@ export const WorryJar = () => {
     return (
         <div
             ref={containerRef}
-            className="relative min-h-[700px] w-full flex flex-col items-center justify-center p-4 overflow-hidden bg-slate-50 dark:bg-slate-950/50"
+            className="relative min-h-[100dvh] w-full flex flex-col items-center justify-center p-4 overflow-hidden bg-slate-50 dark:bg-slate-950/50"
             onMouseMove={handleMouseMove}
             onMouseLeave={handleMouseLeave}
         >
@@ -404,9 +404,9 @@ export const WorryJar = () => {
                         <motion.div
                             initial={{ opacity: 0, scale: 0.8 }}
                             animate={{ opacity: 1, scale: 1 }}
-                            exit={{ opacity: 0, duration: 2 }}
+                            exit={{ opacity: 0, transition: { duration: 2 } }}
                             // Fixed alignment: bottom-1 to sit on floor
-                            className="absolute bottom-1 left-1/2 -translate-x-1/2 w-56 h-32 z-20 pointer-events-none"
+                            className="absolute bottom-6 left-1/2 -translate-x-1/2 w-56 h-32 z-20 pointer-events-none"
                             style={{ transform: "translateZ(0px)" }}
                         >
                             <ProceduralAshPile />
