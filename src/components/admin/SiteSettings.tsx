@@ -466,5 +466,6 @@ export function SiteSettings() {
                     </CardContent>
                 </Card>
             </div>
-            );
+        </div>
+    );
 }

@@ -1,6 +1,5 @@
 
-export const GEMINI_API_KEY = "AIzaSyAiZFvcsNceHA_BSTNU9aJcQMre51SZS9g";
-const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent";
+// API Constants removed in favor of dynamic keys
 
 const SYSTEM_PROMPT = `
 You are the "MindWell Assistant", a warm, empathetic, and professional AI guide for the MindWell mental health platform.
@@ -49,7 +48,13 @@ export type Message = {
     text: string;
 };
 
-export async function generateResponse(history: Message[], userInput: string): Promise<string> {
+// Function for Chatbot
+export async function generateResponse(history: Message[], userInput: string, apiKey: string): Promise<string> {
+    if (!apiKey) return "I need an API key to function. Please verify settings.";
+
+    // Default model if not specified in future configs, using the verified one
+    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${apiKey}`;
+
     try {
         const contents = [
             {
@@ -66,7 +71,7 @@ export async function generateResponse(history: Message[], userInput: string): P
             }
         ];
 
-        const response = await fetch(`${API_URL}?key=${GEMINI_API_KEY}`, {
+        const response = await fetch(API_URL, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -84,12 +89,54 @@ export async function generateResponse(history: Message[], userInput: string): P
 
         if (data.error) {
             console.error("Gemini API Error:", data.error);
-            return "I'm having a little trouble connecting right now. Please try again in a moment.";
+            return "I'm having a little trouble connecting right now. Please check the API key settings.";
         }
 
-        return data.candidates[0].content.parts[0].text;
+        return data.candidates?.[0]?.content?.parts?.[0]?.text || "I didn't get a response. Please try again.";
     } catch (error) {
         console.error("Chat Error:", error);
-        return "I'm having a little trouble connecting right now. Please try again in a moment.";
+        return "Connection error. Please try again later.";
+    }
+}
+
+// Function for AI Blog Tweaker
+export async function refineBlogContent(content: string, category: string, apiKey: string): Promise<string> {
+    if (!apiKey) throw new Error("API Key is missing in settings.");
+
+    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${apiKey}`;
+
+    const prompt = `
+You are an expert mental health blog editor. 
+Refine the following blog draft to be more engaging, empathetic, and professional.
+Category: ${category}
+
+Rules:
+1. Improve flow and readability.
+2. Ensure a warm, supportive tone suitable for mental health.
+3. Use Markdown formatting (headings, bold, lists).
+4. Do NOT change the core meaning.
+5. Return ONLY the refined content (Markdown).
+
+Draft:
+${content}
+    `;
+
+    try {
+        const response = await fetch(API_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                contents: [{ parts: [{ text: prompt }] }]
+            })
+        });
+
+        const data = await response.json();
+
+        if (data.error) throw new Error(data.error.message);
+
+        return data.candidates?.[0]?.content?.parts?.[0]?.text || content;
+    } catch (error) {
+        console.error("Refine Content Error:", error);
+        throw error;
     }
 }
