@@ -439,34 +439,32 @@ export function SiteSettings() {
                         </div>
                     </CardContent>
                 </Card>
-            </Card>
 
-            {/* Integrations & API Keys */}
-            <Card>
-                <CardHeader>
-                    <div className="flex items-center gap-2">
-                        <Settings className="w-5 h-5 text-primary" />
-                        <CardTitle>Integrations</CardTitle>
-                    </div>
-                    <CardDescription>
-                        Manage API keys for external services.
-                    </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                    <div className="grid gap-2">
-                        <Label htmlFor="gemini-key">Gemini API Key</Label>
-                        <Input
-                            id="gemini-key"
-                            type="password"
-                            value={apiKeys.gemini}
-                            onChange={(e) => setApiKeys(prev => ({ ...prev, gemini: e.target.value }))}
-                            placeholder="AIzaSy..."
-                        />
-                        <p className="text-xs text-muted-foreground">Required for Chatbot and AI Content Tweaker.</p>
-                    </div>
-                </CardContent>
-            </Card>
-        </div>
-        </div >
-    );
+                {/* Integrations & API Keys */}
+                <Card>
+                    <CardHeader>
+                        <div className="flex items-center gap-2">
+                            <Settings className="w-5 h-5 text-primary" />
+                            <CardTitle>Integrations</CardTitle>
+                        </div>
+                        <CardDescription>
+                            Manage API keys for external services.
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        <div className="grid gap-2">
+                            <Label htmlFor="gemini-key">Gemini API Key</Label>
+                            <Input
+                                id="gemini-key"
+                                type="password"
+                                value={apiKeys.gemini}
+                                onChange={(e) => setApiKeys(prev => ({ ...prev, gemini: e.target.value }))}
+                                placeholder="AIzaSy..."
+                            />
+                            <p className="text-xs text-muted-foreground">Required for Chatbot and AI Content Tweaker.</p>
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
+            );
 }
