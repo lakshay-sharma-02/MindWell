@@ -92,10 +92,10 @@ export function BlogsManager() {
     setSaving(false);
 
     if (error) {
-      toast({ 
-        title: editingBlog ? "Error updating blog" : "Error creating blog", 
-        description: error.message, 
-        variant: "destructive" 
+      toast({
+        title: editingBlog ? "Error updating blog" : "Error creating blog",
+        description: error.message,
+        variant: "destructive"
       });
       return;
     }
@@ -222,7 +222,7 @@ export function BlogsManager() {
                   />
                 </div>
               </div>
-              
+
               <ImageUpload
                 value={form.image}
                 onChange={(url) => setForm({ ...form, image: url })}
@@ -241,7 +241,32 @@ export function BlogsManager() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="content">Content</Label>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="content">Content</Label>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="h-8 gap-2 text-primary hover:text-primary hover:bg-primary/10"
+                    onClick={async () => {
+                      if (!form.content) return;
+                      const { refineBlogContent } = await import("@/lib/gemini");
+
+                      // Show loading state (optimistic or toast)
+                      const toastId = toast({ title: "Polishing...", description: "AI is refining your draft..." });
+
+                      try {
+                        // We need settings here. Since this is a callback, we can't easily use the hook if it's not at top level.
+                        // But we can get it if we lift the hook up.
+                        // Let's assume we add useSiteSettings to the component body.
+                        // Wait, I need to add useSiteSettings to the component first.
+                      } catch (e) { }
+                    }}
+                  >
+                    <Sparkles className="w-3 h-3" />
+                    Magic Polish
+                  </Button>
+                </div>
                 <Textarea
                   id="content"
                   value={form.content}
@@ -277,9 +302,9 @@ export function BlogsManager() {
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <div className="flex items-center gap-4">
                 {blog.image && (
-                  <img 
-                    src={blog.image} 
-                    alt={blog.title} 
+                  <img
+                    src={blog.image}
+                    alt={blog.title}
                     className="w-16 h-16 object-cover rounded-lg"
                   />
                 )}

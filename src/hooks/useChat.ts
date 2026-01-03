@@ -1,8 +1,10 @@
 
 import { useState, useCallback } from 'react';
 import { Message, generateResponse } from '@/lib/gemini';
+import { useSiteSettings } from './useSiteSettings';
 
 export function useChat() {
+    const { settings } = useSiteSettings();
     const [messages, setMessages] = useState<Message[]>([
         {
             role: 'model',
@@ -20,7 +22,7 @@ export function useChat() {
 
         try {
             // Get AI response
-            const responseText = await generateResponse(messages, text);
+            const responseText = await generateResponse(messages, text, settings.api_keys.gemini);
 
             const botMessage: Message = { role: 'model', text: responseText };
             setMessages((prev) => [...prev, botMessage]);
