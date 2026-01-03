@@ -34,7 +34,8 @@ interface SiteSettings {
         linkedin: string;
     };
     api_keys: {
-        gemini: string;
+        gemini_chat: string;
+        gemini_editor: string;
     };
 }
 
@@ -71,7 +72,8 @@ const defaultSettings: SiteSettings = {
         linkedin: "https://linkedin.com/company/psychespace",
     },
     api_keys: {
-        gemini: "",
+        gemini_chat: "",
+        gemini_editor: "",
     },
 };
 

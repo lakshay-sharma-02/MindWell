@@ -86,7 +86,8 @@ export function SiteSettings() {
     });
 
     const [apiKeys, setApiKeys] = useState({
-        gemini: "",
+        gemini_chat: "",
+        gemini_editor: "",
     });
 
     useEffect(() => {

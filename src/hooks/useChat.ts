@@ -22,7 +22,7 @@ export function useChat() {
 
         try {
             // Get AI response
-            const responseText = await generateResponse(messages, text, settings.api_keys.gemini);
+            const responseText = await generateResponse(messages, text, settings.api_keys.gemini_chat);
 
             const botMessage: Message = { role: 'model', text: responseText };
             setMessages((prev) => [...prev, botMessage]);
