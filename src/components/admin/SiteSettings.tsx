@@ -85,6 +85,10 @@ export function SiteSettings() {
         linkedin: "",
     });
 
+    const [apiKeys, setApiKeys] = useState({
+        gemini: "",
+    });
+
     useEffect(() => {
         fetchSettings();
     }, []);
@@ -114,6 +118,9 @@ export function SiteSettings() {
                         case 'social_links':
                             setSocialLinks(value);
                             break;
+                        case 'api_keys':
+                            setApiKeys(value);
+                            break;
                     }
                 });
             }
@@ -134,6 +141,7 @@ export function SiteSettings() {
                 { key: 'landing_page', value: landingPage as unknown as Json, description: 'Landing page configuration' },
                 { key: 'features', value: features as unknown as Json, description: 'Feature toggles' },
                 { key: 'social_links', value: socialLinks as unknown as Json, description: 'Social media links' },
+                { key: 'api_keys', value: apiKeys as unknown as Json, description: 'API Keys for third-party services' },
             ];
 
             const { error } = await supabase
@@ -431,7 +439,34 @@ export function SiteSettings() {
                         </div>
                     </CardContent>
                 </Card>
-            </div>
+            </Card>
+
+            {/* Integrations & API Keys */}
+            <Card>
+                <CardHeader>
+                    <div className="flex items-center gap-2">
+                        <Settings className="w-5 h-5 text-primary" />
+                        <CardTitle>Integrations</CardTitle>
+                    </div>
+                    <CardDescription>
+                        Manage API keys for external services.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                    <div className="grid gap-2">
+                        <Label htmlFor="gemini-key">Gemini API Key</Label>
+                        <Input
+                            id="gemini-key"
+                            type="password"
+                            value={apiKeys.gemini}
+                            onChange={(e) => setApiKeys(prev => ({ ...prev, gemini: e.target.value }))}
+                            placeholder="AIzaSy..."
+                        />
+                        <p className="text-xs text-muted-foreground">Required for Chatbot and AI Content Tweaker.</p>
+                    </div>
+                </CardContent>
+            </Card>
         </div>
+        </div >
     );
 }

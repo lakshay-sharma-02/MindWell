@@ -33,6 +33,9 @@ interface SiteSettings {
         instagram: string;
         linkedin: string;
     };
+    api_keys: {
+        gemini: string;
+    };
 }
 
 const defaultSettings: SiteSettings = {
@@ -66,6 +69,9 @@ const defaultSettings: SiteSettings = {
         twitter: "https://twitter.com/psychespace",
         instagram: "https://instagram.com/psychespace",
         linkedin: "https://linkedin.com/company/psychespace",
+    },
+    api_keys: {
+        gemini: "",
     },
 };
 
@@ -113,6 +119,7 @@ export const useSiteSettings = () => {
                     if (setting.key === 'features') newSettings.features = { ...newSettings.features, ...value };
                     if (setting.key === 'social_links') newSettings.social_links = { ...newSettings.social_links, ...value };
                     if (setting.key === 'landing_page') newSettings.landing_page = { ...newSettings.landing_page, ...value };
+                    if (setting.key === 'api_keys') newSettings.api_keys = { ...newSettings.api_keys, ...value };
                 });
 
                 setSettings(newSettings);
