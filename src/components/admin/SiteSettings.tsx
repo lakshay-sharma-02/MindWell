@@ -120,7 +120,12 @@ export function SiteSettings() {
                             setSocialLinks(value);
                             break;
                         case 'api_keys':
-                            setApiKeys(value);
+                            // Handle migration from old single key to new split keys
+                            const keys = value as any;
+                            setApiKeys({
+                                gemini_chat: keys.gemini_chat || keys.gemini || "",
+                                gemini_editor: keys.gemini_editor || "",
+                            });
                             break;
                     }
                 });
