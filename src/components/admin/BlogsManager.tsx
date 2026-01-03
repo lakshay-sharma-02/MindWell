@@ -36,9 +36,9 @@ export function BlogsManager() {
     published: false,
   });
 
-  const [saving, setSaving] = useState(false);
+
   const [isCoolingDown, setIsCoolingDown] = useState(false);
-  const { settings } = useSiteSettings();
+
 
   useEffect(() => {
     fetchBlogs();
