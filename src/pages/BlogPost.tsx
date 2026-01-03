@@ -190,6 +190,9 @@ const BlogPost = () => {
     );
   };
 
+  import ReactMarkdown from 'react-markdown';
+  import remarkGfm from 'remark-gfm';
+
   // Enhanced markdown rendering
   const renderContent = (content: string) => {
     return content.split("\n").map((line, index) => {

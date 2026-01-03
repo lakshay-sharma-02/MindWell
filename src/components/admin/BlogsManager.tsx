@@ -11,6 +11,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Pencil, Trash2, Eye, EyeOff } from "lucide-react";
 import { ImageUpload } from "./ImageUpload";
+import { useSiteSettings } from "@/hooks/useSiteSettings";
+import { Sparkles, Loader2 } from "lucide-react";
 
 type Blog = Tables<"blogs">;
 
@@ -21,6 +23,7 @@ export function BlogsManager() {
   const [isOpen, setIsOpen] = useState(false);
   const [editingBlog, setEditingBlog] = useState<Blog | null>(null);
   const { toast } = useToast();
+  const { settings } = useSiteSettings();
 
   const [form, setForm] = useState({
     title: "",
