@@ -15,6 +15,8 @@ export function useChat() {
     const [isOpen, setIsOpen] = useState(false);
 
     const sendMessage = useCallback(async (text: string) => {
+        if (isLoading) return; // Prevent spamming while waiting for response
+
         // Add user message immediately
         const userMessage: Message = { role: 'user', text };
         setMessages((prev) => [...prev, userMessage]);

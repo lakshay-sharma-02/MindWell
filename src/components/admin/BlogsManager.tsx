@@ -250,7 +250,8 @@ export function BlogsManager() {
                     type="button"
                     variant="secondary"
                     size="sm"
-                    className="h-8 gap-2 bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm transition-all hover:scale-105"
+                    disabled={isCoolingDown}
+                    className="h-8 gap-2 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white shadow-sm transition-all hover:scale-105"
                     onClick={async () => {
                       if (!form.content) {
                         toast({ title: "Content required", description: "Write a draft first!", variant: "destructive" });
@@ -263,6 +264,9 @@ export function BlogsManager() {
                         return;
                       }
 
+                      setIsCoolingDown(true);
+                      setTimeout(() => setIsCoolingDown(false), 10000); // 10s cooldown
+
                       const toastId = toast({ title: "Polishing...", description: "AI is refining your draft..." });
 
                       try {
@@ -274,11 +278,12 @@ export function BlogsManager() {
                       } catch (e: any) {
                         console.error(e);
                         toast({ title: "Error", description: e.message || "Failed to refine content", variant: "destructive" });
+                        setIsCoolingDown(false); // Reset cooldown on error
                       }
                     }}
                   >
                     <Sparkles className="w-3 h-3" />
-                    Magic Polish
+                    {isCoolingDown ? "Cooling down..." : "Magic Polish"}
                   </Button>
                 </div>
                 <Textarea
