@@ -14,9 +14,9 @@ interface ImageUploadProps {
   folder?: string;
 }
 
-export function ImageUpload({ 
-  value, 
-  onChange, 
+export function ImageUpload({
+  value,
+  onChange,
   label = "Cover Image",
   bucket = "covers",
   folder = "uploads"
@@ -63,10 +63,10 @@ export function ImageUpload({
       toast({ title: "Image uploaded successfully" });
     } catch (error: any) {
       console.error('Upload error:', error);
-      toast({ 
-        title: "Upload failed", 
-        description: error.message || "Failed to upload image", 
-        variant: "destructive" 
+      toast({
+        title: "Upload failed",
+        description: error.message || "Failed to upload image",
+        variant: "destructive"
       });
     } finally {
       setUploading(false);
@@ -101,27 +101,27 @@ export function ImageUpload({
   return (
     <div className="space-y-2">
       <Label>{label}</Label>
-      
+
       {value ? (
         <div className="relative group">
-          <img 
-            src={value} 
-            alt="Cover preview" 
+          <img
+            src={value}
+            alt="Cover preview"
             className="w-full h-48 object-cover rounded-lg border border-border"
           />
           <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-2">
-            <Button 
-              type="button" 
-              variant="secondary" 
+            <Button
+              type="button"
+              variant="secondary"
               size="sm"
               onClick={() => fileInputRef.current?.click()}
             >
               <Upload className="w-4 h-4 mr-1" />
               Replace
             </Button>
-            <Button 
-              type="button" 
-              variant="destructive" 
+            <Button
+              type="button"
+              variant="destructive"
               size="sm"
               onClick={removeImage}
             >
@@ -170,9 +170,20 @@ export function ImageUpload({
       />
 
       <Input
-        placeholder="Or paste image URL"
+        placeholder="Or paste image URL (Google Drive links supported)"
         value={value}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={(e) => {
+          let newValue = e.target.value;
+          // Auto-convert Google Drive links
+          if (newValue.includes("drive.google.com")) {
+            const idMatch = newValue.match(/\/d\/(.*?)\//) || newValue.match(/id=(.*?)(&|$)/);
+            if (idMatch && idMatch[1]) {
+              newValue = `https://drive.google.com/uc?export=view&id=${idMatch[1]}`;
+              toast({ title: "Link Converted", description: "Google Drive link optimized for display." });
+            }
+          }
+          onChange(newValue);
+        }}
         className="mt-2"
       />
     </div>
