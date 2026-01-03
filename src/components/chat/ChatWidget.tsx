@@ -77,8 +77,8 @@ export function ChatWidget() {
                                         {msg.role === 'user' ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
                                     </div>
                                     <div className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-sm ${msg.role === 'user'
-                                            ? 'bg-primary text-primary-foreground rounded-tr-none'
-                                            : 'bg-secondary/50 border border-border/50 rounded-tl-none'
+                                        ? 'bg-primary text-primary-foreground rounded-tr-none'
+                                        : 'bg-secondary/50 border border-border/50 rounded-tl-none'
                                         }`}>
                                         <ReactMarkdown
                                             components={{
@@ -145,9 +145,11 @@ export function ChatWidget() {
             {/* Floating Action Button */}
             <motion.button
                 onClick={toggleOpen}
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="fixed bottom-4 right-4 md:right-8 z-50 p-4 rounded-full bg-primary text-primary-foreground shadow-glow hover:shadow-lg transition-all"
+                className="fixed bottom-5 right-5 z-[9999] p-4 rounded-full bg-primary text-primary-foreground shadow-2xl hover:shadow-xl transition-all"
             >
                 {isOpen ? <X className="w-6 h-6" /> : <MessageCircle className="w-6 h-6" />}
             </motion.button>
