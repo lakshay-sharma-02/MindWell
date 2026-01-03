@@ -1,6 +1,6 @@
 
 export const GEMINI_API_KEY = "AIzaSyAiZFvcsNceHA_BSTNU9aJcQMre51SZS9g";
-const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent";
+const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent";
 
 const SYSTEM_PROMPT = `
 You are the "MindWell Assistant", a warm, empathetic, and professional AI guide for the MindWell mental health platform.
