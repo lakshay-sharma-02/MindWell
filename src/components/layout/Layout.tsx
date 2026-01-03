@@ -7,8 +7,9 @@ import { ScrollProgress } from "@/components/effects/ScrollProgress";
 import { BackToTop } from "@/components/effects/BackToTop";
 import { CursorGlow } from "@/components/effects/CursorGlow";
 import { SearchModal } from "@/components/search/SearchModal";
-import { SocialProofToast } from "@/components/engagement/SocialProofToast";
+
 import { NewsletterModal } from "@/components/engagement/NewsletterModal";
+import { ChatWidget } from "@/components/chat/ChatWidget";
 import { CookieBanner } from "@/components/engagement/CookieBanner";
 import { AudioPlayer } from "@/components/audio/AudioPlayer";
 
@@ -88,7 +89,7 @@ export function Layout({ children }: LayoutProps) {
           )}
 
           {/* Engagement Features */}
-          <SocialProofToast />
+          <ChatWidget />
           <NewsletterModal />
           <CookieBanner />
         </div>

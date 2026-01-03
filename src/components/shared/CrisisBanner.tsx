@@ -23,15 +23,15 @@ export function CrisisBanner() {
             </span>
           </div>
           <div className="flex items-center gap-3 shrink-0">
-            <a 
-              href="tel:988" 
+            <a
+              href="tel:14416"
               className="flex items-center gap-1.5 font-bold text-destructive hover:underline"
             >
               <Phone className="w-3.5 h-3.5" />
-              <span>Call 988 (US)</span>
+              <span>Call 14416 (India)</span>
             </a>
-             <span className="text-muted-foreground/50 hidden sm:inline">|</span>
-            <button 
+            <span className="text-muted-foreground/50 hidden sm:inline">|</span>
+            <button
               onClick={() => setIsVisible(false)}
               className="p-1 hover:bg-destructive/10 rounded-full transition-colors text-muted-foreground"
               aria-label="Dismiss banner"

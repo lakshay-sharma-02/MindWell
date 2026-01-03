@@ -1,5 +1,5 @@
-import { ReactNode, useState } from "react";
-import { motion } from "framer-motion";
+import { ReactNode } from "react";
+import { motion, useMotionValue, useTransform } from "framer-motion";
 
 interface TiltCardProps {
   children: ReactNode;
@@ -7,23 +7,33 @@ interface TiltCardProps {
 }
 
 export function TiltCard({ children, className = "" }: TiltCardProps) {
-  const [rotateX, setRotateX] = useState(0);
-  const [rotateY, setRotateY] = useState(0);
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+
+  const rotateX = useTransform(y, [-0.5, 0.5], [15, -15]); // Invert Y for tilt
+  const rotateY = useTransform(x, [-0.5, 0.5], [-15, 15]);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    const centerX = rect.width / 2;
-    const centerY = rect.height / 2;
-    
-    setRotateX((y - centerY) / 20);
-    setRotateY((centerX - x) / 20);
+
+    // Calculate normalized position (-0.5 to 0.5)
+    // 0 is center, -0.5 is left/top, 0.5 is right/bottom
+    const width = rect.width;
+    const height = rect.height;
+
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+
+    const xPct = (mouseX / width) - 0.5;
+    const yPct = (mouseY / height) - 0.5;
+
+    x.set(xPct);
+    y.set(yPct);
   };
 
   const handleMouseLeave = () => {
-    setRotateX(0);
-    setRotateY(0);
+    x.set(0);
+    y.set(0);
   };
 
   return (
@@ -32,12 +42,10 @@ export function TiltCard({ children, className = "" }: TiltCardProps) {
       style={{
         transformStyle: "preserve-3d",
         perspective: 1000,
-      }}
-      animate={{
         rotateX,
         rotateY,
       }}
-      transition={{ type: "spring", stiffness: 300, damping: 30 }}
+      initial={false} // Prevent initial animation on mount
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
     >

@@ -4,10 +4,16 @@ import Lenis from "lenis";
 
 export const SmoothScroll = () => {
     useEffect(() => {
-        // Initialize Lenis
+        // Detect if the device is a touch device or has a coarse pointer (mobile/tablet)
+        const isTouchDevice = window.matchMedia("(hover: none) and (pointer: coarse)").matches;
+
+        // If it's a touch device, do not initialize Lenis. Native scrolling is better for mobile.
+        if (isTouchDevice) return;
+
+        // Initialize Lenis for desktop
         const lenis = new Lenis({
             duration: 1.2,
-            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // Exponential easing for premium feel
+            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // Exponential easing
             orientation: "vertical",
             gestureOrientation: "vertical",
             smoothWheel: true,
@@ -21,13 +27,14 @@ export const SmoothScroll = () => {
             requestAnimationFrame(raf);
         }
 
-        requestAnimationFrame(raf);
+        const rafId = requestAnimationFrame(raf);
 
         // Cleanup
         return () => {
+            cancelAnimationFrame(rafId);
             lenis.destroy();
         };
     }, []);
 
-    return null; // This component handles side effects only
+    return null;
 };
