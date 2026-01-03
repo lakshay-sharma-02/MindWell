@@ -248,18 +248,18 @@ export function BlogsManager() {
                   <Label htmlFor="content">Content</Label>
                   <Button
                     type="button"
-                    variant="outline"
+                    variant="secondary"
                     size="sm"
-                    className="h-8 gap-2 text-primary hover:text-primary hover:bg-primary/10"
+                    className="h-8 gap-2 bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm transition-all hover:scale-105"
                     onClick={async () => {
                       if (!form.content) {
                         toast({ title: "Content required", description: "Write a draft first!", variant: "destructive" });
                         return;
                       }
 
-                      const apiKey = settings.api_keys.gemini;
+                      const apiKey = settings.api_keys.gemini_editor;
                       if (!apiKey) {
-                        toast({ title: "API Key Missing", description: "Please add your Gemini API Key in Settings > Integrations.", variant: "destructive" });
+                        toast({ title: "API Key Missing", description: "Please add your Editor API Key in Settings > Integrations.", variant: "destructive" });
                         return;
                       }
 

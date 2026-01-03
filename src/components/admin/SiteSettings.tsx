@@ -454,15 +454,26 @@ export function SiteSettings() {
                     </CardHeader>
                     <CardContent className="space-y-4">
                         <div className="grid gap-2">
-                            <Label htmlFor="gemini-key">Gemini API Key</Label>
+                            <Label htmlFor="gemini-chat-key">Chatbot API Key</Label>
                             <Input
-                                id="gemini-key"
+                                id="gemini-chat-key"
                                 type="password"
-                                value={apiKeys.gemini}
-                                onChange={(e) => setApiKeys(prev => ({ ...prev, gemini: e.target.value }))}
-                                placeholder="AIzaSy..."
+                                value={apiKeys.gemini_chat}
+                                onChange={(e) => setApiKeys(prev => ({ ...prev, gemini_chat: e.target.value }))}
+                                placeholder="AIzaSy... (for Chatbot)"
                             />
-                            <p className="text-xs text-muted-foreground">Required for Chatbot and AI Content Tweaker.</p>
+                            <p className="text-xs text-muted-foreground">Used by the MindWell Assistant.</p>
+                        </div>
+                        <div className="grid gap-2">
+                            <Label htmlFor="gemini-editor-key">Editor API Key</Label>
+                            <Input
+                                id="gemini-editor-key"
+                                type="password"
+                                value={apiKeys.gemini_editor}
+                                onChange={(e) => setApiKeys(prev => ({ ...prev, gemini_editor: e.target.value }))}
+                                placeholder="AIzaSy... (for Blog Tweaker)"
+                            />
+                            <p className="text-xs text-muted-foreground">Used for the "Magic Polish" feature in the blog editor.</p>
                         </div>
                     </CardContent>
                 </Card>
