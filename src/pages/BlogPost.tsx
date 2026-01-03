@@ -14,6 +14,8 @@ import { CommentSection } from "@/components/shared/CommentSection";
 import { SocialShare } from "@/components/shared/SocialShare";
 import { useAuth } from "@/hooks/useAuth";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 type Blog = Tables<"blogs">;
 
@@ -193,61 +195,7 @@ const BlogPost = () => {
   import ReactMarkdown from 'react-markdown';
   import remarkGfm from 'remark-gfm';
 
-  // Enhanced markdown rendering
-  const renderContent = (content: string) => {
-    return content.split("\n").map((line, index) => {
-      if (line.startsWith("## ")) {
-        return (
-          <motion.h2
-            key={index}
-            initial={{ opacity: 0, x: -20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            className="font-display text-2xl md:text-3xl font-semibold text-foreground mt-12 mb-6 flex items-center gap-3"
-          >
-            <span className={`w-1.5 h-8 rounded-full bg-gradient-to-b ${gradientColor}`} />
-            {line.replace("## ", "")}
-          </motion.h2>
-        );
-      }
-      if (line.startsWith("### ")) {
-        return (
-          <h3 key={index} className="font-display text-xl font-semibold text-foreground mt-8 mb-4">
-            {line.replace("### ", "")}
-          </h3>
-        );
-      }
-      if (line.startsWith("- ")) {
-        return (
-          <li key={index} className="text-muted-foreground ml-6 mb-3 list-none relative before:absolute before:left-[-1.5rem] before:top-[0.6rem] before:w-2 before:h-2 before:rounded-full before:bg-primary/50">
-            {line.replace("- ", "")}
-          </li>
-        );
-      }
-      if (line.match(/^\d+\. /)) {
-        return (
-          <li key={index} className="text-muted-foreground ml-6 mb-3 list-decimal marker:text-primary marker:font-semibold">
-            {line.replace(/^\d+\. /, "")}
-          </li>
-        );
-      }
-      if (line.startsWith("**") && line.endsWith("**")) {
-        return (
-          <p key={index} className="font-semibold text-foreground mb-4 text-lg">
-            {line.replace(/\*\*/g, "")}
-          </p>
-        );
-      }
-      if (line.trim() === "") {
-        return <div key={index} className="h-4" />;
-      }
-      return (
-        <p key={index} className="text-muted-foreground leading-relaxed mb-5 text-lg">
-          {line}
-        </p>
-      );
-    });
-  };
+
 
   // Calculate reading time
   const readingTime = post.content ? Math.ceil(post.content.split(/\s+/).length / 200) : 5;
@@ -369,9 +317,20 @@ const BlogPost = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="prose-calm max-w-none"
+              className="prose prose-lg dark:prose-invert max-w-none prose-headings:font-display prose-headings:font-bold prose-p:text-lg prose-p:leading-relaxed prose-a:text-primary hover:prose-a:underline prose-img:rounded-xl prose-img:shadow-lg"
             >
-              {renderContent(post.content)}
+              <ReactMarkdown
+                remarkPlugins={[remarkGfm]}
+                components={{
+                  // Custom rendering for specific elements if needed
+                  h2: ({ node, ...props }) => <h2 className="text-3xl font-bold mt-12 mb-6 flex items-center gap-3" {...props}>
+                    <span className={`w-1.5 h-8 rounded-full bg-gradient-to-b ${gradientColor}`} />
+                    {props.children}
+                  </h2>
+                }}
+              >
+                {post.content}
+              </ReactMarkdown>
             </motion.div>
           ) : (
             <div className="text-center py-12">
