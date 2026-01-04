@@ -21,7 +21,7 @@ const defaultSessionTypes = [
     id: "consultation",
     title: "Initial Consultation",
     duration: "50 minutes",
-    price: "$150",
+    price: "₹1500",
     description: "A comprehensive first session to understand your needs and goals.",
     features: ["Comprehensive assessment", "Goal setting", "Treatment planning", "Q&A time"],
     popular: false,
@@ -31,7 +31,7 @@ const defaultSessionTypes = [
     id: "individual",
     title: "Individual Therapy",
     duration: "50 minutes",
-    price: "$175",
+    price: "₹1800",
     description: "Ongoing individual sessions focused on your therapeutic goals.",
     features: ["Evidence-based treatment", "Personalized approach", "Progress tracking", "Between-session support"],
     popular: true,
@@ -41,7 +41,7 @@ const defaultSessionTypes = [
     id: "intensive",
     title: "Intensive Session",
     duration: "90 minutes",
-    price: "$275",
+    price: "₹3000",
     description: "Extended sessions for deeper work on complex issues.",
     features: ["Deep exploration", "Extended processing", "Skill building", "Integration work"],
     popular: false,
@@ -114,7 +114,7 @@ const Book = () => {
     try {
       const selectedService = services.find(s => s.id === selectedSession);
       const sessionType = selectedService?.title || selectedSession;
-      const price = selectedService?.price || "$150"; // Fallback default
+      const price = selectedService?.price || "₹1500"; // Fallback default
 
       // Format quiz report if available
       let quizReportString = "";
@@ -236,7 +236,7 @@ ${quizResult.report.map((r, i) => `${i + 1}. ${r.question}\n   Answer: ${r.answe
                       <Clock className="w-4 h-4" />
                       {session.duration}
                     </span>
-                    <span className="font-display text-2xl font-bold text-primary">{session.price}</span>
+                    <span className="font-display text-2xl font-bold text-primary">{session.price.replace('$', '₹')}</span>
                   </div>
 
                   <p className="text-sm text-muted-foreground mb-4">{session.description}</p>

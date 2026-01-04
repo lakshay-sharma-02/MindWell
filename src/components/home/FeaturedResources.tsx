@@ -175,7 +175,7 @@ export function FeaturedResources() {
 
                   <div className="flex items-center justify-between pt-3 border-t border-border/50">
                     {resource.isPaid ? (
-                      <span className="text-lg font-bold text-foreground">${resource.price}</span>
+                      <span className="text-lg font-bold text-foreground">₹{resource.price}</span>
                     ) : (
                       <span className="text-sm font-medium text-primary">Free Download</span>
                     )}

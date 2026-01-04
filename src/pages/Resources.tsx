@@ -176,7 +176,7 @@ function ResourceCard({ resource, index, onUpdate, isPurchased }: ResourceCardPr
           {resource.isPremium ? (
             <>
               {isAccessible ? <Check className="w-3 h-3" /> : <Lock className="w-3 h-3" />}
-              {isAccessible ? 'Purchased' : `$${resource.price}`}
+              {isAccessible ? 'Purchased' : `₹${resource.price}`}
             </>
           ) : (
             <>
@@ -226,7 +226,7 @@ function ResourceCard({ resource, index, onUpdate, isPurchased }: ResourceCardPr
               </>
             ) : (
               <>
-                Buy for ${resource.price}
+                Buy for ₹{resource.price}
               </>
             )}
           </Button>

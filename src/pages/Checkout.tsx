@@ -344,7 +344,7 @@ export default function Checkout() {
                                                     <p className="capitalize">{bookingData.format} Session</p>
                                                 </div>
                                             </div>
-                                            <span className="font-bold text-lg text-primary">${amount.toFixed(2)}</span>
+                                            <span className="font-bold text-lg text-primary">₹{amount.toFixed(2)}</span>
                                         </div>
                                         {bookingData.quizResult && (
                                             <div className="py-2 px-3 bg-green-500/10 border border-green-500/20 rounded-lg flex items-center justify-between text-sm">
@@ -366,20 +366,20 @@ export default function Checkout() {
                                                 <p className="capitalize">{resourceData?.type} Resource</p>
                                             </div>
                                         </div>
-                                        <span className="font-bold text-lg text-primary">${resourceData?.price?.toFixed(2)}</span>
+                                        <span className="font-bold text-lg text-primary">₹{resourceData?.price?.toFixed(2)}</span>
                                     </div>
                                 )}
                                 <div className="flex justify-between font-medium">
                                     <span>Subtotal</span>
-                                    <span>${amount.toFixed(2)}</span>
+                                    <span>₹{amount.toFixed(2)}</span>
                                 </div>
                                 <div className="flex justify-between font-medium">
                                     <span>Tax (Estimated)</span>
-                                    <span>$0.00</span>
+                                    <span>₹0.00</span>
                                 </div>
                                 <div className="flex justify-between font-bold text-xl pt-4 border-t border-border/50">
                                     <span>Total</span>
-                                    <span>${amount.toFixed(2)}</span>
+                                    <span>₹{amount.toFixed(2)}</span>
                                 </div>
                             </CardContent>
                         </Card>
@@ -484,7 +484,7 @@ export default function Checkout() {
                                             </div>
                                             <div className="text-sm text-muted-foreground text-center max-w-xs">
                                                 <p>1. Scan the QR code with your UPI app</p>
-                                                <p>2. The amount of <span className="text-primary font-bold">${amount.toFixed(2)}</span> will be pre-filled</p>
+                                                <p>2. The amount of <span className="text-primary font-bold">₹{amount.toFixed(2)}</span> will be pre-filled</p>
                                                 <p>3. Enter the transaction ID below</p>
                                             </div>
 
@@ -510,7 +510,7 @@ export default function Checkout() {
                                                 </>
                                             ) : (
                                                 <>
-                                                    {paymentMethod === "card" ? `Pay $${amount.toFixed(2)}` : "Confirm Payment"}
+                                                    {paymentMethod === "card" ? `Pay ₹${amount.toFixed(2)}` : "Confirm Payment"}
                                                     <ArrowRight className="w-4 h-4 ml-2" />
                                                 </>
                                             )}

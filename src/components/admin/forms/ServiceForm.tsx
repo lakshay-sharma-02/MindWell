@@ -26,7 +26,7 @@ export function ServiceForm({ initialData, onSubmit, isSubmitting, onCancel }: S
         defaultValues: {
             title: "",
             duration: "50 minutes",
-            price: "$150",
+            price: "₹1500",
             description: "",
             features: "",
             popular: false
@@ -76,7 +76,7 @@ export function ServiceForm({ initialData, onSubmit, isSubmitting, onCancel }: S
                             <FormItem>
                                 <FormLabel>Price</FormLabel>
                                 <FormControl>
-                                    <Input {...field} placeholder="e.g. $150" />
+                                    <Input {...field} placeholder="e.g. ₹1500" />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>

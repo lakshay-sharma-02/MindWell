@@ -390,7 +390,7 @@ const Services = () => {
                     <h3 className="font-display text-xl font-semibold text-foreground mb-1">{plan.title}</h3>
                     <p className="text-sm text-muted-foreground mb-4">{plan.duration}</p>
                     <div className="flex items-baseline justify-center gap-1">
-                      <span className="text-4xl font-display font-bold text-foreground">{plan.price}</span>
+                      <span className="text-4xl font-display font-bold text-foreground">{plan.price.replace('$', '₹')}</span>
                     </div>
                     <p className="text-xs text-muted-foreground mt-2">{plan.description}</p>
                   </div>
