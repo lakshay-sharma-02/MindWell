@@ -324,7 +324,30 @@ const BlogPost = () => {
                   h2: ({ node, ...props }) => <h2 className="text-3xl font-bold mt-12 mb-6 flex items-center gap-3" {...props}>
                     <span className={`w-1.5 h-8 rounded-full bg-gradient-to-b ${gradientColor}`} />
                     {props.children}
-                  </h2>
+                  </h2>,
+                  table: ({ node, ...props }) => (
+                    <div className="my-8 w-full overflow-x-auto rounded-lg border border-border shadow-sm">
+                      <table className="w-full text-sm text-left" {...props} />
+                    </div>
+                  ),
+                  thead: ({ node, ...props }) => (
+                    <thead className="bg-secondary/50 text-foreground uppercase tracking-wider font-semibold border-b border-border" {...props} />
+                  ),
+                  tbody: ({ node, ...props }) => (
+                    <tbody className="divide-y divide-border bg-card/50" {...props} />
+                  ),
+                  tr: ({ node, ...props }) => (
+                    <tr className="transition-colors hover:bg-secondary/30" {...props} />
+                  ),
+                  th: ({ node, ...props }) => (
+                    <th className="px-6 py-4 font-display" {...props} />
+                  ),
+                  td: ({ node, ...props }) => (
+                    <td className="px-6 py-4 align-top" {...props} />
+                  ),
+                  blockquote: ({ node, ...props }) => (
+                    <blockquote className="border-l-4 border-primary/50 pl-6 my-8 italic text-xl text-muted-foreground bg-secondary/20 py-4 rounded-r-lg" {...props} />
+                  )
                 }}
               >
                 {post.content}
