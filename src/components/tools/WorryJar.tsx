@@ -215,10 +215,11 @@ const AshSystem = ({ active }: { active: boolean }) => {
                         ease: "easeOut",
                         delay: Math.random() * 1.5
                     }}
-                    className="absolute bottom-0 w-3 h-3 bg-zinc-600/40 blur-[1px] rounded-full z-20 pointer-events-none"
+                    className="absolute bottom-0 left-1/2 w-3 h-3 bg-zinc-600/40 blur-[1px] rounded-full z-20 pointer-events-none"
                     style={{
                         // Irregular shape
-                        borderRadius: `${30 + Math.random() * 70}% ${30 + Math.random() * 70}% ${30 + Math.random() * 70}% ${30 + Math.random() * 70}%`
+                        borderRadius: `${30 + Math.random() * 70}% ${30 + Math.random() * 70}% ${30 + Math.random() * 70}% ${30 + Math.random() * 70}%`,
+                        marginLeft: '-6px' // Center correction for width
                     }}
                 />
             ))}
@@ -246,9 +247,9 @@ const WorryInput = ({
             initial={{ opacity: 0, y: 10, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.5 } }}
-            className="absolute z-50 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md px-6"
+            className="absolute inset-0 z-50 flex items-center justify-center pointer-events-none px-6"
         >
-            <div className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-md shadow-2xl rounded-xl overflow-hidden border border-zinc-200/50 dark:border-zinc-800/50">
+            <div className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-md shadow-2xl rounded-xl overflow-hidden border border-zinc-200/50 dark:border-zinc-800/50 w-full max-w-md pointer-events-auto">
                 <div className="p-6 space-y-4">
                     <p className="text-zinc-500 dark:text-zinc-400 font-medium text-sm text-center uppercase tracking-widest">
                         What weighs on you?
@@ -442,9 +443,9 @@ export const WorryJar = () => {
                     <div className="absolute top-8 right-8 w-24 h-48 bg-gradient-to-b from-white/20 to-transparent skew-x-12 opacity-40 blur-xl rounded-full" />
                 </div>
 
-                {/* Lid - Adjusted Width */}
+                {/* Lid - Adjusted to w-full to match container exactly */}
                 <div
-                    className="absolute -top-4 left-1/2 -translate-x-1/2 w-80 h-8 bg-zinc-100/50 dark:bg-zinc-800/50 border border-white/30 rounded-full shadow-lg backdrop-blur-md z-20"
+                    className="absolute -top-4 inset-x-0 mx-auto w-full h-8 bg-zinc-100/50 dark:bg-zinc-800/50 border border-white/30 rounded-full shadow-lg backdrop-blur-md z-20"
                     style={{ transform: "translateZ(20px)" }}
                 />
 
