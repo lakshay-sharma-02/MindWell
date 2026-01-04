@@ -29,7 +29,7 @@ const Contact = () => {
       title: "Location",
       value: settings.global_info.contact_address || "Gurugram, India",
       href: null,
-      description: "123 Wellness Way, Suite 456"
+      description: ""
     },
     {
       icon: Clock,
