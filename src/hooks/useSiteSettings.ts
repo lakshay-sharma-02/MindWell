@@ -36,6 +36,7 @@ interface SiteSettings {
     api_keys: {
         gemini_chat: string;
         gemini_editor: string;
+        openrouter: string;
     };
 }
 
@@ -74,6 +75,7 @@ const defaultSettings: SiteSettings = {
     api_keys: {
         gemini_chat: "",
         gemini_editor: "",
+        openrouter: "",
     },
 };
 
@@ -126,6 +128,7 @@ export const useSiteSettings = () => {
                         newSettings.api_keys = {
                             gemini_chat: keys.gemini_chat || keys.gemini || "",
                             gemini_editor: keys.gemini_editor || "",
+                            openrouter: keys.openrouter || "",
                         };
                     }
                 });

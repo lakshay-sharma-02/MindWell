@@ -263,8 +263,10 @@ export function BlogsManager() {
                       }
 
                       const apiKey = settings.api_keys.gemini_editor;
-                      if (!apiKey) {
-                        toast({ title: "API Key Missing", description: "Please add your Editor API Key in Settings > Integrations.", variant: "destructive" });
+                      const fallbackKey = settings.api_keys.openrouter;
+
+                      if (!apiKey && !fallbackKey) {
+                        toast({ title: "API Key Missing", description: "Please add your keys in Settings > Integrations.", variant: "destructive" });
                         return;
                       }
 
@@ -275,7 +277,7 @@ export function BlogsManager() {
 
                       try {
                         const { refineBlogContent } = await import("@/lib/gemini");
-                        const refined = await refineBlogContent(form.content, form.category || "General", apiKey);
+                        const refined = await refineBlogContent(form.content, form.category || "General", apiKey, fallbackKey);
 
                         setForm(prev => ({ ...prev, content: refined }));
                         toast({ title: "Polished!", description: "Your draft has been refined." });

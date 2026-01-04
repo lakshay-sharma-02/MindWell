@@ -88,6 +88,7 @@ export function SiteSettings() {
     const [apiKeys, setApiKeys] = useState({
         gemini_chat: "",
         gemini_editor: "",
+        openrouter: "",
     });
 
     useEffect(() => {
@@ -125,6 +126,7 @@ export function SiteSettings() {
                             setApiKeys({
                                 gemini_chat: keys.gemini_chat || keys.gemini || "",
                                 gemini_editor: keys.gemini_editor || "",
+                                openrouter: keys.openrouter || "",
                             });
                             break;
                     }
@@ -459,7 +461,7 @@ export function SiteSettings() {
                     </CardHeader>
                     <CardContent className="space-y-4">
                         <div className="grid gap-2">
-                            <Label htmlFor="gemini-chat-key">Chatbot API Key</Label>
+                            <Label htmlFor="gemini-chat-key">Chatbot API Key (Gemini)</Label>
                             <Input
                                 id="gemini-chat-key"
                                 type="password"
@@ -470,7 +472,7 @@ export function SiteSettings() {
                             <p className="text-xs text-muted-foreground">Used by the MindWell Assistant.</p>
                         </div>
                         <div className="grid gap-2">
-                            <Label htmlFor="gemini-editor-key">Editor API Key</Label>
+                            <Label htmlFor="gemini-editor-key">Editor API Key (Gemini)</Label>
                             <Input
                                 id="gemini-editor-key"
                                 type="password"
@@ -479,6 +481,27 @@ export function SiteSettings() {
                                 placeholder="AIzaSy... (for Blog Tweaker)"
                             />
                             <p className="text-xs text-muted-foreground">Used for the "Magic Polish" feature in the blog editor.</p>
+                        </div>
+
+                        <div className="relative my-4">
+                            <div className="absolute inset-0 flex items-center">
+                                <span className="w-full border-t border-muted/30" />
+                            </div>
+                            <div className="relative flex justify-center text-xs uppercase">
+                                <span className="bg-card px-2 text-muted-foreground">Fallback Provider</span>
+                            </div>
+                        </div>
+
+                        <div className="grid gap-2">
+                            <Label htmlFor="openrouter-key">OpenRouter API Key (Optional)</Label>
+                            <Input
+                                id="openrouter-key"
+                                type="password"
+                                value={apiKeys.openrouter}
+                                onChange={(e) => setApiKeys(prev => ({ ...prev, openrouter: e.target.value }))}
+                                placeholder="sk-or-v1..."
+                            />
+                            <p className="text-xs text-muted-foreground">Backup provider to use if Gemini quota is exceeded.</p>
                         </div>
                     </CardContent>
                 </Card>

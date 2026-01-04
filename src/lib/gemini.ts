@@ -49,7 +49,49 @@ export type Message = {
 };
 
 // Function for Chatbot
-export async function generateResponse(history: Message[], userInput: string, apiKey: string): Promise<string> {
+// Helper to call OpenRouter
+async function callOpenRouter(messages: Message[], apiKey: string): Promise<string> {
+    try {
+        const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${apiKey}`,
+                'Content-Type': 'application/json',
+                'HTTP-Referer': typeof window !== 'undefined' ? window.location.origin : '', // Optional
+                'X-Title': 'MindWell', // Optional
+            },
+            body: JSON.stringify({
+                model: 'openai/gpt-4o',
+                messages: messages,
+            }),
+        });
+
+        const data = await response.json();
+
+        if (data.error) {
+            console.error("OpenRouter API Error:", data.error);
+            return "I'm having trouble with my backup connection too. Please try again later.";
+        }
+
+        return data.choices?.[0]?.message?.content || "I didn't get a response from the backup system.";
+    } catch (error) {
+        console.error("OpenRouter Fetch Error:", error);
+        return "Connection error with backup system.";
+    }
+}
+
+// Function for Chatbot
+export async function generateResponse(history: Message[], userInput: string, apiKey: string, fallbackKey?: string): Promise<string> {
+    // If no main key, try fallback immediately if available
+    if (!apiKey && fallbackKey) {
+        const messages: Message[] = [
+            { role: "user", text: SYSTEM_PROMPT },
+            ...history,
+            { role: "user", text: userInput }
+        ];
+        return callOpenRouter(messages, fallbackKey);
+    }
+
     if (!apiKey) return "I need an API key to function. Please verify settings.";
 
     // Default model if not specified in future configs, using the verified one
@@ -89,23 +131,38 @@ export async function generateResponse(history: Message[], userInput: string, ap
 
         if (data.error) {
             console.error("Gemini API Error:", data.error);
+            // Fallback Trigger
+            if (fallbackKey) {
+                console.log("Switching to OpenRouter Fallback...");
+                const messages: Message[] = [
+                    { role: "user", text: SYSTEM_PROMPT },
+                    ...history,
+                    { role: "user", text: userInput }
+                ];
+                return callOpenRouter(messages, fallbackKey);
+            }
             return "I'm having a little trouble connecting right now. Please check the API key settings.";
         }
 
         return data.candidates?.[0]?.content?.parts?.[0]?.text || "I didn't get a response. Please try again.";
     } catch (error) {
         console.error("Chat Error:", error);
+        if (fallbackKey) {
+            console.log("Switching to OpenRouter Fallback (Catch)...");
+            const messages: Message[] = [
+                { role: "user", text: SYSTEM_PROMPT },
+                ...history,
+                { role: "user", text: userInput }
+            ];
+            return callOpenRouter(messages, fallbackKey);
+        }
         return "Connection error. Please try again later.";
     }
 }
 
 // Function for AI Blog Tweaker
-export async function refineBlogContent(content: string, category: string, apiKey: string): Promise<string> {
-    if (!apiKey) throw new Error("API Key is missing in settings.");
-
-    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${apiKey}`;
-
-    const prompt = `
+export async function refineBlogContent(content: string, category: string, apiKey: string, fallbackKey?: string): Promise<string> {
+    const promptText = `
 You are an expert mental health blog editor. 
 Polish the following draft to be grammatically correct, smooth, and easy to read, while strictly preserving the author's original voice.
 
@@ -122,22 +179,43 @@ Draft:
 ${content}
     `;
 
+    // If no main key, try fallback immediately
+    if (!apiKey && fallbackKey) {
+        const messages: Message[] = [{ role: "user", text: promptText }];
+        return callOpenRouter(messages, fallbackKey);
+    }
+
+    if (!apiKey) throw new Error("API Key is missing in settings.");
+
+    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${apiKey}`;
+
     try {
         const response = await fetch(API_URL, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-                contents: [{ parts: [{ text: prompt }] }]
+                contents: [{ parts: [{ text: promptText }] }]
             })
         });
 
         const data = await response.json();
 
-        if (data.error) throw new Error(data.error.message);
+        if (data.error) {
+            console.error("Gemini API Error (Blog):", data.error);
+            if (fallbackKey) {
+                const messages: Message[] = [{ role: "user", text: promptText }];
+                return callOpenRouter(messages, fallbackKey);
+            }
+            throw new Error(data.error.message);
+        }
 
         return data.candidates?.[0]?.content?.parts?.[0]?.text || content;
     } catch (error) {
         console.error("Refine Content Error:", error);
+        if (fallbackKey) {
+            const messages: Message[] = [{ role: "user", text: promptText }];
+            return callOpenRouter(messages, fallbackKey);
+        }
         throw error;
     }
 }
