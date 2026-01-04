@@ -378,8 +378,17 @@ const Resources = () => {
               ))}
             </div>
           ) : (
-            <div className="text-center py-20">
-              <p className="text-muted-foreground">No resources available yet.</p>
+            <div className="text-center py-24 px-4">
+              <div className="w-20 h-20 bg-primary/5 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Sparkles className="w-10 h-10 text-primary/60" />
+              </div>
+              <h3 className="font-display text-2xl font-bold text-foreground mb-3">
+                Resources Coming Soon
+              </h3>
+              <p className="text-muted-foreground max-w-md mx-auto text-lg">
+                We're curating professional guides and toolkits just for you.
+                Check back soon!
+              </p>
             </div>
           )}
         </div>

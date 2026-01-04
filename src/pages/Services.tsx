@@ -24,50 +24,50 @@ import { useAdminEdit } from "@/hooks/useAdminEdit";
 const services = [
   {
     icon: Brain,
-    title: "Cognitive Behavioral Therapy",
-    shortTitle: "CBT",
-    description: "Evidence-based approach to identify and change negative thought patterns. Perfect for anxiety, depression, and stress management.",
+    title: "Anxiety & Mood Support",
+    shortTitle: "Anxiety",
+    description: "Practical, evidence-based strategies to help you manage stress, overcome worry, and lift your mood.",
     benefits: ["Structured approach", "Measurable progress", "Practical tools"],
     color: "from-primary/20 to-cyan/20",
     popular: true
   },
   {
     icon: Leaf,
-    title: "Acceptance & Commitment Therapy",
-    shortTitle: "ACT",
-    description: "Learn to accept difficult emotions while committing to actions aligned with your values.",
+    title: "Values-Based Living",
+    shortTitle: "Growth",
+    description: "Learn to stay present and take action on what matters most to you, even when things get tough.",
     benefits: ["Mindfulness-based", "Values-driven", "Flexible techniques"],
     color: "from-accent/20 to-amber/20"
   },
   {
     icon: Sparkles,
-    title: "EMDR Therapy",
-    shortTitle: "EMDR",
-    description: "Specialized treatment for trauma and PTSD using bilateral stimulation to process difficult memories.",
-    benefits: ["Trauma-focused", "Research-backed", "Rapid results"],
+    title: "Trauma & Healing",
+    shortTitle: "Trauma",
+    description: "Specialized, gentle support to help you process past experiences and find safety in the present.",
+    benefits: ["Trauma-focused", "Safe environment", "Deep healing"],
     color: "from-violet/20 to-rose/20"
   },
   {
     icon: Users,
-    title: "Couples Therapy",
+    title: "Relationship Counseling",
     shortTitle: "Couples",
-    description: "Strengthen your relationship through improved communication, conflict resolution, and deeper connection.",
+    description: "Strengthen your bond through improved communication, conflict resolution, and deeper connection.",
     benefits: ["Joint sessions", "Communication tools", "Relationship building"],
     color: "from-rose/20 to-primary/20"
   },
   {
     icon: MessageCircle,
-    title: "Individual Counseling",
+    title: "Personal Growth Session",
     shortTitle: "Individual",
-    description: "One-on-one support tailored to your unique needs, goals, and personal growth journey.",
+    description: "One-on-one tailored support for your unique needs, goals, and journey of self-discovery.",
     benefits: ["Personalized care", "Safe space", "Flexible focus"],
     color: "from-cyan/20 to-indigo/20"
   },
   {
     icon: Heart,
-    title: "Mindfulness & Wellness",
+    title: "Stress & Mindfulness",
     shortTitle: "Mindfulness",
-    description: "Develop present-moment awareness and stress reduction techniques for lasting peace.",
+    description: "Develop present-moment awareness and relaxation techniques for lasting peace and balance.",
     benefits: ["Stress relief", "Self-awareness", "Daily practices"],
     color: "from-amber/20 to-accent/20"
   }
