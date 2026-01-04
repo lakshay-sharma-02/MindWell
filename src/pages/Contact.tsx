@@ -23,13 +23,7 @@ const Contact = () => {
       href: "mailto:psychespaced@gmail.com",
       description: "We respond within 24 hours"
     },
-    {
-      icon: Phone,
-      title: "Phone",
-      value: settings.global_info.contact_phone || "",
-      href: `tel:${settings.global_info.contact_phone}`,
-      description: "Mon-Fri, 9am-6pm PT"
-    },
+
     {
       icon: MapPin,
       title: "Location",
@@ -294,14 +288,14 @@ const Contact = () => {
                     <h3 className="font-semibold text-foreground mb-2">In a Crisis?</h3>
                     <p className="text-sm text-muted-foreground mb-3">
                       If you're experiencing a mental health emergency, please call
-                      the 988 Suicide & Crisis Lifeline or go to your nearest emergency room.
+                      the National Mental Health Helpline or go to your nearest emergency room.
                     </p>
                     <a
-                      href="tel:988"
+                      href="tel:14416"
                       className="inline-flex items-center gap-2 text-accent font-semibold hover:underline"
                     >
                       <Phone className="w-4 h-4" />
-                      Call 988
+                      Call 14416
                     </a>
                   </div>
                 </div>
