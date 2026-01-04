@@ -14,6 +14,7 @@ interface CrumpledPaper {
     rotation: number;
     scale: number;
     seed: number;
+    color: string;
 }
 
 interface AshParticle {
@@ -64,7 +65,7 @@ const RitualAssets = () => (
 
 // --- Components ---
 
-const ProceduralCrumpledPaper = ({ seed, isBurning = false, className }: { seed: number, isBurning?: boolean, className?: string }) => {
+const ProceduralCrumpledPaper = ({ seed, isBurning = false, color, className }: { seed: number, isBurning?: boolean, color: string, className?: string }) => {
     // Generate unique pattern ID for this instance to avoid conflicts
     const patternId = useMemo(() => `paper-pattern-${seed}`, [seed]);
     const foldId = useMemo(() => `paper-folds-${seed}`, [seed]);
@@ -82,12 +83,12 @@ const ProceduralCrumpledPaper = ({ seed, isBurning = false, className }: { seed:
                 <g filter={`url(#${foldId})`}>
                     <path
                         d="M50 5 L90 25 L95 70 L70 95 L30 95 L5 70 L10 25 Z"
-                        fill="#fdfdfc"
+                        fill={color}
                         stroke={isBurning ? "#573a2e" : "#d4d4d4"}
                         strokeWidth="0.5"
                         className="transition-colors duration-[3000ms]"
                         style={{
-                            fill: isBurning ? "#291812" : "#fdfdfc", // Fade to char color
+                            fill: isBurning ? "#291812" : color, // Fade to char color
                         }}
                     />
 
@@ -301,13 +302,17 @@ export const WorryJar = () => {
     };
 
     const handleToss = (text: string) => {
+        const colors = ["#fdfdfc", "#fef9c3", "#dbeafe", "#fce7f3", "#e0e7ff"]; // White, Yellow, Blue, Pink, Indigo
+        const randomColor = colors[Math.floor(Math.random() * colors.length)];
+
         const newItem: CrumpledPaper = {
             id: Date.now().toString(),
             x: Math.random() * 60 - 30,
             y: Math.random() * 10 - 5,
             rotation: Math.random() * 360,
             scale: 0.8 + Math.random() * 0.3,
-            seed: Math.floor(Math.random() * 1000)
+            seed: Math.floor(Math.random() * 1000),
+            color: randomColor
         };
         setItems(prev => [...prev, newItem]);
     };
@@ -415,7 +420,7 @@ export const WorryJar = () => {
                                     damping: 15
                                 }}
                             >
-                                <ProceduralCrumpledPaper seed={item.seed} isBurning={isBurning} />
+                                <ProceduralCrumpledPaper seed={item.seed} color={item.color} isBurning={isBurning} />
                             </motion.div>
                         ))}
                     </AnimatePresence>
@@ -437,9 +442,9 @@ export const WorryJar = () => {
                     <div className="absolute top-8 right-8 w-24 h-48 bg-gradient-to-b from-white/20 to-transparent skew-x-12 opacity-40 blur-xl rounded-full" />
                 </div>
 
-                {/* Lid */}
+                {/* Lid - Adjusted Width */}
                 <div
-                    className="absolute -top-4 left-1/2 -translate-x-1/2 w-64 h-8 bg-zinc-100/50 dark:bg-zinc-800/50 border border-white/30 rounded-full shadow-lg backdrop-blur-md z-20"
+                    className="absolute -top-4 left-1/2 -translate-x-1/2 w-80 h-8 bg-zinc-100/50 dark:bg-zinc-800/50 border border-white/30 rounded-full shadow-lg backdrop-blur-md z-20"
                     style={{ transform: "translateZ(20px)" }}
                 />
 
