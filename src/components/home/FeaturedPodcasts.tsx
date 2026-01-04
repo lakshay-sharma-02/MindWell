@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { PodcastCard } from "@/components/podcasts/PodcastCard";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Headphones, Play } from "lucide-react";
+import { ArrowRight, Headphones, Play, Sparkles } from "lucide-react";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -153,8 +153,16 @@ export function FeaturedPodcasts() {
             ))}
           </div>
         ) : (
-          <div className="text-center py-12 text-muted-foreground">
-            No podcasts available.
+          <div className="text-center py-16 px-4">
+            <div className="w-16 h-16 bg-primary/5 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Sparkles className="w-8 h-8 text-primary/60" />
+            </div>
+            <h3 className="font-display text-xl font-bold text-foreground mb-2">
+              New Episodes Coming Soon
+            </h3>
+            <p className="text-muted-foreground max-w-sm mx-auto">
+              We're recording some amazing conversations. Stay tuned!
+            </p>
           </div>
         )}
 
