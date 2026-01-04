@@ -67,7 +67,7 @@ async function callOpenRouter(messages: Message[], apiKey: string): Promise<stri
                 'X-Title': 'MindWell',
             },
             body: JSON.stringify({
-                model: 'openai/gpt-4o', // Ensure your OpenRouter account has access to this, or use 'openai/gpt-3.5-turbo'
+                model: 'deepseek/deepseek-r1', // Updated to DeepSeek R1 as requested
                 messages: messages.map(msg => ({
                     role: msg.role === 'model' ? 'assistant' : msg.role,
                     content: msg.text
