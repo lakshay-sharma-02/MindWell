@@ -51,39 +51,62 @@ export type Message = {
 // Function for Chatbot
 // Helper to call OpenRouter
 async function callOpenRouter(messages: Message[], apiKey: string): Promise<string> {
+    console.log("Attempting to call OpenRouter Fallback...");
+    if (!apiKey || apiKey.trim() === "") {
+        console.warn("OpenRouter Fallback aborted: No API Key provided.");
+        return "I'm having trouble with my backup connection (Configuration Error).";
+    }
+
     try {
         const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
             method: 'POST',
             headers: {
                 Authorization: `Bearer ${apiKey}`,
                 'Content-Type': 'application/json',
-                'HTTP-Referer': typeof window !== 'undefined' ? window.location.origin : '', // Optional
-                'X-Title': 'MindWell', // Optional
+                'HTTP-Referer': typeof window !== 'undefined' ? window.location.origin : 'https://mindwell.app',
+                'X-Title': 'MindWell',
             },
             body: JSON.stringify({
-                model: 'openai/gpt-4o',
-                messages: messages,
+                model: 'openai/gpt-4o', // Ensure your OpenRouter account has access to this, or use 'openai/gpt-3.5-turbo'
+                messages: messages.map(msg => ({
+                    role: msg.role === 'model' ? 'assistant' : msg.role,
+                    content: msg.text
+                })),
             }),
         });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error(`OpenRouter API Error (${response.status}):`, errorText);
+            throw new Error(`OpenRouter HTTP Error ${response.status}: ${errorText}`);
+        }
 
         const data = await response.json();
 
         if (data.error) {
-            console.error("OpenRouter API Error:", data.error);
+            console.error("OpenRouter API Returned Error:", data.error);
             return "I'm having trouble with my backup connection too. Please try again later.";
         }
 
-        return data.choices?.[0]?.message?.content || "I didn't get a response from the backup system.";
+        const content = data.choices?.[0]?.message?.content;
+        if (!content) {
+            console.error("OpenRouter API returned no content:", data);
+            return "I received an empty response from the backup system.";
+        }
+
+        console.log("OpenRouter Fallback Success.");
+        return content;
     } catch (error) {
-        console.error("OpenRouter Fetch Error:", error);
-        return "Connection error with backup system.";
+        console.error("OpenRouter System Error:", error);
+        return "Connection error with backup system. Please check your internet or try again later.";
     }
 }
 
 // Function for Chatbot
 export async function generateResponse(history: Message[], userInput: string, apiKey: string, fallbackKey?: string): Promise<string> {
     // If no main key, try fallback immediately if available
-    if (!apiKey && fallbackKey) {
+    if ((!apiKey || apiKey.trim() === "") && fallbackKey) {
+        console.warn("Primary Gemini Key missing, trying Fallback immediately.");
         const messages: Message[] = [
             { role: "user", text: SYSTEM_PROMPT },
             ...history,
@@ -129,11 +152,13 @@ export async function generateResponse(history: Message[], userInput: string, ap
 
         const data = await response.json();
 
-        if (data.error) {
-            console.error("Gemini API Error:", data.error);
+        if (!response.ok || data.error) {
+            const errorMessage = data.error?.message || response.statusText;
+            console.error("Gemini API Error:", errorMessage);
+
             // Fallback Trigger
             if (fallbackKey) {
-                console.log("Switching to OpenRouter Fallback...");
+                console.log(`Switching to OpenRouter Fallback due to Gemini Error: ${errorMessage}`);
                 const messages: Message[] = [
                     { role: "user", text: SYSTEM_PROMPT },
                     ...history,
@@ -141,14 +166,14 @@ export async function generateResponse(history: Message[], userInput: string, ap
                 ];
                 return callOpenRouter(messages, fallbackKey);
             }
-            return "I'm having a little trouble connecting right now. Please check the API key settings.";
+            return "I'm having a little trouble connecting right now. Please check the API key settings or try again.";
         }
 
         return data.candidates?.[0]?.content?.parts?.[0]?.text || "I didn't get a response. Please try again.";
     } catch (error) {
-        console.error("Chat Error:", error);
+        console.error("Chat System Error:", error);
         if (fallbackKey) {
-            console.log("Switching to OpenRouter Fallback (Catch)...");
+            console.log("Switching to OpenRouter Fallback due to Chat System Exception...");
             const messages: Message[] = [
                 { role: "user", text: SYSTEM_PROMPT },
                 ...history,
@@ -180,7 +205,7 @@ ${content}
     `;
 
     // If no main key, try fallback immediately
-    if (!apiKey && fallbackKey) {
+    if ((!apiKey || apiKey.trim() === "") && fallbackKey) {
         const messages: Message[] = [{ role: "user", text: promptText }];
         return callOpenRouter(messages, fallbackKey);
     }
@@ -200,19 +225,23 @@ ${content}
 
         const data = await response.json();
 
-        if (data.error) {
-            console.error("Gemini API Error (Blog):", data.error);
+        if (!response.ok || data.error) {
+            const errorMessage = data.error?.message || response.statusText;
+            console.error("Gemini API Error (Blog):", errorMessage);
+
             if (fallbackKey) {
+                console.log("Switching to OpenRouter Fallback for Blog Refinement...");
                 const messages: Message[] = [{ role: "user", text: promptText }];
                 return callOpenRouter(messages, fallbackKey);
             }
-            throw new Error(data.error.message);
+            throw new Error(`Gemini API Error: ${errorMessage}`);
         }
 
         return data.candidates?.[0]?.content?.parts?.[0]?.text || content;
     } catch (error) {
-        console.error("Refine Content Error:", error);
+        console.error("Refine Content System Error:", error);
         if (fallbackKey) {
+            console.log("Switching to OpenRouter Fallback for Blog Refinement (Exception)...");
             const messages: Message[] = [{ role: "user", text: promptText }];
             return callOpenRouter(messages, fallbackKey);
         }
