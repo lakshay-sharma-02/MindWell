@@ -245,35 +245,3 @@ export async function prefetchCriticalResources(): Promise<void> {
 
   console.log('Critical resources prefetched');
 }
-
-/**
- * React hook for offline status
- */
-export function useOfflineStatus() {
-  const [isOffline, setIsOffline] = useState(false);
-  const { toast } = useToast();
-
-  useEffect(() => {
-    const cleanup = setupOfflineListener(
-      () => {
-        setIsOffline(false);
-        toast.dismiss('offline-notice');
-      },
-      () => {
-        setIsOffline(true);
-        toast.error('You are offline. Some features may be limited.', {
-          id: 'offline-notice',
-          duration: Infinity,
-          action: {
-            label: 'Dismiss',
-            onClick: () => toast.dismiss('offline-notice'),
-          },
-        });
-      }
-    );
-
-    return cleanup;
-  }, [toast]);
-
-  return { isOffline, isOnline: () => !isOffline };
-}
