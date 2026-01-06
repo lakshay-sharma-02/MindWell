@@ -1,22 +1,35 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 export function CursorGlow() {
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isVisible, setIsVisible] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const requestRef = useRef<number>();
+  const positionRef = useRef({ x: 0, y: 0 });
+
+  const updatePosition = useCallback(() => {
+    setPosition({ ...positionRef.current });
+    requestRef.current = undefined;
+  }, []);
 
   useEffect(() => {
-    // Check if mobile
     const checkMobile = () => {
-      setIsMobile(window.matchMedia("(max-width: 768px)").matches);
+      const mobile = window.matchMedia("(max-width: 768px)").matches;
+      setIsMobile(mobile);
     };
+
     checkMobile();
-    window.addEventListener("resize", checkMobile);
+    const resizeListener = () => checkMobile();
+    window.addEventListener("resize", resizeListener);
 
     const handleMouseMove = (e: MouseEvent) => {
-      setPosition({ x: e.clientX, y: e.clientY });
+      positionRef.current = { x: e.clientX, y: e.clientY };
       setIsVisible(true);
+
+      if (!requestRef.current) {
+        requestRef.current = requestAnimationFrame(updatePosition);
+      }
     };
 
     const handleMouseLeave = () => {
@@ -29,11 +42,14 @@ export function CursorGlow() {
     }
 
     return () => {
-      window.removeEventListener("resize", checkMobile);
+      window.removeEventListener("resize", resizeListener);
       window.removeEventListener("mousemove", handleMouseMove);
       document.body.removeEventListener("mouseleave", handleMouseLeave);
+      if (requestRef.current) {
+        cancelAnimationFrame(requestRef.current);
+      }
     };
-  }, [isMobile]);
+  }, [isMobile, updatePosition]);
 
   if (isMobile) return null;
 

@@ -1,5 +1,5 @@
 import { useParams, Link } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { Layout } from "@/components/layout/Layout";
 import { SEOHead } from "@/components/seo/SEOHead";
 import { supabase } from "@/integrations/supabase/client";
@@ -53,25 +53,32 @@ const BlogPost = () => {
         console.error("Error fetching blog:", error);
       } else if (data) {
         setPost(data);
-
-        // Fetch related posts
-        if (data.category) {
-          const { data: related } = await supabase
-            .from("blogs")
-            .select("*")
-            .eq("category", data.category)
-            .eq("published", true)
-            .neq("id", data.id)
-            .limit(3);
-
-          setRelatedPosts(related || []);
-        }
       }
       setLoading(false);
     };
 
+    const fetchRelatedPosts = async (category: string, postId: string) => {
+      const { data: related } = await supabase
+        .from("blogs")
+        .select("*")
+        .eq("category", category)
+        .eq("published", true)
+        .neq("id", postId)
+        .limit(3);
+
+      setRelatedPosts(related || []);
+    };
+
     fetchPost();
-  }, [slug]);
+
+    // When post is loaded, fetch related posts
+    return () => {
+      const currentPost = post;
+      if (currentPost?.category) {
+        fetchRelatedPosts(currentPost.category, currentPost.id);
+      }
+    };
+  }, [slug, post]);
 
   // Check if user has liked the post
   useEffect(() => {
@@ -91,7 +98,7 @@ const BlogPost = () => {
     checkLikeStatus();
   }, [user, post]);
 
-  const handleLike = async () => {
+  const handleLike = useCallback(async () => {
     if (!user) {
       toast.error("Please sign in to like articles");
       return;
@@ -130,7 +137,7 @@ const BlogPost = () => {
     } finally {
       setLikeLoading(false);
     }
-  };
+  }, [user, post, isLiked]);
 
   if (loading) {
     return (
@@ -196,7 +203,9 @@ const BlogPost = () => {
 
 
   // Calculate reading time
-  const readingTime = post.content ? Math.ceil(post.content.split(/\s+/).length / 200) : 5;
+  const readingTime = useMemo(() => {
+    return post.content ? Math.ceil(post.content.split(/\s+/).length / 200) : 5;
+  }, [post.content]);
 
   return (
     <Layout>

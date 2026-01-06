@@ -299,6 +299,49 @@ export interface Database {
           created_at?: string
         }
       }
+      mood_logs: {
+        Row: {
+          id: string
+          user_id: string
+          mood: string
+          note: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id?: string
+          mood?: string
+          note?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          mood?: string
+          note?: string | null
+          created_at?: string
+        }
+      }
+      gratitude_logs: {
+        Row: {
+          id: string
+          user_id: string
+          content: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id?: string
+          content?: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          content?: string
+          created_at?: string
+        }
+      }
       comments: {
         Row: {
           id: string

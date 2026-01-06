@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { motion, AnimatePresence, useMotionValue, useTransform, useSpring } from "framer-motion";
 import { Flame, Send, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -286,6 +286,7 @@ export const WorryJar = () => {
     const [burnCount, setBurnCount] = useState(0);
 
     const containerRef = useRef<HTMLDivElement>(null);
+    const timeoutRefs = useRef<NodeJS.Timeout[]>([]);
     const { toast } = useToast();
 
     // Mouse Parallax
@@ -302,7 +303,7 @@ export const WorryJar = () => {
         mouseY.set(y);
     };
 
-    const handleToss = (text: string) => {
+    const handleToss = useCallback((text: string) => {
         const colors = ["#fdfdfc", "#fef9c3", "#dbeafe", "#fce7f3", "#e0e7ff"]; // White, Yellow, Blue, Pink, Indigo
         const randomColor = colors[Math.floor(Math.random() * colors.length)];
 
@@ -316,9 +317,9 @@ export const WorryJar = () => {
             color: randomColor
         };
         setItems(prev => [...prev, newItem]);
-    };
+    }, []);
 
-    const startRitual = () => {
+    const startRitual = useCallback(() => {
         if (items.length === 0) return;
         setIsBurning(true);
         setPhase("burning");
@@ -330,9 +331,9 @@ export const WorryJar = () => {
         // 8s: Fire dies down -> "It's okay"
         // 12s: Reset
 
-        setTimeout(() => setPhase("releasing"), 5000); // Ash phase
+        const timeout1 = setTimeout(() => setPhase("releasing"), 5000); // Ash phase
 
-        setTimeout(() => {
+        const timeout2 = setTimeout(() => {
             // Cleanup
             setItems([]);
             const newCount = burnCount + items.length;
@@ -341,10 +342,19 @@ export const WorryJar = () => {
             setIsBurning(false);
         }, 9000);
 
-        setTimeout(() => {
+        const timeout3 = setTimeout(() => {
             setPhase("idle");
         }, 13000);
-    };
+
+        timeoutRefs.current = [timeout1, timeout2, timeout3];
+    }, [items.length, burnCount]);
+
+    useEffect(() => {
+        return () => {
+            timeoutRefs.current.forEach(timeout => clearTimeout(timeout));
+            timeoutRefs.current = [];
+        };
+    }, []);
 
     return (
         <div

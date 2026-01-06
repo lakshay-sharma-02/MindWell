@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Layout } from "@/components/layout/Layout";
@@ -44,15 +44,17 @@ export default function Checkout() {
     if (!bookingData && !resourceData) return null;
 
     // Parse price string (e.g. "$150") to number
-    const parsePrice = (priceStr?: string | number) => {
+    const parsePrice = useCallback((priceStr?: string | number) => {
         if (!priceStr) return 0;
         if (typeof priceStr === 'number') return priceStr;
         return parseFloat(priceStr.replace(/[^0-9.]/g, '')) || 0;
-    };
+    }, []);
 
-    const amount = bookingData ? parsePrice(bookingData.price) : (resourceData?.price || 0);
+    const amount = useMemo(() => {
+        return bookingData ? parsePrice(bookingData.price) : (resourceData?.price || 0);
+    }, [bookingData, resourceData, parsePrice]);
 
-    const validateCard = () => {
+    const validateCard = useCallback(() => {
         const { cardNumber, expiryDate, cvc, nameOnCard } = formData;
 
         if (cardNumber.replace(/\s/g, "").length < 15) {
@@ -91,9 +93,9 @@ export default function Checkout() {
         }
 
         return true;
-    };
+    }, [formData]);
 
-    const handlePayment = async (e: React.FormEvent) => {
+    const handlePayment = useCallback(async (e: React.FormEvent) => {
         e.preventDefault();
 
         if (paymentMethod === "card" && !validateCard()) {
@@ -197,9 +199,9 @@ export default function Checkout() {
         } finally {
             setIsProcessing(false);
         }
-    };
+    }, [formData, paymentMethod, transactionId, bookingData, resourceData, navigate]);
 
-    const handleCalendarDownload = () => {
+    const handleCalendarDownload = useCallback(() => {
         if (!bookingData) return;
 
         // Convert time (e.g., "3:00 PM") to ISO string
@@ -243,9 +245,9 @@ export default function Checkout() {
             console.error("Date parsing error", e);
             toast.error("Could not generate calendar event");
         }
-    };
+    }, [bookingData]);
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         const { id, value } = e.target;
         if (id === "cardNumber") {
             const v = value.replace(/\s+/g, "").replace(/[^0-9]/gi, "").substr(0, 16);
@@ -263,7 +265,7 @@ export default function Checkout() {
         } else {
             setFormData(prev => ({ ...prev, [id]: value }));
         }
-    };
+    }, []);
 
     if (isSuccess && bookingData) {
         return (

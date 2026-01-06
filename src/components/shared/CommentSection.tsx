@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Tables } from "@/types/database";
 import { Button } from "@/components/ui/button";
@@ -35,51 +35,34 @@ export function CommentSection({ postId, postType }: CommentSectionProps) {
 
     useEffect(() => {
         fetchComments();
-    }, [postId]);
+    }, [postId, isAdmin]);
 
-    const fetchComments = async () => {
+    const fetchComments = useCallback(async () => {
         try {
-            const { data, error } = await supabase
+            let query = supabase
                 .from("comments")
                 .select("*")
                 .eq("post_id", postId)
                 .order("created_at", { ascending: false });
 
+            // Filter at database level - non-admins only see approved comments
+            // Admins see all comments (including unapproved for moderation)
+            if (!isAdmin) {
+                query = query.eq("approved", true);
+            }
+
+            const { data, error } = await query;
+
             if (error) throw error;
-
-            // If admin, show all (though currently we fetch all anyway, usually approved filter is here)
-            // Ideally we filter by approved=true for non-admins, but for now showing all as per existing code structure
-            // or filtering if requirement says so. The previous code had .eq("approved", true).
-            // Let's keep approved=true for public view, but maybe admins want to see unapproved?
-            // For this specific request "remove or edit", let's just stick to what was there but add controls.
-            // If the user previously had .eq("approved", true), we should keep it unless admin.
-
-            const visibleComments = isAdmin
-                ? data
-                : data?.filter(c => c.approved); // Simple client-side filter if API returns all, or adjust query.
-
-            // The previous query had .eq("approved", true). 
-            // If we want admins to see unapproved comments to moderate them, we should remove that filter from the query
-            // and filter in memory, or use conditional query.
-            // Let's modify the fetch to get all if admin, but since we can't easily change the query based on hook result inside async efficiently without complexity,
-            // let's just fetch approved=true as before for safety, assuming "edit/delete" is for visible comments.
-            // If the user wants to moderate pending comments, that's a larger scope (Admin Dashboard).
-            // For "edit/remove comments as admin", implying visible ones.
-            // However, seeing the request context, it's safer to fetch based on logic.
-
-            // Let's stick to the original query for now to minimize side effects, 
-            // but if admin needs to see *hidden* comments, we'd need to change the RLS or query.
-            // Assuming "approved" is the default for now as per previous code "approved: true // Auto-approve".
-
-            setComments(visibleComments || []);
+            setComments(data || []);
         } catch (error) {
             console.error("Error fetching comments:", error);
         } finally {
             setLoading(false);
         }
-    };
+    }, [postId, isAdmin]);
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = useCallback(async (e: React.FormEvent) => {
         e.preventDefault();
         if (!content.trim() || !authorName.trim()) return;
 
@@ -104,7 +87,7 @@ export function CommentSection({ postId, postType }: CommentSectionProps) {
         } finally {
             setSubmitting(false);
         }
-    };
+    }, [postId, postType, authorName, content, isAdmin]);
 
     const handleEditStart = (comment: Comment) => {
         setEditingCommentId(comment.id);
