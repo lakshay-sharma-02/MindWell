@@ -467,11 +467,11 @@ const Services = () => {
               Ready to Take the First Step?
             </h2>
             <p className="text-muted-foreground mb-8">
-              Your wellbeing matters. Let's start this journey together with a free consultation.
+              Your wellbeing matters. Let's start this journey together with your first consultation.
             </p>
             <Button variant="hero" size="xl" className="btn-glow" asChild>
               <Link to="/book">
-                Schedule Free Consultation
+                Schedule Your First Consultation
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Link>
             </Button>

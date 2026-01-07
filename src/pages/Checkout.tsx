@@ -228,7 +228,7 @@ export default function Checkout() {
             endDateTime.setMinutes(endDateTime.getMinutes() + 50); // Default 50 mins
 
             const event: BookingEvent = {
-                title: `${bookingData.sessionType} with Dr. Sarah`,
+                title: `${bookingData.sessionType} with your therapist`,
                 description: `Format: ${bookingData.format}\n\nNotes: ${bookingData.notes || 'None'}`,
                 location: bookingData.format === 'virtual' ? 'Virtual (Link sent via email)' : 'Gurugram, India',
                 startTime: startDateTime.toISOString(),

@@ -275,7 +275,7 @@ ${quizResult.report.map((r, i) => `${i + 1}. ${r.question}\n   Answer: ${r.answe
                     Mental Health Assessment (Optional)
                   </h3>
                   <p className="text-muted-foreground mt-2 max-w-lg">
-                    Take a quick 2-minute assessment to help Dr. Sarah understand your needs better before your session.
+                    Take a quick 2-minute assessment to help your therapist understand your needs better before your session.
                   </p>
                 </div>
 
@@ -318,7 +318,7 @@ ${quizResult.report.map((r, i) => `${i + 1}. ${r.question}\n   Answer: ${r.answe
                         Result: <span className="font-semibold text-primary">{quizResult.title}</span>
                       </p>
                       <p className="text-xs text-muted-foreground mt-1">
-                        Your detailed responses will be sent securely to the doctor.
+                        Your detailed responses will be sent securely to your therapist.
                       </p>
                     </div>
                   </div>
