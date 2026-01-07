@@ -12,6 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { WaveDivider } from "@/components/shared/WaveDivider";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import remarkBreaks from "remark-breaks";
 
 // Local interface since we can't regenerate types immediately
 interface CommunityPost {
@@ -247,34 +248,44 @@ const PostCard = ({ post, isAdmin, onPublish, onDelete }: { post: CommunityPost,
 
             {/* Solution Section */}
             {(post.is_published || isAdmin) && (
-                <div className="bg-primary/5 rounded-xl p-5 border border-primary/10">
-                    <div className="flex items-center gap-2 mb-3 text-primary font-semibold">
-                        <Sparkles className="w-4 h-4" />
-                        <span>Expert Answer</span>
+                <div className="relative overflow-hidden rounded-xl border border-primary/20 bg-gradient-to-br from-primary/5 to-primary/10 p-6 shadow-sm">
+
+                    <div className="flex items-center gap-2 mb-4 text-primary font-bold tracking-tight">
+                        <div className="p-1.5 bg-primary/10 rounded-full">
+                            <Sparkles className="w-4 h-4" />
+                        </div>
+                        <span className="uppercase text-xs tracking-wider">Expert Perspective</span>
                     </div>
 
                     {post.is_published ? (
-                        <div className="prose prose-sm dark:prose-invert max-w-none text-foreground/90">
-                            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                        <div className="prose prose-sm dark:prose-invert max-w-none text-foreground leading-relaxed
+                            prose-headings:font-display prose-headings:font-bold prose-headings:text-primary
+                            prose-p:text-base prose-p:my-3 prose-p:opacity-90
+                            prose-li:marker:text-primary/70
+                            prose-strong:text-primary/90 prose-strong:font-semibold">
+                            <ReactMarkdown remarkPlugins={[remarkGfm, remarkBreaks]}>
                                 {post.solution || ""}
                             </ReactMarkdown>
                         </div>
                     ) : (
                         // Admin Answer Input
-                        <div className="space-y-3">
+                        <div className="space-y-4">
                             <textarea
-                                className="w-full p-3 rounded-lg border border-input bg-background text-sm min-h-[100px]"
-                                placeholder="Type your expert solution here..."
+                                className="w-full p-4 rounded-lg border border-primary/20 bg-background/50 text-base min-h-[150px] focus:ring-2 focus:ring-primary/20 transition-all font-body leading-relaxed"
+                                placeholder="Type your expert solution here... (supports Markdown)"
                                 value={adminSolution}
                                 onChange={(e) => setAdminSolution(e.target.value)}
                             />
-                            <Button
-                                size="sm"
-                                onClick={() => onPublish(post.id, adminSolution)}
-                                disabled={!adminSolution.trim()}
-                            >
-                                Publish Answer
-                            </Button>
+                            <div className="flex justify-end">
+                                <Button
+                                    size="sm"
+                                    onClick={() => onPublish(post.id, adminSolution)}
+                                    disabled={!adminSolution.trim()}
+                                    className="shadow-md hover:shadow-lg transition-shadow"
+                                >
+                                    Publish Answer
+                                </Button>
+                            </div>
                         </div>
                     )}
                 </div>
