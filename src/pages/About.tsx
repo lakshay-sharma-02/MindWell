@@ -54,7 +54,7 @@ const whyUs = [
 ];
 
 const credentials = [
-  { icon: GraduationCap, text: "MA in Psychology (Candidate)" },
+  { icon: GraduationCap, text: "Strong Academic Background" },
   { icon: Brain, text: "Mental Health Research & Psychoeducation" },
   { icon: Heart, text: "Emotional Support & Wellness Intervention" },
   { icon: Users, text: "Mental Health Advocacy" }
@@ -327,7 +327,7 @@ const About = () => {
                     emotional support accessible, ethical, and stigma-free.
                   </p>
                   <p>
-                    With a strong academic foundation (MA in Psychology Candidate) and hands-on experience in
+                    With a strong academic foundation and hands-on experience in
                     mental health initiatives, she founded Psyche Space to create a platform where evidence-based
                     understanding meets compassionate care.
                   </p>

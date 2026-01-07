@@ -10,6 +10,8 @@ import { AskQuestionDialog } from "@/components/community/AskQuestionDialog";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { WaveDivider } from "@/components/shared/WaveDivider";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 // Local interface since we can't regenerate types immediately
 interface CommunityPost {
@@ -252,7 +254,11 @@ const PostCard = ({ post, isAdmin, onPublish, onDelete }: { post: CommunityPost,
                     </div>
 
                     {post.is_published ? (
-                        <p className="text-foreground/90">{post.solution}</p>
+                        <div className="prose prose-sm dark:prose-invert max-w-none text-foreground/90">
+                            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                {post.solution || ""}
+                            </ReactMarkdown>
+                        </div>
                     ) : (
                         // Admin Answer Input
                         <div className="space-y-3">
@@ -276,5 +282,6 @@ const PostCard = ({ post, isAdmin, onPublish, onDelete }: { post: CommunityPost,
         </motion.div>
     );
 };
+
 
 export default CommunitySupport;

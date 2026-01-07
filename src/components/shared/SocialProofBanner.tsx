@@ -7,7 +7,7 @@ export function SocialProofBanner() {
     { icon: Users, value: 1247, suffix: "+", label: "Clients Helped" },
     { icon: Star, value: 4.9, suffix: "", label: "Average Rating", isDecimal: true },
     { icon: Shield, value: 100, suffix: "%", label: "Confidential" },
-    { icon: Award, value: 15, suffix: "+", label: "Years Experience" },
+    { icon: Award, value: 3, suffix: "+", label: "Years Experience" },
   ];
 
   return (
