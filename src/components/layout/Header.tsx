@@ -106,7 +106,7 @@ export function Header({ onSearchClick }: HeaderProps) {
               transition={{ type: "spring", stiffness: 400, damping: 17 }}
               className="w-10 h-10 flex items-center justify-center"
             >
-              <img src="/logo.png" alt="Psyche Space Logo" className="w-full h-full object-contain" />
+              <img src="/logo-transparent.png" alt="Psyche Space Logo" className="w-full h-full object-contain" />
             </motion.div>
             <span className="font-display text-xl font-semibold text-foreground">
               {settings.global_info.title}
