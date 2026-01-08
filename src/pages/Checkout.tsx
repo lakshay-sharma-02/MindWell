@@ -478,9 +478,9 @@ export default function Checkout() {
                                                 />
                                             </div>
                                             <div className="text-center space-y-1">
-                                                <p className="font-medium">Lakshay Sharma</p>
+                                                <p className="font-medium">Tamanna Dahiya</p>
                                                 <p className="text-sm text-muted-foreground font-mono bg-secondary/50 px-2 py-1 rounded">
-                                                    sharmalakshay0208@oksbi
+                                                    tamannadahiya2915@oksbi
                                                 </p>
                                             </div>
                                             <div className="text-sm text-muted-foreground text-center max-w-xs">
