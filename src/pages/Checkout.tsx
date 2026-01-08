@@ -470,12 +470,11 @@ export default function Checkout() {
                                             <CardDescription>Use any UPI app to scan and pay</CardDescription>
                                         </CardHeader>
                                         <CardContent className="flex flex-col items-center space-y-6 pb-6">
-                                            <div className="relative w-64 h-64 bg-white rounded-xl border border-border flex items-center justify-center p-4">
-                                                <QRCodeSVG
-                                                    value={`upi://pay?pa=sharmalakshay0208@oksbi&pn=Lakshay%20Sharma&am=${amount.toFixed(2)}&cu=INR`}
-                                                    size={220}
-                                                    level="H"
-                                                    includeMargin={true}
+                                            <div className="relative w-64 h-auto bg-transparent flex items-center justify-center p-0">
+                                                <img
+                                                    src="/payment-qr.jpg"
+                                                    alt="Payment QR Code"
+                                                    className="w-full h-full object-contain rounded-xl shadow-lg border border-border/50"
                                                 />
                                             </div>
                                             <div className="text-center space-y-1">
