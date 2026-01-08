@@ -104,9 +104,9 @@ export function Header({ onSearchClick }: HeaderProps) {
               whileHover={{ scale: 1.05, rotate: 2 }}
               whileTap={{ scale: 0.95 }}
               transition={{ type: "spring", stiffness: 400, damping: 17 }}
-              className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-glow"
+              className="w-10 h-10 flex items-center justify-center"
             >
-              <Heart className="w-5 h-5 text-primary-foreground" fill="currentColor" />
+              <img src="/logo.png" alt="Psyche Space Logo" className="w-full h-full object-contain" />
             </motion.div>
             <span className="font-display text-xl font-semibold text-foreground">
               {settings.global_info.title}
@@ -340,7 +340,7 @@ export function Header({ onSearchClick }: HeaderProps) {
           )}
         </AnimatePresence>
       </nav>
-    </header>
+    </header >
   );
 }
 

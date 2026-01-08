@@ -87,9 +87,9 @@ export function Footer() {
             <Link to="/" className="inline-flex items-center gap-2.5 mb-6 group">
               <motion.div
                 whileHover={{ scale: 1.05, rotate: 3 }}
-                className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-glow"
+                className="w-12 h-12 flex items-center justify-center p-1"
               >
-                <Heart className="w-6 h-6 text-primary-foreground" fill="currentColor" />
+                <img src="/logo.png" alt="Psyche Space Logo" className="w-full h-full object-contain rounded-lg" />
               </motion.div>
               <span className="font-display text-2xl font-semibold text-foreground">
                 {settings.global_info.title}
