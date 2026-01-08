@@ -472,7 +472,7 @@ export default function Checkout() {
                                         <CardContent className="flex flex-col items-center space-y-6 pb-6">
                                             <div className="relative w-64 h-auto bg-transparent flex items-center justify-center p-0">
                                                 <img
-                                                    src="/payment-qr.jpg"
+                                                    src="/image.png"
                                                     alt="Payment QR Code"
                                                     className="w-full h-full object-contain rounded-xl shadow-lg border border-border/50"
                                                 />
