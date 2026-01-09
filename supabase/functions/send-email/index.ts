@@ -1,5 +1,5 @@
 // Setup type definitions for built-in Supabase Edge Runtime APIs
-import "jsr:@supabase/functions-js/edge-runtime.d.ts"
+// import "jsr:@supabase/functions-js/edge-runtime.d.ts"
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 const ADMIN_EMAIL = Deno.env.get("ADMIN_EMAIL");
@@ -8,6 +8,7 @@ const ADMIN_EMAIL = Deno.env.get("ADMIN_EMAIL");
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
   "Access-Control-Allow-Headers":
     "authorization, x-client-info, apikey, content-type",
 };
@@ -81,7 +82,7 @@ async function sendEmail(to: string[], subject: string, html: string) {
 Deno.serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+    return new Response("ok", { headers: corsHeaders, status: 200 });
   }
 
   try {
