@@ -2,7 +2,9 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts"
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
-const ADMIN_EMAIL = "sharmalakshay0208@gmail.com";
+const ADMIN_EMAIL = Deno.env.get("ADMIN_EMAIL");
+
+// Validation moved inside handler to prevent CORS errors on startup
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -52,14 +54,12 @@ type EmailRequest =
   | { type: "story"; data: StoryData };
 
 async function sendEmail(to: string[], subject: string, html: string) {
-  if (!RESEND_API_KEY) {
-    throw new Error("RESEND_API_KEY is not set");
-  }
+  // RESEND_API_KEY validation moved to top level
 
   const response = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
-      "Authorization": `Bearer ${RESEND_API_KEY}`,
+      "Authorization": `Bearer ${RESEND_API_KEY!}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
@@ -86,6 +86,15 @@ Deno.serve(async (req) => {
 
   try {
     const body: EmailRequest = await req.json();
+
+    if (!RESEND_API_KEY) {
+      throw new Error("RESEND_API_KEY is not set");
+    }
+
+    if (!ADMIN_EMAIL) {
+      throw new Error("ADMIN_EMAIL is not set");
+    }
+
     console.log(`Processing ${body.type} form submission:`, body.data);
 
     let subject = "";
@@ -168,7 +177,7 @@ Deno.serve(async (req) => {
 
     // Send notification email to admin
     const adminEmailResponse = await sendEmail(
-      [ADMIN_EMAIL],
+      [ADMIN_EMAIL!],
       `[MindWell] ${subject}`,
       htmlContent
     );
