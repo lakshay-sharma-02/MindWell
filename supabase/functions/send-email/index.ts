@@ -188,14 +188,15 @@ Deno.serve(async (req) => {
     let confirmationResponse = null;
 
     // Send confirmation email to user (if applicable)
-    if (userEmail && body.type !== "newsletter") {
-      confirmationResponse = await sendEmail(
-        [userEmail],
-        getConfirmationSubject(body.type),
-        getConfirmationHtml(body.type, body.data)
-      );
-      console.log("Confirmation email sent:", confirmationResponse);
-    }
+    // DISABLED: Resend Free Tier only allows sending to verified domain (Admin Email).
+    // if (userEmail && body.type !== "newsletter") {
+    //   confirmationResponse = await sendEmail(
+    //     [userEmail],
+    //     getConfirmationSubject(body.type),
+    //     getConfirmationHtml(body.type, body.data)
+    //   );
+    //   console.log("Confirmation email sent:", confirmationResponse);
+    // }
 
     return new Response(
       JSON.stringify({
@@ -203,7 +204,7 @@ Deno.serve(async (req) => {
         message: "Email request processed",
         details: {
           admin: adminEmailResponse,
-          user: userEmail ? (body.type !== "newsletter" ? confirmationResponse : "skipped-newsletter") : "skipped-no-email"
+          user: "skipped-resend-limitation"
         }
       }),
       {
