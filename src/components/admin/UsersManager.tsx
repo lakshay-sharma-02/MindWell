@@ -125,17 +125,17 @@ export function UsersManager() {
                 </div>
             </div>
 
-            <Card>
+            <Card className="border-none shadow-md overflow-hidden">
                 <CardContent className="p-0">
                     {loading ? (
                         <div className="p-6 space-y-4">
                             {[1, 2, 3].map((i) => <Skeleton key={i} className="h-12 w-full" />)}
                         </div>
                     ) : (
-                        <div className="rounded-md border">
+                        <div className="rounded-md">
                             <Table>
-                                <TableHeader>
-                                    <TableRow>
+                                <TableHeader className="bg-muted/50 hover:bg-muted/50">
+                                    <TableRow className="border-b border-border/50">
                                         <TableHead>User</TableHead>
                                         <TableHead>Email</TableHead>
                                         <TableHead>Joined</TableHead>
