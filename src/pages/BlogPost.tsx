@@ -139,6 +139,11 @@ const BlogPost = () => {
     }
   }, [user, post, isLiked]);
 
+  // Calculate reading time
+  const readingTime = useMemo(() => {
+    return post?.content ? Math.ceil(post.content.split(/\s+/).length / 200) : 5;
+  }, [post?.content]);
+
   if (loading) {
     return (
       <Layout>
@@ -198,14 +203,6 @@ const BlogPost = () => {
       "_blank"
     );
   };
-
-
-
-
-  // Calculate reading time
-  const readingTime = useMemo(() => {
-    return post.content ? Math.ceil(post.content.split(/\s+/).length / 200) : 5;
-  }, [post.content]);
 
   return (
     <Layout>
@@ -465,7 +462,7 @@ const BlogPost = () => {
           </section>
         )}
       </article>
-    </Layout>
+    </Layout >
   );
 };
 
