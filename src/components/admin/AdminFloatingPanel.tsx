@@ -145,7 +145,6 @@ export function AdminFloatingPanel() {
             role: data.role,
             content: data.content,
             rating: data.rating || 5,
-            image_url: data.image_url || "",
             published: data.published ?? false,
           };
           {

@@ -167,7 +167,6 @@ export interface Database {
           name: string
           role: string | null
           content: string
-          image: string | null
           rating: number
           published: boolean
           created_at: string
@@ -177,7 +176,6 @@ export interface Database {
           name: string
           role?: string | null
           content: string
-          image?: string | null
           rating?: number
           published?: boolean
           created_at?: string
@@ -187,7 +185,6 @@ export interface Database {
           name?: string
           role?: string | null
           content?: string
-          image?: string | null
           rating?: number
           published?: boolean
           created_at?: string

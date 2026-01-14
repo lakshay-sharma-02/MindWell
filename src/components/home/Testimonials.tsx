@@ -45,7 +45,7 @@ export function Testimonials() {
           role: t.role || "Client",
           content: t.content,
           rating: t.rating || 5,
-          avatar: t.image_url || t.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase(),
+          avatar: t.name.split(' ').map((n: string) => n[0]).join('').substring(0, 2).toUpperCase(),
           verified: true,
           published: t.published
         }));

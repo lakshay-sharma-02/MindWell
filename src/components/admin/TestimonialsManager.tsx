@@ -24,7 +24,6 @@ export function TestimonialsManager() {
     name: "",
     role: "",
     content: "",
-    image: "",
     rating: 5,
     published: false,
   });
@@ -107,7 +106,6 @@ export function TestimonialsManager() {
       name: "",
       role: "",
       content: "",
-      image: "",
       rating: 5,
       published: false,
     });
@@ -121,7 +119,6 @@ export function TestimonialsManager() {
       name: testimonial.name,
       role: testimonial.role || "",
       content: testimonial.content,
-      image: testimonial.image || "",
       rating: testimonial.rating,
       published: testimonial.published,
     });
@@ -166,14 +163,6 @@ export function TestimonialsManager() {
                     onChange={(e) => setForm({ ...form, role: e.target.value })}
                   />
                 </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="image">Image URL</Label>
-                <Input
-                  id="image"
-                  value={form.image || ""}
-                  onChange={(e) => setForm({ ...form, image: e.target.value })}
-                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="rating">Rating (1-5)</Label>

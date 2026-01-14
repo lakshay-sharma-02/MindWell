@@ -19,7 +19,6 @@ export function TestimonialForm({ initialData, onSubmit, isSubmitting, onCancel 
         role: "",
         content: "",
         rating: 5,
-        image_url: "",
         published: false
     });
 
@@ -30,7 +29,6 @@ export function TestimonialForm({ initialData, onSubmit, isSubmitting, onCancel 
                 role: initialData.role || "",
                 content: initialData.content || "",
                 rating: initialData.rating || 5,
-                image_url: initialData.image_url || initialData.avatar || "", // Handle avatar/image_url mapping
                 published: initialData.published ?? false
             });
         }
@@ -62,13 +60,6 @@ export function TestimonialForm({ initialData, onSubmit, isSubmitting, onCancel 
                     max={5}
                     value={data.rating}
                     onChange={(e) => setData({ ...data, rating: parseInt(e.target.value) })}
-                />
-            </div>
-            <div>
-                <Label>Image URL (Avatar)</Label>
-                <Input
-                    value={data.image_url}
-                    onChange={(e) => setData({ ...data, image_url: e.target.value })}
                 />
             </div>
             <div className="space-y-2">
