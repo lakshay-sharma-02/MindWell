@@ -8,6 +8,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Quote, Heart, Loader2 } from "lucide-react";
 import { WaveDivider } from "@/components/shared/WaveDivider";
 import { formatDistanceToNow } from "date-fns";
+import { ShareStory } from "@/components/home/ShareStory";
+import { useSearchParams } from "react-router-dom";
 
 export default function Stories() {
     const [stories, setStories] = useState<Tables<"stories">[]>([]);
@@ -33,6 +35,19 @@ export default function Stories() {
             setLoading(false);
         }
     };
+
+    const [searchParams] = useSearchParams();
+
+    useEffect(() => {
+        if (searchParams.get("action") === "share") {
+            setTimeout(() => {
+                const element = document.getElementById("share-story-form");
+                if (element) {
+                    element.scrollIntoView({ behavior: "smooth" });
+                }
+            }, 500); // Small delay to allow rendering
+        }
+    }, [searchParams]);
 
     return (
         <Layout>
@@ -118,6 +133,11 @@ export default function Stories() {
                     )}
                 </div>
             </section>
+
+            {/* Share Story Form */}
+            <div id="share-story-form">
+                <ShareStory />
+            </div>
 
         </Layout>
     );

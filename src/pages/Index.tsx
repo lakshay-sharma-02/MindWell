@@ -8,7 +8,6 @@ import { CTASection } from "@/components/home/CTASection";
 import { Marquee } from "@/components/home/Marquee";
 import { PressBar } from "@/components/home/PressBar";
 import { Testimonials } from "@/components/home/Testimonials";
-import { ShareStory } from "@/components/home/ShareStory";
 import { SocialProofBanner } from "@/components/shared/SocialProofBanner";
 import { WaveDivider } from "@/components/shared/WaveDivider";
 import { FeaturedTools } from "@/components/home/FeaturedTools";
@@ -32,7 +31,6 @@ const Index = () => {
       <FeaturedTools />
       <FeaturedResources />
       <FeaturedPodcasts />
-      <ShareStory />
       <CTASection />
     </Layout>
   );
