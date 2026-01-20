@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { Loader2, Heart, Calendar, Trash2, Sun } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { format } from "date-fns";
+import { Link } from "react-router-dom";
 
 interface GratitudeLog {
     id: string;
@@ -104,6 +105,25 @@ export function GratitudeJournal() {
         return (
             <div className="flex justify-center items-center py-20">
                 <Loader2 className="w-8 h-8 animate-spin text-primary" />
+            </div>
+        );
+    }
+
+    if (!user) {
+        return (
+            <div className="bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-950/20 dark:to-amber-950/20 rounded-3xl p-8 text-center h-full flex flex-col items-center justify-center min-h-[400px] border border-orange-100/50 dark:border-orange-500/10">
+                <div className="w-16 h-16 bg-orange-500/10 rounded-full flex items-center justify-center mb-6">
+                    <Heart className="w-8 h-8 text-orange-500" />
+                </div>
+                <h3 className="text-2xl font-display font-bold mb-3">Practice Gratitude</h3>
+                <p className="text-muted-foreground mb-8 max-w-xs mx-auto">
+                    Cultivate a positive mindset by journaling your daily gratitude. specific moments. Sign in to start your collection.
+                </p>
+                <div className="flex gap-4">
+                    <Button asChild size="lg" className="bg-orange-500 hover:bg-orange-600 text-white border-none shadow-lg shadow-orange-500/20">
+                        <Link to="/auth">Sign In to Journal</Link>
+                    </Button>
+                </div>
             </div>
         );
     }

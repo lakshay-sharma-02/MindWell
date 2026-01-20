@@ -11,6 +11,7 @@ import { Testimonials } from "@/components/home/Testimonials";
 import { ShareStory } from "@/components/home/ShareStory";
 import { SocialProofBanner } from "@/components/shared/SocialProofBanner";
 import { WaveDivider } from "@/components/shared/WaveDivider";
+import { FeaturedTools } from "@/components/home/FeaturedTools";
 
 const Index = () => {
   return (
@@ -28,6 +29,7 @@ const Index = () => {
       <FeaturedBlogs />
       <WaveDivider variant="wave" color="hsl(var(--secondary) / 0.3)" />
       <Testimonials />
+      <FeaturedTools />
       <FeaturedResources />
       <FeaturedPodcasts />
       <ShareStory />
