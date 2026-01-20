@@ -4,7 +4,6 @@ import { Footer } from "./Footer";
 import { AdminFloatingPanel } from "@/components/admin/AdminFloatingPanel";
 import { AdminEditProvider } from "@/hooks/useAdminEdit";
 import { ScrollProgress } from "@/components/effects/ScrollProgress";
-import { BackToTop } from "@/components/effects/BackToTop";
 import { CursorGlow } from "@/components/effects/CursorGlow";
 import { SearchModal } from "@/components/search/SearchModal";
 
@@ -72,7 +71,6 @@ export function Layout({ children }: LayoutProps) {
           </main>
 
           <Footer />
-          <BackToTop />
           <AdminFloatingPanel />
 
           {/* Search Modal */}
