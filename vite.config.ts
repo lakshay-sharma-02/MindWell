@@ -43,6 +43,13 @@ export default defineConfig(({ mode }) => ({
             type: 'image/svg+xml'
           }
         ]
+      },
+      workbox: {
+        skipWaiting: true,
+        clientsClaim: true,
+        cleanupOutdatedCaches: true,
+        navigateFallback: 'index.html',
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2}']
       }
     })
   ].filter(Boolean),
