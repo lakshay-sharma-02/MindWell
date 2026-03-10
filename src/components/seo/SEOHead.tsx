@@ -46,7 +46,7 @@ export function SEOHead({
       <meta name="twitter:image" content={ogImage} />
 
       {/* Canonical */}
-      {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
+      <link rel="canonical" href={canonicalUrl || 'https://psychespace.vercel.app'} />
 
       {/* Robots */}
       {noIndex && <meta name="robots" content="noindex, nofollow" />}

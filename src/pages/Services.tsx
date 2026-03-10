@@ -137,7 +137,8 @@ const Services = () => {
       <SEOHead
         title="Services"
         description="Explore our range of therapy services including CBT, ACT, EMDR, couples therapy, and mindfulness counseling. Find the right approach for your mental health journey."
-        keywords="therapy services, CBT, EMDR, couples therapy, mindfulness, counseling, mental health treatment"
+        keywords="therapy services, CBT, EMDR, couples therapy, mindfulness, counseling, mental health treatment, psychology sessions, online therapy"
+        canonicalUrl="https://psychespace.vercel.app/services"
       />
 
       {/* Hero Section */}

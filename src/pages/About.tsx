@@ -66,7 +66,8 @@ const About = () => {
       <SEOHead
         title="About Us - Psyche Space"
         description="A safe, supportive, and non-judgmental space for emotional well-being. Meet Tamanna Dahiya and learn about our mission."
-        keywords="about psyche space, mental health support, tamanna dahiya, emotional wellness, safe space"
+        keywords="about psyche space, mental health support, tamanna dahiya, emotional wellness, safe space, therapy, counseling"
+        canonicalUrl="https://psychespace.vercel.app/about"
       />
 
       {/* Hero Section */}

@@ -18,7 +18,8 @@ const Index = () => {
       <SEOHead
         title="Home"
         description="Psyche Space is your trusted resource for mental health support, therapy sessions, evidence-based articles, and wellness podcasts. Start your journey to better mental health today."
-        keywords="mental health, therapy, psychology, wellness, counseling, mindfulness, anxiety, depression, self-care"
+        keywords="mental health, therapy, psychology, wellness, counseling, mindfulness, anxiety, depression, self-care, Psyche Space"
+        canonicalUrl="https://psychespace.vercel.app/"
       />
 
       <HeroSection />
