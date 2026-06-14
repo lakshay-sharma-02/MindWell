@@ -84,6 +84,7 @@ function AnimatedRoutes() {
 }
 
 import { FeatureTour } from "@/components/onboarding/FeatureTour";
+import { AIChatCompanion } from "@/components/ai/AIChatCompanion";
 
 function GlobalOverlays() {
   const { hasSeenTour, completeTour, user, loading } = useAuth();
@@ -91,11 +92,14 @@ function GlobalOverlays() {
   if (loading || !user) return null;
 
   return (
-    <FeatureTour
-      isOpen={!hasSeenTour}
-      onComplete={completeTour}
-      onSkip={completeTour}
-    />
+    <>
+      <FeatureTour
+        isOpen={!hasSeenTour}
+        onComplete={completeTour}
+        onSkip={completeTour}
+      />
+      <AIChatCompanion />
+    </>
   );
 }
 

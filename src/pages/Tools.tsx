@@ -6,9 +6,11 @@ import { MoodTracker } from "@/components/tools/MoodTracker";
 import { motion } from "framer-motion";
 import { WaveDivider } from "@/components/shared/WaveDivider";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Wind, PenTool, Sparkles, Heart, Flame } from "lucide-react";
+import { Wind, PenTool, Sparkles, Heart, Flame, Bot, Lightbulb } from "lucide-react";
 import { GratitudeJournal } from "@/components/tools/GratitudeJournal";
 import { WorryJar } from "@/components/tools/WorryJar";
+import { AIJournalAnalysis } from "@/components/ai/AIJournalAnalysis";
+import { AICopingStrategies } from "@/components/ai/AICopingStrategies";
 
 import { useSearchParams } from "react-router-dom";
 
@@ -58,22 +60,30 @@ export default function Tools() {
             <section className="py-20 bg-background min-h-[60vh]">
                 <div className="container-wide">
                     <Tabs defaultValue={defaultTab} className="max-w-4xl mx-auto">
-                        <TabsList className="grid w-full grid-cols-1 md:grid-cols-3 mb-12 p-1 bg-secondary/30 rounded-2xl h-auto relative">
-                            <TabsTrigger value="breathing" className="w-full flex items-center justify-center text-base md:text-lg py-3 md:py-4 rounded-xl data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all duration-300">
-                                <Wind className="w-5 h-5 mr-2" />
+                        <TabsList className="grid w-full grid-cols-2 md:grid-cols-3 lg:grid-cols-6 mb-12 p-1 bg-secondary/30 rounded-2xl h-auto relative">
+                            <TabsTrigger value="breathing" className="w-full flex items-center justify-center text-sm md:text-base py-3 md:py-4 rounded-xl data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all duration-300">
+                                <Wind className="w-4 h-4 mr-2" />
                                 Breathing
                             </TabsTrigger>
-                            <TabsTrigger value="mood" className="w-full flex items-center justify-center text-base md:text-lg py-3 md:py-4 rounded-xl data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all duration-300">
-                                <PenTool className="w-5 h-5 mr-2" />
-                                Mood Journal
+                            <TabsTrigger value="mood" className="w-full flex items-center justify-center text-sm md:text-base py-3 md:py-4 rounded-xl data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all duration-300">
+                                <PenTool className="w-4 h-4 mr-2" />
+                                Mood
                             </TabsTrigger>
-                            <TabsTrigger value="gratitude" className="w-full flex items-center justify-center text-base md:text-lg py-3 md:py-4 rounded-xl data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all duration-300">
-                                <Heart className="w-5 h-5 mr-2" />
+                            <TabsTrigger value="gratitude" className="w-full flex items-center justify-center text-sm md:text-base py-3 md:py-4 rounded-xl data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all duration-300">
+                                <Heart className="w-4 h-4 mr-2" />
                                 Gratitude
                             </TabsTrigger>
-                            <TabsTrigger value="worry" className="w-full flex items-center justify-center text-base md:text-lg py-3 md:py-4 rounded-xl data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all duration-300">
-                                <Flame className="w-5 h-5 mr-2" />
+                            <TabsTrigger value="worry" className="w-full flex items-center justify-center text-sm md:text-base py-3 md:py-4 rounded-xl data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all duration-300">
+                                <Flame className="w-4 h-4 mr-2" />
                                 Worry Jar
+                            </TabsTrigger>
+                            <TabsTrigger value="ai-journal" className="w-full flex items-center justify-center text-sm md:text-base py-3 md:py-4 rounded-xl data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all duration-300">
+                                <Bot className="w-4 h-4 mr-2" />
+                                AI Journal
+                            </TabsTrigger>
+                            <TabsTrigger value="coping" className="w-full flex items-center justify-center text-sm md:text-base py-3 md:py-4 rounded-xl data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all duration-300">
+                                <Lightbulb className="w-4 h-4 mr-2" />
+                                Coping
                             </TabsTrigger>
                         </TabsList>
 
@@ -98,6 +108,26 @@ export default function Tools() {
 
                         <TabsContent value="worry" className="focus-visible:outline-none animate-in fade-in slide-in-from-bottom-4 duration-500">
                             <WorryJar />
+                        </TabsContent>
+
+                        <TabsContent value="ai-journal" className="focus-visible:outline-none animate-in fade-in slide-in-from-bottom-4 duration-500">
+                            <div className="max-w-2xl mx-auto">
+                                <div className="text-center mb-8">
+                                    <h2 className="text-2xl font-display font-bold mb-2">AI Journal Analysis</h2>
+                                    <p className="text-muted-foreground">Get personalized insights and support from AI by analyzing your journal entries.</p>
+                                </div>
+                                <AIJournalAnalysis />
+                            </div>
+                        </TabsContent>
+
+                        <TabsContent value="coping" className="focus-visible:outline-none animate-in fade-in slide-in-from-bottom-4 duration-500">
+                            <div className="max-w-2xl mx-auto">
+                                <div className="text-center mb-8">
+                                    <h2 className="text-2xl font-display font-bold mb-2">Personalized Coping Strategies</h2>
+                                    <p className="text-muted-foreground">Receive evidence-based coping techniques tailored to your situation.</p>
+                                </div>
+                                <AICopingStrategies />
+                            </div>
                         </TabsContent>
                     </Tabs>
                 </div>

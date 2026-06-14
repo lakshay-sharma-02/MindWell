@@ -10,6 +10,7 @@ import { format } from "date-fns";
 import { motion, AnimatePresence } from "framer-motion";
 import { Tables } from "@/types/database";
 import { Link } from "react-router-dom";
+import { AIMoodInsights } from "@/components/ai/AIMoodInsights";
 
 type MoodLog = Tables<"mood_logs">;
 
@@ -146,51 +147,64 @@ export function MoodTracker() {
                 </form>
             </div>
 
-            {/* History */}
-            <div className="bg-secondary/20 rounded-3xl p-6 md:p-8">
-                <h3 className="text-xl font-display font-bold mb-6 flex items-center gap-2">
-                    <Calendar className="w-5 h-5 text-muted-foreground" />
-                    Recent History
-                </h3>
+            {/* History & AI Insights */}
+            <div className="space-y-6">
+                <div className="bg-secondary/20 rounded-3xl p-6 md:p-8">
+                    <h3 className="text-xl font-display font-bold mb-6 flex items-center gap-2">
+                        <Calendar className="w-5 h-5 text-muted-foreground" />
+                        Recent History
+                    </h3>
 
-                {loadingHistory ? (
-                    <div className="flex justify-center py-12">
-                        <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
-                    </div>
-                ) : history.length === 0 ? (
-                    <div className="text-center py-12 border-2 border-dashed border-border/50 rounded-2xl">
-                        <p className="text-muted-foreground italic">No logs yet. Start today!</p>
-                    </div>
-                ) : (
-                    <div className="space-y-4">
-                        {history.map((log) => {
-                            const moodDef = MOODS.find(m => m.value === log.mood) || MOODS[1];
-                            return (
-                                <motion.div
-                                    key={log.id}
-                                    initial={{ opacity: 0, x: -10 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    className="bg-background rounded-2xl p-4 flex gap-4 items-start shadow-sm border border-border/50"
-                                >
-                                    <div className={`p-2 rounded-xl ${moodDef.bg}`}>
-                                        <moodDef.icon className={`w-5 h-5 ${moodDef.color}`} />
-                                    </div>
-                                    <div>
-                                        <div className="flex items-center gap-2 mb-1">
-                                            <span className="font-semibold capitalize text-sm">{moodDef.label}</span>
-                                            <span className="text-xs text-muted-foreground">•</span>
-                                            <span className="text-xs text-muted-foreground">
-                                                {format(new Date(log.created_at), "MMM d, h:mm a")}
-                                            </span>
+                    {loadingHistory ? (
+                        <div className="flex justify-center py-12">
+                            <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+                        </div>
+                    ) : history.length === 0 ? (
+                        <div className="text-center py-12 border-2 border-dashed border-border/50 rounded-2xl">
+                            <p className="text-muted-foreground italic">No logs yet. Start today!</p>
+                        </div>
+                    ) : (
+                        <div className="space-y-4">
+                            {history.map((log) => {
+                                const moodDef = MOODS.find(m => m.value === log.mood) || MOODS[1];
+                                return (
+                                    <motion.div
+                                        key={log.id}
+                                        initial={{ opacity: 0, x: -10 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        className="bg-background rounded-2xl p-4 flex gap-4 items-start shadow-sm border border-border/50"
+                                    >
+                                        <div className={`p-2 rounded-xl ${moodDef.bg}`}>
+                                            <moodDef.icon className={`w-5 h-5 ${moodDef.color}`} />
                                         </div>
-                                        {log.note && (
-                                            <p className="text-sm text-muted-foreground leading-snug">"{log.note}"</p>
-                                        )}
-                                    </div>
-                                </motion.div>
-                            );
-                        })}
-                    </div>
+                                        <div>
+                                            <div className="flex items-center gap-2 mb-1">
+                                                <span className="font-semibold capitalize text-sm">{moodDef.label}</span>
+                                                <span className="text-xs text-muted-foreground">•</span>
+                                                <span className="text-xs text-muted-foreground">
+                                                    {format(new Date(log.created_at), "MMM d, h:mm a")}
+                                                </span>
+                                            </div>
+                                            {log.note && (
+                                                <p className="text-sm text-muted-foreground leading-snug">"{log.note}"</p>
+                                            )}
+                                        </div>
+                                    </motion.div>
+                                );
+                            })}
+                        </div>
+                    )}
+                </div>
+
+                {/* AI Insights Section */}
+                {history.length >= 3 && (
+                    <AIMoodInsights
+                        moodEntries={history.map(log => ({
+                            mood: log.mood,
+                            note: log.note || undefined,
+                            created_at: log.created_at
+                        }))}
+                    />
                 )}
             </div>
         </div>
