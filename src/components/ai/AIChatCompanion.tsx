@@ -325,9 +325,9 @@ export function AIChatCompanion() {
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            className="fixed bottom-24 right-6 z-50 w-[400px] max-w-[calc(100vw-3rem)]"
+            className="fixed top-20 right-6 z-40 w-[400px] max-w-[calc(100vw-3rem)]"
           >
-            <Card className="flex flex-col h-[600px] max-h-[80vh] shadow-2xl border-primary/20 overflow-hidden">
+            <Card className="flex flex-col h-[calc(100vh-6rem)] max-h-[600px] shadow-2xl border-primary/20 overflow-hidden">
               {/* Header */}
               <div className="flex items-center justify-between p-4 border-b bg-gradient-to-r from-primary/10 to-primary/5">
                 <div className="flex items-center gap-3">
