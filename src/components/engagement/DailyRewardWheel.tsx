@@ -6,6 +6,7 @@ import { Gift, Sparkles, Trophy, Heart, Star, Zap, Crown, Lock } from "lucide-re
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import confetti from "canvas-confetti";
+import { useXP, XP_AMOUNTS } from "@/hooks/useXP";
 
 interface Reward {
   id: string;
@@ -117,6 +118,7 @@ const REWARD_POOL: Reward[] = [
 
 export function DailyRewardWheel() {
   const { user } = useAuth();
+  const { awardXP } = useXP();
   const [hasClaimed, setHasClaimed] = useState(false);
   const [spinning, setSpinning] = useState(false);
   const [wonReward, setWonReward] = useState<Reward | null>(null);
@@ -189,6 +191,13 @@ export function DailyRewardWheel() {
       if (!error) {
         setHasClaimed(true);
         setShowReward(true);
+
+        // Award XP for spinning wheel
+        await awardXP(
+          XP_AMOUNTS.REWARD_WHEEL,
+          'reward_wheel',
+          `Daily reward: ${reward.title}`
+        );
 
         // Trigger confetti
         if (reward.rarity === 'legendary') {

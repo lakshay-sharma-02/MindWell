@@ -1,4 +1,4 @@
-import { Suspense, useEffect } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { AuthPopup } from "@/components/auth/AuthPopup";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -13,6 +13,7 @@ import ScrollToTop from "@/components/utils/ScrollToTop";
 import { PageSkeleton } from "@/components/layout/PageSkeleton";
 import { lazyWithRetry } from "@/utils/lazyWithRetry";
 import { SmoothScroll } from "@/components/utils/SmoothScroll";
+import { LevelUpModal } from "@/components/gamification/LevelUpModal";
 
 // Lazy load pages for performance with retry logic
 const Index = lazyWithRetry(() => import("./pages/Index"));
@@ -34,6 +35,7 @@ const Profile = lazyWithRetry(() => import("./pages/Profile"));
 const CommunitySupport = lazyWithRetry(() => import("./pages/CommunitySupport"));
 const Dashboard = lazyWithRetry(() => import("./pages/Dashboard"));
 const Tools = lazyWithRetry(() => import("./pages/Tools"));
+const Badges = lazyWithRetry(() => import("./pages/Badges"));
 
 const queryClient = new QueryClient();
 
@@ -74,6 +76,7 @@ function AnimatedRoutes() {
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/tools" element={<Tools />} />
               <Route path="/profile" element={<Profile />} />
+              <Route path="/badges" element={<Badges />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>
@@ -88,6 +91,46 @@ import { AIChatCompanion } from "@/components/ai/AIChatCompanion";
 
 function GlobalOverlays() {
   const { hasSeenTour, completeTour, user, loading } = useAuth();
+  const [levelUpModal, setLevelUpModal] = useState<{
+    isOpen: boolean;
+    newLevel: number;
+    oldLevel: number;
+    levelTitle: string;
+  }>({
+    isOpen: false,
+    newLevel: 1,
+    oldLevel: 1,
+    levelTitle: "Beginner",
+  });
+
+  // Expose level up modal trigger globally
+  useEffect(() => {
+    if (user) {
+      (window as any).showLevelUpModal = (newLevel: number, oldLevel: number) => {
+        // Fetch level title
+        const levelTitle = getLevelTitle(newLevel);
+        setLevelUpModal({
+          isOpen: true,
+          newLevel,
+          oldLevel,
+          levelTitle,
+        });
+      };
+    }
+  }, [user]);
+
+  const getLevelTitle = (level: number) => {
+    if (level >= 1 && level <= 5) return "Beginner";
+    if (level >= 6 && level <= 10) return "Mindful Explorer";
+    if (level >= 11 && level <= 15) return "Wellness Seeker";
+    if (level >= 16 && level <= 20) return "Wellness Warrior";
+    if (level >= 21 && level <= 25) return "Mental Health Champion";
+    if (level >= 26 && level <= 30) return "Zen Master";
+    if (level >= 31 && level <= 35) return "Enlightened Soul";
+    if (level >= 36 && level <= 40) return "Wellness Legend";
+    if (level >= 41 && level <= 45) return "Master of Mindfulness";
+    return "Transcendent Being";
+  };
 
   if (loading || !user) return null;
 
@@ -99,6 +142,13 @@ function GlobalOverlays() {
         onSkip={completeTour}
       />
       <AIChatCompanion />
+      <LevelUpModal
+        isOpen={levelUpModal.isOpen}
+        onClose={() => setLevelUpModal({ ...levelUpModal, isOpen: false })}
+        newLevel={levelUpModal.newLevel}
+        oldLevel={levelUpModal.oldLevel}
+        levelTitle={levelUpModal.levelTitle}
+      />
     </>
   );
 }

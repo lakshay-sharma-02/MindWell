@@ -10,6 +10,7 @@ import { Sunrise, Moon, Target, Heart, Sparkles, CheckCircle2 } from "lucide-rea
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { aiService } from "@/lib/ai-services";
+import { useXP, XP_AMOUNTS } from "@/hooks/useXP";
 
 interface CheckInData {
   // Morning
@@ -32,6 +33,7 @@ interface DailyCheckInFlowProps {
 
 export function DailyCheckInFlow({ type, onComplete, isOpen, onClose }: DailyCheckInFlowProps) {
   const { user } = useAuth();
+  const { awardXP } = useXP();
   const [step, setStep] = useState(1);
   const [data, setData] = useState<CheckInData>({});
   const [loading, setLoading] = useState(false);

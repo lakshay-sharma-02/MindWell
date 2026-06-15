@@ -9,6 +9,7 @@ import { Loader2, Heart, Calendar, Trash2, Sun } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { format } from "date-fns";
 import { Link } from "react-router-dom";
+import { useXP, XP_AMOUNTS } from "@/hooks/useXP";
 
 interface GratitudeLog {
     id: string;
@@ -17,6 +18,7 @@ interface GratitudeLog {
 }
 
 export function GratitudeJournal() {
+    const { awardXP } = useXP();
     const [logs, setLogs] = useState<GratitudeLog[]>([]);
     const [newEntry, setNewEntry] = useState("");
     const [loading, setLoading] = useState(true);
@@ -75,7 +77,27 @@ export function GratitudeJournal() {
 
             setLogs([data, ...logs]);
             setNewEntry("");
-            toast.success("Saved to your gratitude journal!");
+
+            // Award XP for journal entry
+            await awardXP(
+                XP_AMOUNTS.JOURNAL_ENTRY,
+                'journal_entry',
+                'Gratitude journal entry',
+                { length: newEntry.trim().length }
+            );
+
+            // Check for badge eligibility
+            await supabase.rpc('check_badge_eligibility', {
+                p_user_id: user.id
+            });
+
+            // Increment challenge progress if applicable
+            await supabase.rpc('increment_challenge_progress', {
+                p_user_id: user.id,
+                p_challenge_type: 'gratitude'
+            });
+
+            toast.success("Saved to your gratitude journal! +25 XP");
         } catch (error) {
             console.error('Error saving gratitude log:', error);
             toast.error("Failed to save entry.");

@@ -3,12 +3,18 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Play, Pause, RotateCcw } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { useXP, XP_AMOUNTS } from "@/hooks/useXP";
+import { supabase } from "@/integrations/supabase/client";
 
 export function BreathingExercise() {
+    const { user } = useAuth();
+    const { awardXP } = useXP();
     const [isActive, setIsActive] = useState(false);
     const [phase, setPhase] = useState<"inhale" | "hold" | "exhale" | "idle">("idle");
     const [instruction, setInstruction] = useState("Ready to relax?");
     const [timer, setTimer] = useState(0);
+    const [cycleCount, setCycleCount] = useState(0);
 
     // 4-7-8 Technique
     const PHASE_durations = {
@@ -39,7 +45,31 @@ export function BreathingExercise() {
                 setInstruction("Exhale slowly...");
                 await new Promise((r) => setTimeout(r, PHASE_durations.exhale));
 
-                // Loop is handled by useEffect dependency or recursion, 
+                // Award XP after completing a full cycle
+                const newCycleCount = cycleCount + 1;
+                setCycleCount(newCycleCount);
+
+                if (user && newCycleCount === 1) {
+                    // Award XP after first complete cycle
+                    await awardXP(
+                        XP_AMOUNTS.BREATHING_EXERCISE,
+                        'breathing_exercise',
+                        'Completed breathing exercise'
+                    );
+
+                    // Check for badge eligibility
+                    await supabase.rpc('check_badge_eligibility', {
+                        p_user_id: user.id
+                    });
+
+                    // Increment challenge progress if applicable
+                    await supabase.rpc('increment_challenge_progress', {
+                        p_user_id: user.id,
+                        p_challenge_type: 'breathing'
+                    });
+                }
+
+                // Loop is handled by useEffect dependency or recursion,
                 // but simple recursion here might cause state update on unmount warnings if not careful.
                 // Let's just rely on a cycle trigger.
                 setTimer(t => t + 1);
@@ -58,6 +88,7 @@ export function BreathingExercise() {
         setIsActive(false);
         setPhase("idle");
         setInstruction("Ready to relax?");
+        setCycleCount(0);
     };
 
     return (

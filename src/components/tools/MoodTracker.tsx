@@ -11,6 +11,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Tables } from "@/types/database";
 import { Link } from "react-router-dom";
 import { AIMoodInsights } from "@/components/ai/AIMoodInsights";
+import { useXP, XP_AMOUNTS } from "@/hooks/useXP";
 
 type MoodLog = Tables<"mood_logs">;
 
@@ -24,6 +25,7 @@ const MOODS = [
 
 export function MoodTracker() {
     const { user } = useAuth();
+    const { awardXP } = useXP();
     const [selectedMood, setSelectedMood] = useState<string | null>(null);
     const [note, setNote] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -74,7 +76,26 @@ export function MoodTracker() {
 
             if (error) throw error;
 
-            toast.success("Mood logged successfully");
+            // Award XP for mood log
+            await awardXP(
+                XP_AMOUNTS.MOOD_LOG,
+                'mood_log',
+                `Logged mood: ${selectedMood}`,
+                { mood: selectedMood, has_note: !!note.trim() }
+            );
+
+            // Check for badge eligibility
+            await supabase.rpc('check_badge_eligibility', {
+                p_user_id: user.id
+            });
+
+            // Increment challenge progress if applicable
+            await supabase.rpc('increment_challenge_progress', {
+                p_user_id: user.id,
+                p_challenge_type: 'mood_tracking'
+            });
+
+            toast.success("Mood logged successfully! +10 XP");
             setSelectedMood(null);
             setNote("");
             fetchHistory();
@@ -104,107 +125,120 @@ export function MoodTracker() {
     }
 
     return (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 h-full">
-            {/* Logger */}
-            <div className="bg-card border border-border/50 rounded-3xl p-6 md:p-8 shadow-sm">
-                <h3 className="text-xl font-display font-bold mb-6">How are you feeling?</h3>
+        <div className="max-w-4xl mx-auto space-y-6">
+            {/* Mood Logger */}
+            <div className="glass-card p-8 rounded-3xl">
+                <div className="mb-6 text-center">
+                    <h2 className="text-2xl font-display font-bold mb-2">How are you feeling today?</h2>
+                    <p className="text-muted-foreground">Select your mood and add optional notes</p>
+                </div>
 
-                <form onSubmit={handleSubmit}>
-                    <div className="grid grid-cols-5 gap-3 mb-8">
-                        {MOODS.map((m) => {
-                            const isSelected = selectedMood === m.value;
+                <form onSubmit={handleSubmit} className="space-y-6">
+                    {/* Mood Selector */}
+                    <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                        {MOODS.map((mood) => {
+                            const Icon = mood.icon;
+                            const isSelected = selectedMood === mood.value;
                             return (
-                                <button
-                                    key={m.value}
+                                <motion.button
+                                    key={mood.value}
                                     type="button"
-                                    onClick={() => setSelectedMood(m.value)}
-                                    className={`flex flex-col items-center gap-2 p-3 rounded-2xl transition-all ${isSelected
-                                            ? `${m.bg} ring-2 ring-primary ring-offset-2 ring-offset-background scale-105`
-                                            : "hover:bg-secondary hover:scale-105"
-                                        }`}
+                                    whileHover={{ scale: 1.05 }}
+                                    whileTap={{ scale: 0.95 }}
+                                    onClick={() => setSelectedMood(mood.value)}
+                                    className={`p-6 rounded-2xl border-2 transition-all ${
+                                        isSelected
+                                            ? `${mood.bg} border-current scale-105 shadow-lg`
+                                            : "bg-card border-border hover:border-primary/30"
+                                    }`}
                                 >
-                                    <m.icon className={`w-8 h-8 ${isSelected ? m.color : "text-muted-foreground"}`} />
-                                    <span className="text-xs font-medium">{m.label}</span>
-                                </button>
-                            )
+                                    <Icon className={`w-10 h-10 mx-auto mb-2 ${isSelected ? mood.color : "text-muted-foreground"}`} />
+                                    <p className={`text-sm font-medium ${isSelected ? "text-foreground" : "text-muted-foreground"}`}>
+                                        {mood.label}
+                                    </p>
+                                </motion.button>
+                            );
                         })}
                     </div>
 
-                    <div className="space-y-4 mb-6">
-                        <label className="text-sm font-medium text-muted-foreground">Add a note (optional)</label>
+                    {/* Optional Note */}
+                    <div>
+                        <label className="block text-sm font-medium mb-2">How are you feeling? (Optional)</label>
                         <Textarea
-                            placeholder="What's on your mind today?"
                             value={note}
                             onChange={(e) => setNote(e.target.value)}
-                            className="resize-none h-32 bg-background/50 focus:bg-background transition-colors"
+                            placeholder="Share more about your mood..."
+                            className="min-h-[100px] resize-none"
                         />
                     </div>
 
-                    <Button type="submit" disabled={isSubmitting || !selectedMood} className="w-full">
-                        {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <History className="w-4 h-4 mr-2" />}
-                        Log Mood
+                    <Button type="submit" size="lg" className="w-full btn-glow" disabled={!selectedMood || isSubmitting}>
+                        {isSubmitting ? (
+                            <>
+                                <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                                Saving...
+                            </>
+                        ) : (
+                            <>
+                                <Calendar className="w-5 h-5 mr-2" />
+                                Log Mood (+10 XP)
+                            </>
+                        )}
                     </Button>
                 </form>
             </div>
 
-            {/* History & AI Insights */}
-            <div className="space-y-6">
-                <div className="bg-secondary/20 rounded-3xl p-6 md:p-8">
-                    <h3 className="text-xl font-display font-bold mb-6 flex items-center gap-2">
-                        <Calendar className="w-5 h-5 text-muted-foreground" />
-                        Recent History
-                    </h3>
+            {/* AI Mood Insights */}
+            <AIMoodInsights />
 
-                    {loadingHistory ? (
-                        <div className="flex justify-center py-12">
-                            <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
-                        </div>
-                    ) : history.length === 0 ? (
-                        <div className="text-center py-12 border-2 border-dashed border-border/50 rounded-2xl">
-                            <p className="text-muted-foreground italic">No logs yet. Start today!</p>
-                        </div>
-                    ) : (
-                        <div className="space-y-4">
-                            {history.map((log) => {
-                                const moodDef = MOODS.find(m => m.value === log.mood) || MOODS[1];
+            {/* Recent History */}
+            <div className="glass-card p-6 rounded-3xl">
+                <div className="flex items-center gap-2 mb-4">
+                    <History className="w-5 h-5 text-primary" />
+                    <h3 className="font-display font-bold text-lg">Recent Mood Logs</h3>
+                </div>
+
+                {loadingHistory ? (
+                    <div className="text-center py-8">
+                        <Loader2 className="w-8 h-8 animate-spin mx-auto text-primary" />
+                    </div>
+                ) : history.length === 0 ? (
+                    <p className="text-center text-muted-foreground py-8">No mood logs yet. Start tracking today!</p>
+                ) : (
+                    <div className="space-y-3">
+                        <AnimatePresence>
+                            {history.map((log, index) => {
+                                const mood = MOODS.find((m) => m.value === log.mood);
+                                const Icon = mood?.icon || Smile;
                                 return (
                                     <motion.div
                                         key={log.id}
-                                        initial={{ opacity: 0, x: -10 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        className="bg-background rounded-2xl p-4 flex gap-4 items-start shadow-sm border border-border/50"
+                                        initial={{ opacity: 0, y: 20 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ delay: index * 0.05 }}
+                                        className={`p-4 rounded-xl border ${mood?.bg || "bg-card"}`}
                                     >
-                                        <div className={`p-2 rounded-xl ${moodDef.bg}`}>
-                                            <moodDef.icon className={`w-5 h-5 ${moodDef.color}`} />
-                                        </div>
-                                        <div>
-                                            <div className="flex items-center gap-2 mb-1">
-                                                <span className="font-semibold capitalize text-sm">{moodDef.label}</span>
-                                                <span className="text-xs text-muted-foreground">•</span>
-                                                <span className="text-xs text-muted-foreground">
-                                                    {format(new Date(log.created_at), "MMM d, h:mm a")}
-                                                </span>
+                                        <div className="flex items-start gap-3">
+                                            <div className="flex-shrink-0">
+                                                <Icon className={`w-6 h-6 ${mood?.color || "text-muted-foreground"}`} />
                                             </div>
-                                            {log.note && (
-                                                <p className="text-sm text-muted-foreground leading-snug">"{log.note}"</p>
-                                            )}
+                                            <div className="flex-1 min-w-0">
+                                                <div className="flex items-center justify-between gap-2 mb-1">
+                                                    <span className="font-semibold capitalize">{log.mood}</span>
+                                                    <span className="text-xs text-muted-foreground">
+                                                        {format(new Date(log.created_at), "MMM d, h:mm a")}
+                                                    </span>
+                                                </div>
+                                                {log.note && (
+                                                    <p className="text-sm text-muted-foreground line-clamp-2">{log.note}</p>
+                                                )}
+                                            </div>
                                         </div>
                                     </motion.div>
                                 );
                             })}
-                        </div>
-                    )}
-                </div>
-
-                {/* AI Insights Section */}
-                {history.length >= 3 && (
-                    <AIMoodInsights
-                        moodEntries={history.map(log => ({
-                            mood: log.mood,
-                            note: log.note || undefined,
-                            created_at: log.created_at
-                        }))}
-                    />
+                        </AnimatePresence>
+                    </div>
                 )}
             </div>
         </div>

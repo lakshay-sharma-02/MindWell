@@ -6,6 +6,7 @@ import { AdminEditProvider } from "@/hooks/useAdminEdit";
 import { ScrollProgress } from "@/components/effects/ScrollProgress";
 import { CursorGlow } from "@/components/effects/CursorGlow";
 import { SearchModal } from "@/components/search/SearchModal";
+import { XPProgressBar } from "@/components/gamification/XPProgressBar";
 
 import { NewsletterModal } from "@/components/engagement/NewsletterModal";
 import { ChatWidget } from "@/components/chat/ChatWidget";
@@ -15,6 +16,7 @@ import { AudioPlayer } from "@/components/audio/AudioPlayer";
 import { CrisisBanner } from "@/components/shared/CrisisBanner";
 import { AnnouncementBanner } from "@/components/layout/AnnouncementBanner";
 import { PodcastEpisode } from "@/data/podcasts";
+import { useAuth } from "@/hooks/useAuth";
 
 interface LayoutProps {
   children: ReactNode;
@@ -35,6 +37,7 @@ export const useAudioPlayer = () => {
 };
 
 export function Layout({ children }: LayoutProps) {
+  const { user } = useAuth();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [currentEpisode, setCurrentEpisode] = useState<PodcastEpisode | null>(null);
   const [isPlayerMinimized, setIsPlayerMinimized] = useState(false);
@@ -65,6 +68,11 @@ export function Layout({ children }: LayoutProps) {
           <CursorGlow />
           <ScrollProgress />
           <Header onSearchClick={() => setIsSearchOpen(true)} />
+
+          {/* XP Progress Bar - Show for logged-in users */}
+          {user && (
+            <XPProgressBar variant="fixed" showDetails={true} />
+          )}
 
           <main className="flex-grow pt-16 lg:pt-[4.5rem] relative z-10">
             {children}

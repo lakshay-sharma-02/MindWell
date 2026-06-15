@@ -18,6 +18,9 @@ import { PageSkeleton } from "@/components/layout/PageSkeleton";
 import { supabase } from "@/integrations/supabase/client";
 import { DailyRewardWheel } from "@/components/engagement/DailyRewardWheel";
 import { DailyCheckInWidget } from "@/components/engagement/DailyCheckInWidget";
+import { ActivityFeed } from "@/components/gamification/ActivityFeed";
+import { WeeklyChallengeCard } from "@/components/gamification/WeeklyChallengeCard";
+import { ThemeUnlockCard } from "@/components/gamification/ThemeUnlockCard";
 
 import { motion, Variants } from "framer-motion";
 
@@ -210,6 +213,21 @@ export default function Dashboard() {
                             streakDays={streakDays}
                             toolsUsed={['Mood Tracker', 'Gratitude Journal']}
                         />
+                    </motion.div>
+
+                    {/* Phase 2: Gamification Row */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <motion.div variants={item}>
+                            <WeeklyChallengeCard />
+                        </motion.div>
+                        <motion.div variants={item}>
+                            <ActivityFeed />
+                        </motion.div>
+                    </div>
+
+                    {/* Theme Unlocks */}
+                    <motion.div variants={item}>
+                        <ThemeUnlockCard />
                     </motion.div>
 
                     {/* Bottom Row: Recommendations */}
