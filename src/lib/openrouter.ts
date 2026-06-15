@@ -20,10 +20,8 @@ interface OpenRouterResponse {
 }
 
 const FREE_MODELS = [
-  'meta-llama/llama-3.2-3b-instruct:free',
-  'google/gemma-2-9b-it:free',
-  'microsoft/phi-3-mini-128k-instruct:free',
-  'mistralai/mistral-7b-instruct:free',
+  'openai/gpt-oss-120b:free',
+  'google/gemma-4-31b-it:free',
 ];
 
 class OpenRouterClient {

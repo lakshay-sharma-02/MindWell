@@ -40,11 +40,9 @@ This document describes the AI-powered features integrated into MindWell using O
 
 ### OpenRouter Integration
 - **Multiple API Key Fallback System**: Supports 3 API keys for redundancy
-- **Free Models Used**:
-  - `meta-llama/llama-3.2-3b-instruct:free`
-  - `google/gemma-2-9b-it:free`
-  - `microsoft/phi-3-mini-128k-instruct:free`
-  - `mistralai/mistral-7b-instruct:free`
+ - **Free Models Used**:
+  - `openai/gpt-oss-120b:free`
+  - `google/gemma-4-31b-it:free`
 - Automatic model switching on failure
 - Automatic key rotation on rate limits
 

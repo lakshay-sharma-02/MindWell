@@ -74,10 +74,8 @@
 - Multi-key fallback system (supports 3 API keys)
 - Automatic model switching on failure
 - 4 free models configured:
-  - meta-llama/llama-3.2-3b-instruct:free
-  - google/gemma-2-9b-it:free
-  - microsoft/phi-3-mini-128k-instruct:free
-  - mistralai/mistral-7b-instruct:free
+   - openai/gpt-oss-120b:free
+   - google/gemma-4-31b-it:free
 
 ✅ **Safety & Privacy**
 - Crisis detection keywords
@@ -351,11 +349,9 @@ Production-ready ✅
 ✅ **OpenRouter Integration**
 - Multi-key fallback system (supports 3 API keys)
 - Automatic model switching on failure
-- 4 free models configured:
-  - meta-llama/llama-3.2-3b-instruct:free
-  - google/gemma-2-9b-it:free
-  - microsoft/phi-3-mini-128k-instruct:free
-  - mistralai/mistral-7b-instruct:free
+- 2 free models configured:
+   - openai/gpt-oss-120b:free
+   - google/gemma-4-31b-it:free
 
 ✅ **Safety & Privacy**
 - Crisis detection keywords
