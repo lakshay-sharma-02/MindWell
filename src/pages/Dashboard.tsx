@@ -122,9 +122,9 @@ export default function Dashboard() {
                 description="Your personalized mental wellness dashboard."
             />
 
-            <div className="container-wide py-24 min-h-screen bg-secondary/5">
+            <div className="container-wide py-20 sm:py-24 min-h-screen bg-secondary/5 px-4 sm:px-6">
                 <motion.div
-                    className="max-w-6xl mx-auto space-y-6"
+                    className="max-w-6xl mx-auto space-y-4 sm:space-y-6"
                     variants={container}
                     initial="hidden"
                     animate="show"
@@ -149,7 +149,7 @@ export default function Dashboard() {
                     </motion.div>
 
                     {/* Streak & Score Row */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                         <motion.div variants={item}>
                             <StreakWidget userId={user.id} />
                         </motion.div>
@@ -165,8 +165,8 @@ export default function Dashboard() {
                     </div>
 
                     {/* Middle Row: Mood & Actions */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <motion.div variants={item} className="md:col-span-2 h-[300px]">
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+                        <motion.div variants={item} className="lg:col-span-2 h-[300px] sm:h-[350px]">
                             <MoodSummaryWidget userId={user.id} />
                         </motion.div>
                         <motion.div variants={item} className="h-auto">
@@ -175,7 +175,7 @@ export default function Dashboard() {
                     </div>
 
                     {/* AI-Powered Features Row */}
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
                         <motion.div variants={item}>
                             <AIGoalSetter
                                 userId={user.id}
@@ -216,7 +216,7 @@ export default function Dashboard() {
                     </motion.div>
 
                     {/* Phase 2: Gamification Row */}
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
                         <motion.div variants={item}>
                             <WeeklyChallengeCard />
                         </motion.div>

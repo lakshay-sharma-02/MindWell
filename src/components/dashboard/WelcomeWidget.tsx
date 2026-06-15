@@ -43,26 +43,26 @@ export function WelcomeWidget({ userName }: WelcomeWidgetProps) {
 
     return (
         <Card className="border-none bg-gradient-to-r from-primary/10 to-secondary/20 shadow-sm overflow-hidden relative hover-lift">
-            <div className="absolute right-0 top-0 opacity-5 -translate-y-1/2 translate-x-1/4">
+            <div className="absolute right-0 top-0 opacity-5 -translate-y-1/2 translate-x-1/4 hidden sm:block">
                 <Icon className="w-64 h-64 text-primary" />
             </div>
 
-            <CardContent className="p-8 relative z-10">
-                <div className="flex flex-col md:flex-row gap-6 items-start md:items-center justify-between">
+            <CardContent className="p-4 sm:p-6 md:p-8 relative z-10">
+                <div className="flex flex-col md:flex-row gap-4 sm:gap-6 items-start md:items-center justify-between">
                     <div>
                         <div className="flex items-center gap-2 text-primary mb-2">
-                            <Icon className="w-5 h-5" />
-                            <span className="text-sm font-medium uppercase tracking-wider">{greeting}</span>
+                            <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
+                            <span className="text-xs sm:text-sm font-medium uppercase tracking-wider">{greeting}</span>
                         </div>
-                        <h2 className="text-3xl md:text-4xl font-display font-bold text-foreground">
+                        <h2 className="text-2xl sm:text-3xl md:text-4xl font-display font-bold text-foreground">
                             Hello, {firstName}
                         </h2>
                     </div>
 
-                    <div className="bg-background/40 backdrop-blur-sm p-4 rounded-xl border border-white/10 max-w-md">
-                        <div className="flex gap-3">
-                            <Quote className="w-5 h-5 text-primary/60 flex-shrink-0 mt-1" />
-                            <p className="text-muted-foreground italic font-medium">
+                    <div className="bg-background/40 backdrop-blur-sm p-3 sm:p-4 rounded-xl border border-white/10 w-full md:max-w-md">
+                        <div className="flex gap-2 sm:gap-3">
+                            <Quote className="w-4 h-4 sm:w-5 sm:h-5 text-primary/60 flex-shrink-0 mt-1" />
+                            <p className="text-sm sm:text-base text-muted-foreground italic font-medium">
                                 "{quote}"
                             </p>
                         </div>

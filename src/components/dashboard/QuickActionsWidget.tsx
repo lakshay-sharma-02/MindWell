@@ -17,27 +17,27 @@ export function QuickActionsWidget() {
 
     return (
         <Card className="h-full hover-lift">
-            <CardHeader className="pb-2">
-                <CardTitle className="text-lg font-display">Quick Actions</CardTitle>
+            <CardHeader className="pb-2 px-4 sm:px-6 pt-4 sm:pt-6">
+                <CardTitle className="text-base sm:text-lg font-display">Quick Actions</CardTitle>
             </CardHeader>
-            <CardContent>
-                <div className="grid grid-cols-2 gap-3">
+            <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
+                <div className="grid grid-cols-2 gap-2 sm:gap-3">
                     {actions.map((action) => (
                         <Button
                             key={action.label}
                             variant="outline"
-                            className={`h-auto py-4 flex flex-col gap-2 items-center justify-center border-border/50 transition-colors ${action.bg} ${action.label === "Sign Out" ? "col-span-2" : ""}`}
+                            className={`h-auto py-3 sm:py-4 flex flex-col gap-1.5 sm:gap-2 items-center justify-center border-border/50 transition-colors ${action.bg} ${action.label === "Sign Out" ? "col-span-2" : ""} min-h-[80px] sm:min-h-[88px]`}
                             asChild
                         >
                             {action.onClick ? (
-                                <div onClick={action.onClick} className="flex flex-col items-center gap-2 w-full h-full cursor-pointer">
-                                    <action.icon className={`w-6 h-6 ${action.color}`} />
-                                    <span className="text-xs font-medium">{action.label}</span>
+                                <div onClick={action.onClick} className="flex flex-col items-center gap-1.5 sm:gap-2 w-full h-full cursor-pointer">
+                                    <action.icon className={`w-5 h-5 sm:w-6 sm:h-6 ${action.color}`} />
+                                    <span className="text-xs sm:text-sm font-medium">{action.label}</span>
                                 </div>
                             ) : (
                                 <Link to={action.href}>
-                                    <action.icon className={`w-6 h-6 ${action.color}`} />
-                                    <span className="text-xs font-medium">{action.label}</span>
+                                    <action.icon className={`w-5 h-5 sm:w-6 sm:h-6 ${action.color}`} />
+                                    <span className="text-xs sm:text-sm font-medium">{action.label}</span>
                                 </Link>
                             )}
                         </Button>

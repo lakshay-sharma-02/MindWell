@@ -94,14 +94,14 @@ export function AICrisisPredictor({ moodHistory, userId }: AICrisisPredictorProp
 
   if (moodHistory.length < 7) {
     return (
-      <Card className="p-6 bg-gradient-to-br from-primary/5 to-secondary/5 border-primary/20">
-        <div className="flex items-start gap-3">
-          <div className="p-2 bg-primary/10 rounded-lg">
-            <Shield className="w-5 h-5 text-primary" />
+      <Card className="p-4 sm:p-6 bg-gradient-to-br from-primary/5 to-secondary/5 border-primary/20">
+        <div className="flex items-start gap-2 sm:gap-3">
+          <div className="p-2 bg-primary/10 rounded-lg flex-shrink-0">
+            <Shield className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
           </div>
-          <div className="flex-1">
-            <h3 className="font-display font-bold text-lg mb-2">Crisis Prevention System</h3>
-            <p className="text-sm text-muted-foreground mb-3">
+          <div className="flex-1 min-w-0">
+            <h3 className="font-display font-bold text-base sm:text-lg mb-2">Crisis Prevention System</h3>
+            <p className="text-xs sm:text-sm text-muted-foreground mb-3">
               Track moods for at least 7 days to unlock AI-powered early warning detection.
             </p>
             <div className="flex items-center gap-2 text-sm">
@@ -111,7 +111,7 @@ export function AICrisisPredictor({ moodHistory, userId }: AICrisisPredictorProp
                   style={{ width: `${(moodHistory.length / 7) * 100}%` }}
                 />
               </div>
-              <span className="text-xs font-medium text-muted-foreground">
+              <span className="text-xs font-medium text-muted-foreground whitespace-nowrap">
                 {moodHistory.length}/7
               </span>
             </div>
@@ -122,25 +122,25 @@ export function AICrisisPredictor({ moodHistory, userId }: AICrisisPredictorProp
   }
 
   return (
-    <Card className={`p-6 ${analysis ? getRiskBg(analysis.level) : 'bg-card'} border-2 transition-all duration-300`}>
-      <div className="flex items-start justify-between mb-4">
-        <div className="flex items-center gap-3">
-          <div className={`p-2 rounded-lg ${analysis ? getRiskBg(analysis.level) : 'bg-primary/10'}`}>
+    <Card className={`p-4 sm:p-6 ${analysis ? getRiskBg(analysis.level) : 'bg-card'} border-2 transition-all duration-300`}>
+      <div className="flex items-start justify-between mb-4 gap-2">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+          <div className={`p-2 rounded-lg flex-shrink-0 ${analysis ? getRiskBg(analysis.level) : 'bg-primary/10'}`}>
             {analysis ? (
               (() => {
                 const Icon = getRiskIcon(analysis.level);
-                return <Icon className={`w-5 h-5 ${getRiskColor(analysis.level)}`} />;
+                return <Icon className={`w-4 h-4 sm:w-5 sm:h-5 ${getRiskColor(analysis.level)}`} />;
               })()
             ) : (
-              <Shield className="w-5 h-5 text-primary" />
+              <Shield className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
             )}
           </div>
-          <div>
-            <h3 className="font-display font-bold text-lg">Early Warning System</h3>
+          <div className="min-w-0">
+            <h3 className="font-display font-bold text-base sm:text-lg truncate">Early Warning System</h3>
             <p className="text-xs text-muted-foreground">AI-powered crisis prediction</p>
           </div>
         </div>
-        <Badge variant="secondary" className="text-xs">
+        <Badge variant="secondary" className="text-xs flex-shrink-0">
           {lastAnalyzed ? `Last: ${lastAnalyzed.toLocaleDateString()}` : 'New'}
         </Badge>
       </div>
@@ -160,16 +160,16 @@ export function AICrisisPredictor({ moodHistory, userId }: AICrisisPredictorProp
             className="space-y-4"
           >
             {/* Risk Level */}
-            <div className="flex items-center justify-between p-4 bg-background/50 rounded-xl">
-              <div>
-                <p className="text-sm text-muted-foreground mb-1">Current Risk Level</p>
-                <p className={`text-2xl font-bold capitalize ${getRiskColor(analysis.level)}`}>
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-3 sm:p-4 bg-background/50 rounded-xl">
+              <div className="flex-1">
+                <p className="text-xs sm:text-sm text-muted-foreground mb-1">Current Risk Level</p>
+                <p className={`text-xl sm:text-2xl font-bold capitalize ${getRiskColor(analysis.level)}`}>
                   {analysis.level}
                 </p>
               </div>
-              <div className="text-right">
-                <p className="text-sm text-muted-foreground mb-1">Confidence</p>
-                <p className="text-2xl font-bold">{Math.round(analysis.confidence * 100)}%</p>
+              <div className="text-left sm:text-right">
+                <p className="text-xs sm:text-sm text-muted-foreground mb-1">Confidence</p>
+                <p className="text-xl sm:text-2xl font-bold">{Math.round(analysis.confidence * 100)}%</p>
               </div>
             </div>
 
@@ -197,12 +197,12 @@ export function AICrisisPredictor({ moodHistory, userId }: AICrisisPredictorProp
             {/* Triggers */}
             {analysis.triggers.length > 0 && (
               <div>
-                <h4 className="text-sm font-semibold mb-2">Identified Patterns</h4>
+                <h4 className="text-xs sm:text-sm font-semibold mb-2">Identified Patterns</h4>
                 <div className="space-y-2">
                   {analysis.triggers.map((trigger, idx) => (
-                    <div key={idx} className="flex items-start gap-2 p-3 bg-background/50 rounded-lg text-sm">
-                      <TrendingDown className="w-4 h-4 text-orange-500 flex-shrink-0 mt-0.5" />
-                      <p>{trigger}</p>
+                    <div key={idx} className="flex items-start gap-2 p-2 sm:p-3 bg-background/50 rounded-lg text-xs sm:text-sm">
+                      <TrendingDown className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-orange-500 flex-shrink-0 mt-0.5" />
+                      <p className="flex-1 min-w-0">{trigger}</p>
                     </div>
                   ))}
                 </div>
@@ -212,12 +212,12 @@ export function AICrisisPredictor({ moodHistory, userId }: AICrisisPredictorProp
             {/* Recommendations */}
             {analysis.recommendations.length > 0 && (
               <div>
-                <h4 className="text-sm font-semibold mb-2">Recommended Actions</h4>
+                <h4 className="text-xs sm:text-sm font-semibold mb-2">Recommended Actions</h4>
                 <div className="space-y-2">
                   {analysis.recommendations.map((rec, idx) => (
-                    <div key={idx} className="flex items-start gap-2 p-3 bg-background/50 rounded-lg text-sm">
-                      <Heart className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                      <p>{rec}</p>
+                    <div key={idx} className="flex items-start gap-2 p-2 sm:p-3 bg-background/50 rounded-lg text-xs sm:text-sm">
+                      <Heart className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary flex-shrink-0 mt-0.5" />
+                      <p className="flex-1 min-w-0">{rec}</p>
                     </div>
                   ))}
                 </div>
@@ -227,19 +227,19 @@ export function AICrisisPredictor({ moodHistory, userId }: AICrisisPredictorProp
             {/* Support Resources */}
             {analysis.supportResources.length > 0 && (
               <div className="border-t pt-4 mt-4">
-                <h4 className="text-sm font-semibold mb-3">Immediate Support</h4>
+                <h4 className="text-xs sm:text-sm font-semibold mb-3">Immediate Support</h4>
                 <div className="space-y-2">
                   {analysis.supportResources.map((resource, idx) => (
                     <a
                       key={idx}
                       href={resource.contact.startsWith('http') ? resource.contact : `tel:${resource.contact}`}
-                      className="flex items-center gap-3 p-3 bg-primary/5 hover:bg-primary/10 rounded-lg transition-colors group"
+                      className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 bg-primary/5 hover:bg-primary/10 rounded-lg transition-colors group min-h-[44px]"
                     >
-                      <div className="p-2 bg-primary/10 rounded-lg">
+                      <div className="p-2 bg-primary/10 rounded-lg flex-shrink-0">
                         {resource.contact.includes('988') || resource.contact.includes('tel') ? (
-                          <PhoneCall className="w-4 h-4 text-primary" />
+                          <PhoneCall className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary" />
                         ) : (
-                          <MessageCircle className="w-4 h-4 text-primary" />
+                          <MessageCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary" />
                         )}
                       </div>
                       <div className="flex-1">

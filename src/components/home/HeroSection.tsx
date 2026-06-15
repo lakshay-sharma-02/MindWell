@@ -126,21 +126,21 @@ export function HeroSection() {
       </div>
 
       <div className="container-wide relative z-10">
-        <div className="max-w-4xl mx-auto text-center py-16 md:py-20">
+        <div className="max-w-4xl mx-auto text-center py-12 sm:py-16 md:py-20">
           {/* Trust indicator badge */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="inline-flex items-center gap-2 mb-8"
+            className="inline-flex items-center gap-2 mb-6 sm:mb-8"
           >
             <motion.span
               whileHover={{ scale: 1.02 }}
-              className="px-4 py-1.5 rounded-full bg-teal-950/30 backdrop-blur-md border border-teal-500/20 text-teal-200 text-sm font-medium flex items-center gap-2 shadow-[0_0_15px_-3px_rgba(20,184,166,0.2)]"
+              className="px-3 sm:px-4 py-1.5 rounded-full bg-teal-950/30 backdrop-blur-md border border-teal-500/20 text-teal-200 text-xs sm:text-sm font-medium flex items-center gap-1.5 sm:gap-2 shadow-[0_0_15px_-3px_rgba(20,184,166,0.2)]"
             >
-              <Heart className="w-3.5 h-3.5 fill-teal-500/50 text-teal-400" />
+              <Heart className="w-3 h-3 sm:w-3.5 sm:h-3.5 fill-teal-500/50 text-teal-400" />
               {hero.badge_text}
-              <span className="w-px h-3 bg-teal-500/20 mx-1" />
+              <span className="w-px h-3 bg-teal-500/20 mx-0.5 sm:mx-1" />
               <span className="flex items-center gap-1 text-teal-100">
                 <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
                 {hero.badge_rating}
@@ -153,7 +153,7 @@ export function HeroSection() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.15 }}
-            className="font-display text-balance text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-foreground leading-[1.1] mb-8 tracking-tight"
+            className="font-display text-balance text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-foreground leading-[1.1] mb-6 sm:mb-8 tracking-tight px-4 sm:px-0"
           >
             {hero.title_line_1}
             <br />
@@ -169,7 +169,7 @@ export function HeroSection() {
                 initial={{ width: 0 }}
                 animate={{ width: "100%" }}
                 transition={{ delay: 1, duration: 1, ease: "easeOut" }}
-                className="absolute bottom-1 left-0 h-[4px] bg-gradient-to-r from-teal-500/0 via-teal-500/50 to-teal-500/0 rounded-full"
+                className="absolute bottom-1 left-0 h-[3px] sm:h-[4px] bg-gradient-to-r from-teal-500/0 via-teal-500/50 to-teal-500/0 rounded-full"
               />
             </motion.span>
           </motion.h1>
@@ -179,7 +179,7 @@ export function HeroSection() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
-            className="text-lg md:text-xl text-balance text-muted-foreground leading-relaxed mb-10 max-w-2xl mx-auto"
+            className="text-base sm:text-lg md:text-xl text-balance text-muted-foreground leading-relaxed mb-8 sm:mb-10 max-w-2xl mx-auto px-4 sm:px-0"
           >
             {hero.description}
           </motion.p>
@@ -189,23 +189,23 @@ export function HeroSection() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
-            className="flex flex-col sm:flex-row gap-4 justify-center mb-20 items-center"
+            className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-12 sm:mb-20 items-stretch sm:items-center px-4 sm:px-0"
           >
             <Button
               size="xl"
-              className="rounded-full px-8 bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-500 hover:to-cyan-500 text-white shadow-[0_4px_20px_-4px_rgba(20,184,166,0.3)] hover:shadow-[0_8px_30px_-4px_rgba(20,184,166,0.4)] transition-all duration-300 transform border-0"
+              className="rounded-full px-6 sm:px-8 h-12 sm:h-auto bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-500 hover:to-cyan-500 text-white shadow-[0_4px_20px_-4px_rgba(20,184,166,0.3)] hover:shadow-[0_8px_30px_-4px_rgba(20,184,166,0.4)] transition-all duration-300 transform border-0 text-sm sm:text-base"
               asChild
             >
               <Link to="/book">
                 {hero.cta_primary}
-                <ArrowRight className="w-5 h-5 ml-2" />
+                <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 ml-2" />
               </Link>
             </Button>
 
             <Button
               variant="outline"
               size="xl"
-              className="rounded-full px-8 border-teal-500/20 bg-teal-500/5 hover:bg-teal-500/10 text-teal-300 hover:text-teal-200 transition-all duration-300"
+              className="rounded-full px-6 sm:px-8 h-12 sm:h-auto border-teal-500/20 bg-teal-500/5 hover:bg-teal-500/10 text-teal-300 hover:text-teal-200 transition-all duration-300 text-sm sm:text-base"
               asChild
             >
               <Link to="/resources">
@@ -220,7 +220,7 @@ export function HeroSection() {
             initial={{ opacity: 0, y: 25 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.55 }}
-            className="flex flex-wrap justify-center gap-4 md:gap-6"
+            className="flex flex-wrap justify-center gap-3 sm:gap-4 md:gap-6 px-4 sm:px-0"
           >
             {stats.map((stat, index) => (
               <motion.div
@@ -229,16 +229,16 @@ export function HeroSection() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.65 + index * 0.1 }}
                 whileHover={{ y: -3, transition: { duration: 0.2 } }}
-                className="flex items-center gap-3 px-5 py-3 rounded-2xl bg-card/60 backdrop-blur-md border border-white/5 md:border-teal-500/10 shadow-lg shadow-black/5 hover:shadow-teal-500/5 hover:border-teal-500/20 transition-all duration-300"
+                className="flex items-center gap-2 sm:gap-3 px-3 sm:px-5 py-2.5 sm:py-3 rounded-xl sm:rounded-2xl bg-card/60 backdrop-blur-md border border-white/5 md:border-teal-500/10 shadow-lg shadow-black/5 hover:shadow-teal-500/5 hover:border-teal-500/20 transition-all duration-300"
               >
-                <div className="w-10 h-10 rounded-xl bg-teal-500/10 flex items-center justify-center text-teal-400">
-                  <stat.icon className="w-5 h-5" />
+                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-teal-500/10 flex items-center justify-center text-teal-400 flex-shrink-0">
+                  <stat.icon className="w-4 h-4 sm:w-5 sm:h-5" />
                 </div>
                 <div className="text-left">
-                  <span className="font-display text-lg font-bold text-foreground block leading-none mb-1">
+                  <span className="font-display text-base sm:text-lg font-bold text-foreground block leading-none mb-0.5 sm:mb-1">
                     <AnimatedCounter end={stat.value} suffix={stat.suffix} duration={2.5} />
                   </span>
-                  <span className="text-xs text-muted-foreground font-medium">{stat.label}</span>
+                  <span className="text-[10px] sm:text-xs text-muted-foreground font-medium">{stat.label}</span>
                 </div>
               </motion.div>
             ))}

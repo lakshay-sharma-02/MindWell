@@ -295,12 +295,12 @@ export function AIChatCompanion() {
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0, opacity: 0 }}
-            className="fixed bottom-24 right-6 z-50"
+            className="fixed bottom-20 right-4 sm:bottom-24 sm:right-6 z-50"
           >
             <Button
               size="lg"
               onClick={() => setIsOpen(true)}
-              className="rounded-full w-16 h-16 shadow-2xl hover:shadow-primary/50 bg-gradient-to-br from-primary to-primary/80 relative group text-2xl"
+              className="rounded-full w-14 h-14 sm:w-16 sm:h-16 shadow-2xl hover:shadow-primary/50 bg-gradient-to-br from-primary to-primary/80 relative group text-xl sm:text-2xl"
             >
               {currentAvatar.emoji}
               <span className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-background animate-pulse" />
@@ -325,15 +325,15 @@ export function AIChatCompanion() {
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            className="fixed top-20 right-6 z-40 w-[400px] max-w-[calc(100vw-3rem)]"
+            className="fixed bottom-4 right-4 sm:top-20 sm:right-6 sm:bottom-auto z-40 w-[calc(100vw-2rem)] sm:w-[400px] max-w-[calc(100vw-2rem)]"
           >
-            <Card className="flex flex-col h-[calc(100vh-6rem)] max-h-[600px] shadow-2xl border-primary/20 overflow-hidden">
+            <Card className="flex flex-col h-[calc(100vh-2rem)] sm:h-[calc(100vh-6rem)] max-h-[700px] sm:max-h-[600px] shadow-2xl border-primary/20 overflow-hidden">
               {/* Header */}
-              <div className="flex items-center justify-between p-4 border-b bg-gradient-to-r from-primary/10 to-primary/5">
-                <div className="flex items-center gap-3">
-                  <div className="text-3xl">{currentAvatar.emoji}</div>
+              <div className="flex items-center justify-between p-3 sm:p-4 border-b bg-gradient-to-r from-primary/10 to-primary/5">
+                <div className="flex items-center gap-2 sm:gap-3">
+                  <div className="text-2xl sm:text-3xl">{currentAvatar.emoji}</div>
                   <div>
-                    <h3 className="font-semibold flex items-center gap-2">
+                    <h3 className="text-sm sm:text-base font-semibold flex items-center gap-2">
                       {companionName}
                       <Heart className="w-3 h-3 text-pink-500 fill-pink-500" />
                     </h3>
@@ -343,7 +343,7 @@ export function AIChatCompanion() {
                     </div>
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1 sm:gap-2">
                   <Button
                     size="icon"
                     variant="ghost"
