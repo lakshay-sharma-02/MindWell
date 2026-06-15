@@ -21,12 +21,12 @@ CREATE TABLE IF NOT EXISTS public.daily_checkins (
     ai_insight TEXT,
 
     -- Metadata
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
-);
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+    checkin_date DATE GENERATED ALWAYS AS (DATE(created_at)) STORED,
 
--- Create unique index for one check-in per type per day
-CREATE UNIQUE INDEX IF NOT EXISTS idx_daily_checkins_unique
-ON public.daily_checkins(user_id, checkin_type, DATE(created_at));
+    -- Ensure one morning and one evening per day per user
+    UNIQUE(user_id, checkin_type, checkin_date)
+);
 
 -- Daily Rewards Table
 CREATE TABLE IF NOT EXISTS public.daily_rewards (
@@ -35,12 +35,12 @@ CREATE TABLE IF NOT EXISTS public.daily_rewards (
     reward_type TEXT NOT NULL, -- affirmation, badge, unlock, hug, quote, premium_tool
     reward_data JSONB, -- stores specific reward details
     rarity TEXT CHECK (rarity IN ('common', 'rare', 'legendary')) NOT NULL,
-    claimed_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
-);
+    claimed_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+    claimed_date DATE GENERATED ALWAYS AS (DATE(claimed_at)) STORED,
 
--- Create unique index for one reward per day per user
-CREATE UNIQUE INDEX IF NOT EXISTS idx_daily_rewards_unique
-ON public.daily_rewards(user_id, DATE(claimed_at));
+    -- One reward per day per user
+    UNIQUE(user_id, claimed_date)
+);
 
 -- Companion Memory Table (stores key insights about user)
 CREATE TABLE IF NOT EXISTS public.companion_memory (
