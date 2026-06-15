@@ -2,12 +2,23 @@ import { useState, useRef, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Bot, Send, User, Loader2, AlertCircle, Sparkles, X } from "lucide-react";
+import { Bot, Send, User, Loader2, AlertCircle, Sparkles, X, Settings, Heart } from "lucide-react";
 import { aiService } from "@/lib/ai-services";
 import { motion, AnimatePresence } from "framer-motion";
 import { OpenRouterMessage } from "@/lib/openrouter";
 import { Badge } from "@/components/ui/badge";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 interface Message {
   role: 'user' | 'assistant';
@@ -15,18 +26,43 @@ interface Message {
   timestamp: Date;
 }
 
+const COMPANION_AVATARS = [
+  { id: 'default', emoji: '🤖', name: 'Bot' },
+  { id: 'luna', emoji: '🌙', name: 'Luna' },
+  { id: 'sunny', emoji: '☀️', name: 'Sunny' },
+  { id: 'sage', emoji: '🧘', name: 'Sage' },
+  { id: 'hope', emoji: '✨', name: 'Hope' },
+  { id: 'buddy', emoji: '🐶', name: 'Buddy' },
+  { id: 'zen', emoji: '🍃', name: 'Zen' },
+];
+
 export function AIChatCompanion() {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      role: 'assistant',
-      content: "Hello! I'm here to listen and support you. How are you feeling today?",
-      timestamp: new Date(),
-    },
-  ]);
+  const { user } = useAuth();
+  const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Companion personality
+  const [companionName, setCompanionName] = useState("Luna");
+  const [companionAvatar, setCompanionAvatar] = useState("luna");
+  const [editingName, setEditingName] = useState(false);
+  const [tempName, setTempName] = useState("");
+
+  // Memory and proactive messaging
+  const [memories, setMemories] = useState<any[]>([]);
+  const [hasProactiveMessage, setHasProactiveMessage] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      loadCompanionSettings();
+      loadMemories();
+      checkProactiveMessages();
+      loadChatHistory();
+    }
+  }, [user, isOpen]);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -34,8 +70,124 @@ export function AIChatCompanion() {
     }
   }, [messages]);
 
+  const loadCompanionSettings = async () => {
+    if (!user) return;
+
+    const { data } = await supabase
+      .from('profiles')
+      .select('companion_name, companion_avatar')
+      .eq('id', user.id)
+      .single();
+
+    if (data) {
+      setCompanionName(data.companion_name || 'Luna');
+      setCompanionAvatar(data.companion_avatar || 'luna');
+    }
+  };
+
+  const saveCompanionSettings = async (name: string, avatar: string) => {
+    if (!user) return;
+
+    await supabase
+      .from('profiles')
+      .update({
+        companion_name: name,
+        companion_avatar: avatar,
+      })
+      .eq('id', user.id);
+
+    setCompanionName(name);
+    setCompanionAvatar(avatar);
+  };
+
+  const loadMemories = async () => {
+    if (!user) return;
+
+    const { data } = await supabase
+      .from('companion_memory')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('updated_at', { ascending: false })
+      .limit(10);
+
+    if (data) {
+      setMemories(data);
+    }
+  };
+
+  const checkProactiveMessages = async () => {
+    if (!user) return;
+
+    const { data } = await supabase
+      .from('proactive_messages')
+      .select('*')
+      .eq('user_id', user.id)
+      .eq('delivered', false)
+      .order('priority', { ascending: false })
+      .limit(1);
+
+    if (data && data.length > 0) {
+      setHasProactiveMessage(true);
+
+      // Add proactive message to chat if opening for first time
+      if (messages.length === 0) {
+        const proactiveMsg: Message = {
+          role: 'assistant',
+          content: data[0].message,
+          timestamp: new Date(),
+        };
+        setMessages([proactiveMsg]);
+
+        // Mark as delivered
+        await supabase
+          .from('proactive_messages')
+          .update({ delivered: true, delivered_at: new Date().toISOString() })
+          .eq('id', data[0].id);
+      }
+    }
+  };
+
+  const loadChatHistory = () => {
+    // Load last conversation from localStorage (keeps context between sessions)
+    const storedHistory = localStorage.getItem(`chat_history_${user?.id}`);
+    if (storedHistory && messages.length === 0) {
+      try {
+        const parsed = JSON.parse(storedHistory);
+        setMessages(parsed.map((m: any) => ({ ...m, timestamp: new Date(m.timestamp) })));
+      } catch (e) {
+        console.error('Error loading chat history:', e);
+      }
+    }
+
+    // If no history and no proactive message, show personalized greeting
+    if (messages.length === 0 && !hasProactiveMessage) {
+      const greeting = generatePersonalizedGreeting();
+      setMessages([{
+        role: 'assistant',
+        content: greeting,
+        timestamp: new Date(),
+      }]);
+    }
+  };
+
+  const generatePersonalizedGreeting = (): string => {
+    const greetings = [
+      `Hello! I'm ${companionName}, your wellness companion. How are you feeling today? 💙`,
+      `Hey there! ${companionName} here. I'm always here to listen. What's on your mind?`,
+      `Welcome back! It's ${companionName}. Ready to check in with yourself today?`,
+    ];
+
+    // Check for memories to personalize
+    const recentMemory = memories.find(m => m.memory_type === 'concern');
+    if (recentMemory) {
+      return `Hi! I remember you mentioned ${recentMemory.memory_key} last time. How's that going? I'm here if you want to talk about it. 💙`;
+    }
+
+    return greetings[Math.floor(Math.random() * greetings.length)];
+  };
+
   const sendMessage = async () => {
-    if (!input.trim() || loading) return;
+    if (!input.trim() || loading || !user) return;
 
     const userMessage: Message = {
       role: 'user',
@@ -43,18 +195,25 @@ export function AIChatCompanion() {
       timestamp: new Date(),
     };
 
-    setMessages(prev => [...prev, userMessage]);
+    const updatedMessages = [...messages, userMessage];
+    setMessages(updatedMessages);
     setInput("");
     setLoading(true);
 
     try {
-      const chatHistory: OpenRouterMessage[] = messages
+      // Build context with memories
+      const memoryContext = memories
+        .slice(0, 3)
+        .map(m => `[Memory: ${m.memory_key} - ${m.memory_value}]`)
+        .join('\n');
+
+      const systemPrompt = `You are ${companionName}, a warm and empathetic AI wellness companion. You remember past conversations and provide personalized support. ${memoryContext ? '\n\nContext from past conversations:\n' + memoryContext : ''}`;
+
+      const chatHistory: OpenRouterMessage[] = updatedMessages
         .slice(-8)
         .map(m => ({ role: m.role, content: m.content }));
 
-      chatHistory.push({ role: 'user', content: input });
-
-      const response = await aiService.chatWithSupport(chatHistory);
+      const response = await aiService.chatWithSupport(chatHistory, systemPrompt);
 
       const assistantMessage: Message = {
         role: 'assistant',
@@ -62,7 +221,15 @@ export function AIChatCompanion() {
         timestamp: new Date(),
       };
 
-      setMessages(prev => [...prev, assistantMessage]);
+      const finalMessages = [...updatedMessages, assistantMessage];
+      setMessages(finalMessages);
+
+      // Save to localStorage for persistence
+      localStorage.setItem(`chat_history_${user.id}`, JSON.stringify(finalMessages.slice(-20)));
+
+      // Extract and store insights as memories
+      await extractAndStoreMemory(input, response);
+
     } catch (error) {
       console.error('Chat failed:', error);
       setMessages(prev => [
@@ -78,12 +245,36 @@ export function AIChatCompanion() {
     }
   };
 
+  const extractAndStoreMemory = async (userInput: string, aiResponse: string) => {
+    if (!user) return;
+
+    // Simple keyword extraction for memory
+    const concerns = ['stress', 'anxiety', 'work', 'sleep', 'relationship', 'family', 'health'];
+    const lowercaseInput = userInput.toLowerCase();
+
+    for (const concern of concerns) {
+      if (lowercaseInput.includes(concern)) {
+        await supabase.from('companion_memory').upsert({
+          user_id: user.id,
+          memory_type: 'concern',
+          memory_key: concern,
+          memory_value: userInput.slice(0, 200),
+          last_referenced_at: new Date().toISOString(),
+        }, {
+          onConflict: 'user_id,memory_key'
+        });
+      }
+    }
+  };
+
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       sendMessage();
     }
   };
+
+  const currentAvatar = COMPANION_AVATARS.find(a => a.id === companionAvatar) || COMPANION_AVATARS[0];
 
   return (
     <>
@@ -99,10 +290,19 @@ export function AIChatCompanion() {
             <Button
               size="lg"
               onClick={() => setIsOpen(true)}
-              className="rounded-full w-16 h-16 shadow-2xl hover:shadow-primary/50 bg-gradient-to-br from-primary to-primary/80 relative group"
+              className="rounded-full w-16 h-16 shadow-2xl hover:shadow-primary/50 bg-gradient-to-br from-primary to-primary/80 relative group text-2xl"
             >
-              <Bot className="w-7 h-7" />
+              {currentAvatar.emoji}
               <span className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-background animate-pulse" />
+              {hasProactiveMessage && (
+                <motion.span
+                  animate={{ scale: [1, 1.2, 1] }}
+                  transition={{ repeat: Infinity, duration: 2 }}
+                  className="absolute -top-2 -left-2 w-6 h-6 bg-red-500 rounded-full flex items-center justify-center text-xs font-bold text-white"
+                >
+                  !
+                </motion.span>
+              )}
             </Button>
           </motion.div>
         )}
@@ -121,25 +321,36 @@ export function AIChatCompanion() {
               {/* Header */}
               <div className="flex items-center justify-between p-4 border-b bg-gradient-to-r from-primary/10 to-primary/5">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-primary/10 rounded-lg">
-                    <Bot className="w-5 h-5 text-primary" />
-                  </div>
+                  <div className="text-3xl">{currentAvatar.emoji}</div>
                   <div>
-                    <h3 className="font-semibold">AI Support Companion</h3>
+                    <h3 className="font-semibold flex items-center gap-2">
+                      {companionName}
+                      <Heart className="w-3 h-3 text-pink-500 fill-pink-500" />
+                    </h3>
                     <div className="flex items-center gap-1.5">
                       <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                      <p className="text-xs text-muted-foreground">Online</p>
+                      <p className="text-xs text-muted-foreground">Always here for you</p>
                     </div>
                   </div>
                 </div>
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  onClick={() => setIsOpen(false)}
-                  className="rounded-full"
-                >
-                  <X className="w-4 h-4" />
-                </Button>
+                <div className="flex items-center gap-2">
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    onClick={() => setShowSettings(true)}
+                    className="rounded-full"
+                  >
+                    <Settings className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    onClick={() => setIsOpen(false)}
+                    className="rounded-full"
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                </div>
               </div>
 
               {/* Disclaimer */}
@@ -165,17 +376,13 @@ export function AIChatCompanion() {
                       }`}
                     >
                       <div
-                        className={`p-2 rounded-lg flex-shrink-0 h-fit ${
+                        className={`text-xl flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full ${
                           message.role === 'user'
                             ? 'bg-primary text-primary-foreground'
                             : 'bg-secondary'
                         }`}
                       >
-                        {message.role === 'user' ? (
-                          <User className="w-4 h-4" />
-                        ) : (
-                          <Bot className="w-4 h-4" />
-                        )}
+                        {message.role === 'user' ? '👤' : currentAvatar.emoji}
                       </div>
                       <div
                         className={`flex-1 ${
@@ -206,8 +413,8 @@ export function AIChatCompanion() {
                       animate={{ opacity: 1 }}
                       className="flex gap-3"
                     >
-                      <div className="p-2 bg-secondary rounded-lg">
-                        <Bot className="w-4 h-4" />
+                      <div className="text-xl w-8 h-8 flex items-center justify-center bg-secondary rounded-full">
+                        {currentAvatar.emoji}
                       </div>
                       <div className="bg-secondary p-3 rounded-2xl rounded-bl-none">
                         <Loader2 className="w-4 h-4 animate-spin text-primary" />
@@ -224,7 +431,7 @@ export function AIChatCompanion() {
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     onKeyDown={handleKeyPress}
-                    placeholder="Share what's on your mind..."
+                    placeholder={`Talk to ${companionName}...`}
                     className="min-h-[60px] max-h-[120px] resize-none"
                     disabled={loading}
                   />
@@ -246,6 +453,69 @@ export function AIChatCompanion() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Settings Dialog */}
+      <Dialog open={showSettings} onOpenChange={setShowSettings}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Companion Settings</DialogTitle>
+            <DialogDescription>
+              Customize your AI companion's name and appearance
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-6 py-4">
+            {/* Name */}
+            <div className="space-y-2">
+              <Label>Companion Name</Label>
+              <div className="flex gap-2">
+                <Input
+                  value={editingName ? tempName : companionName}
+                  onChange={(e) => setTempName(e.target.value)}
+                  onFocus={() => {
+                    setEditingName(true);
+                    setTempName(companionName);
+                  }}
+                  placeholder="Give your companion a name"
+                />
+                {editingName && (
+                  <Button
+                    onClick={() => {
+                      if (tempName.trim()) {
+                        saveCompanionSettings(tempName, companionAvatar);
+                        setEditingName(false);
+                      }
+                    }}
+                  >
+                    Save
+                  </Button>
+                )}
+              </div>
+            </div>
+
+            {/* Avatar */}
+            <div className="space-y-2">
+              <Label>Choose Avatar</Label>
+              <div className="grid grid-cols-4 gap-3">
+                {COMPANION_AVATARS.map((avatar) => (
+                  <button
+                    key={avatar.id}
+                    onClick={() => saveCompanionSettings(companionName, avatar.id)}
+                    className={`p-4 rounded-lg border-2 transition-all hover:scale-105 ${
+                      companionAvatar === avatar.id
+                        ? 'border-primary bg-primary/10'
+                        : 'border-border hover:border-primary/50'
+                    }`}
+                  >
+                    <div className="text-3xl mb-1">{avatar.emoji}</div>
+                    <p className="text-xs font-medium">{avatar.name}</p>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

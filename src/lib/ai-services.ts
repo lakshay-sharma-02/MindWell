@@ -171,9 +171,10 @@ Return only the affirmation text, no quotes or extra formatting.`,
 
   async chatWithSupport(
     messages: OpenRouterMessage[],
+    customSystemPrompt?: string,
     onChunk?: (chunk: string) => void
   ): Promise<string> {
-    const systemPrompt = `You are a compassionate mental health support companion. You are NOT a replacement for professional therapy.
+    const defaultSystemPrompt = `You are a compassionate mental health support companion. You are NOT a replacement for professional therapy.
 
 Guidelines:
 - Be warm, empathetic, and non-judgmental
@@ -186,6 +187,8 @@ Guidelines:
 - Never diagnose or prescribe treatment
 
 Remember: You're a supportive companion, not a therapist.`;
+
+    const systemPrompt = customSystemPrompt || defaultSystemPrompt;
 
     try {
       if (onChunk) {

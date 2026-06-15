@@ -16,6 +16,8 @@ import { AIGoalSetter } from "@/components/ai/AIGoalSetter";
 import { useNavigate } from "react-router-dom";
 import { PageSkeleton } from "@/components/layout/PageSkeleton";
 import { supabase } from "@/integrations/supabase/client";
+import { DailyRewardWheel } from "@/components/engagement/DailyRewardWheel";
+import { DailyCheckInWidget } from "@/components/engagement/DailyCheckInWidget";
 
 import { motion, Variants } from "framer-motion";
 
@@ -127,6 +129,16 @@ export default function Dashboard() {
                     {/* Top Row: Welcome (Full Width) */}
                     <motion.div variants={item}>
                         <WelcomeWidget userName={profile?.full_name} />
+                    </motion.div>
+
+                    {/* Daily Reward Wheel - First thing users see! */}
+                    <motion.div variants={item}>
+                        <DailyRewardWheel />
+                    </motion.div>
+
+                    {/* Daily Check-ins Widget */}
+                    <motion.div variants={item}>
+                        <DailyCheckInWidget />
                     </motion.div>
 
                     <motion.div variants={item}>
