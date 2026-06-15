@@ -42,7 +42,7 @@ export function ChatWidget() {
                         initial={{ opacity: 0, y: 20, scale: 0.95 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 20, scale: 0.95 }}
-                        className="fixed bottom-20 right-4 md:right-8 z-50 w-[90vw] md:w-[400px] h-[600px] max-h-[70vh] flex flex-col shadow-2xl rounded-2xl border border-white/20 bg-background/80 backdrop-blur-xl overflow-hidden"
+                        className="fixed bottom-6 left-6 z-50 w-[90vw] md:w-[400px] h-[600px] max-h-[70vh] flex flex-col shadow-2xl rounded-2xl border border-white/20 bg-background/80 backdrop-blur-xl overflow-hidden"
                     >
                         {/* Header */}
                         <div className="p-4 border-b border-border/50 bg-primary/5 flex items-center justify-between">
@@ -149,7 +149,7 @@ export function ChatWidget() {
                 animate={{ scale: 1, opacity: 1 }}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="fixed bottom-5 right-5 z-[9999] p-4 rounded-full bg-primary text-primary-foreground shadow-2xl hover:shadow-xl transition-all"
+                className="fixed bottom-5 left-5 z-[9999] p-4 rounded-full bg-primary text-primary-foreground shadow-2xl hover:shadow-xl transition-all"
             >
                 {isOpen ? <X className="w-6 h-6" /> : <MessageCircle className="w-6 h-6" />}
             </motion.button>

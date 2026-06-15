@@ -73,15 +73,25 @@ export function AIChatCompanion() {
   const loadCompanionSettings = async () => {
     if (!user) return;
 
-    const { data } = await supabase
-      .from('profiles')
-      .select('companion_name, companion_avatar')
-      .eq('id', user.id)
-      .single();
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('companion_name, companion_avatar')
+        .eq('id', user.id)
+        .single();
 
-    if (data) {
-      setCompanionName(data.companion_name || 'Luna');
-      setCompanionAvatar(data.companion_avatar || 'luna');
+      if (error) {
+        // Columns might not exist yet - use defaults
+        console.warn('Companion settings not loaded, using defaults:', error);
+        return;
+      }
+
+      if (data) {
+        setCompanionName(data.companion_name || 'Luna');
+        setCompanionAvatar(data.companion_avatar || 'luna');
+      }
+    } catch (error) {
+      console.warn('Error loading companion settings:', error);
     }
   };
 
@@ -285,7 +295,7 @@ export function AIChatCompanion() {
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0, opacity: 0 }}
-            className="fixed bottom-6 right-6 z-50"
+            className="fixed bottom-24 right-6 z-50"
           >
             <Button
               size="lg"
@@ -315,7 +325,7 @@ export function AIChatCompanion() {
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            className="fixed bottom-6 right-6 z-50 w-[400px] max-w-[calc(100vw-3rem)]"
+            className="fixed bottom-24 right-6 z-50 w-[400px] max-w-[calc(100vw-3rem)]"
           >
             <Card className="flex flex-col h-[600px] max-h-[80vh] shadow-2xl border-primary/20 overflow-hidden">
               {/* Header */}
