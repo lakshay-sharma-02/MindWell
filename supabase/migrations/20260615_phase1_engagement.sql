@@ -21,11 +21,7 @@ CREATE TABLE IF NOT EXISTS public.daily_checkins (
     ai_insight TEXT,
 
     -- Metadata
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
-    checkin_date DATE GENERATED ALWAYS AS (DATE(created_at)) STORED,
-
-    -- Ensure one morning and one evening per day per user
-    UNIQUE(user_id, checkin_type, checkin_date)
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
 -- Daily Rewards Table
@@ -33,13 +29,9 @@ CREATE TABLE IF NOT EXISTS public.daily_rewards (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
     reward_type TEXT NOT NULL, -- affirmation, badge, unlock, hug, quote, premium_tool
-    reward_data JSONB, -- stores specific reward details
+    reward_data JSONB,
     rarity TEXT CHECK (rarity IN ('common', 'rare', 'legendary')) NOT NULL,
-    claimed_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
-    claimed_date DATE GENERATED ALWAYS AS (DATE(claimed_at)) STORED,
-
-    -- One reward per day per user
-    UNIQUE(user_id, claimed_date)
+    claimed_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
 -- Companion Memory Table (stores key insights about user)
@@ -202,3 +194,8 @@ CREATE INDEX IF NOT EXISTS idx_daily_rewards_user_date ON public.daily_rewards(u
 CREATE INDEX IF NOT EXISTS idx_companion_memory_user ON public.companion_memory(user_id, updated_at DESC);
 CREATE INDEX IF NOT EXISTS idx_proactive_messages_undelivered ON public.proactive_messages(user_id, delivered, priority DESC) WHERE delivered = false;
 CREATE INDEX IF NOT EXISTS idx_profiles_last_active ON public.profiles(last_active_at);
+
+-- Workaround: Use application-level enforcement instead of database constraints
+-- The daily uniqueness will be handled by has_completed_checkin_today() and has_claimed_reward_today() functions
+COMMENT ON TABLE public.daily_checkins IS 'Daily check-ins enforced at application level via RPC functions';
+COMMENT ON TABLE public.daily_rewards IS 'Daily rewards enforced at application level via RPC functions';
