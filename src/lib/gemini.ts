@@ -68,7 +68,7 @@ async function callOpenRouter(messages: Message[], apiKey: string): Promise<stri
                 'X-Title': 'MindWell',
             },
             body: JSON.stringify({
-                model: 'deepseek/deepseek-r1', // Updated to DeepSeek R1 as requested
+                model: 'openai/gpt-oss-120b:free', // Free model via OpenRouter
                 messages: messages.map(msg => ({
                     role: msg.role === 'model' ? 'assistant' : msg.role,
                     content: msg.text
@@ -118,8 +118,8 @@ export async function generateResponse(history: Message[], userInput: string, ap
 
     if (!apiKey) return "I need an API key to function. Please verify settings.";
 
-    // Default model if not specified in future configs, using the verified one
-    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${apiKey}`;
+    // Using free model via Gemini API
+    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${apiKey}`;
 
     try {
         const contents = [
@@ -213,7 +213,7 @@ ${content}
 
     if (!apiKey) throw new Error("API Key is missing in settings.");
 
-    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${apiKey}`;
+    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${apiKey}`;
 
     try {
         const response = await fetch(API_URL, {
