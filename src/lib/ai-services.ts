@@ -465,6 +465,26 @@ Be encouraging and specific. Return ONLY JSON.`,
       engagementScore: 65,
     };
   }
+
+  // Generic text generation method
+  async generateText(prompt: string): Promise<string> {
+    try {
+      const messages: OpenRouterMessage[] = [
+        { role: 'user', content: prompt }
+      ];
+
+      const response = await getOpenRouter().chat(messages, {
+        systemPrompt: 'You are a compassionate mental health assistant. Keep responses brief, encouraging, and actionable (1-2 sentences).',
+        temperature: 0.7,
+        maxTokens: 150,
+      });
+
+      return response;
+    } catch (error) {
+      console.error('Text generation failed:', error);
+      return 'Thank you for sharing. Keep up the great work on your mental health journey! 💙';
+    }
+  }
 }
 
 export const aiService = new AIService();
