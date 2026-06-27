@@ -32,11 +32,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const { data: { user: currentUser } } = await supabase.auth.getUser();
 
-      if (currentUser?.email === 'psychespaced@gmail.com') {
-        setIsAdmin(true);
-        return true;
-      }
-
       const { data, error } = await supabase
         .from('user_roles')
         .select('role')

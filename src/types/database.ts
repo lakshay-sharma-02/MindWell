@@ -301,6 +301,8 @@ export interface Database {
           id: string
           user_id: string
           mood: string
+          sub_emotion: string | null
+          activities: string[] | null
           note: string | null
           created_at: string
         }
@@ -308,6 +310,8 @@ export interface Database {
           id?: string
           user_id?: string
           mood?: string
+          sub_emotion?: string | null
+          activities?: string[] | null
           note?: string | null
           created_at?: string
         }
@@ -315,6 +319,8 @@ export interface Database {
           id?: string
           user_id?: string
           mood?: string
+          sub_emotion?: string | null
+          activities?: string[] | null
           note?: string | null
           created_at?: string
         }
@@ -324,18 +330,24 @@ export interface Database {
           id: string
           user_id: string
           content: string
+          image_url: string | null
+          prompt_used: string | null
           created_at: string
         }
         Insert: {
           id?: string
           user_id?: string
           content?: string
+          image_url?: string | null
+          prompt_used?: string | null
           created_at?: string
         }
         Update: {
           id?: string
           user_id?: string
           content?: string
+          image_url?: string | null
+          prompt_used?: string | null
           created_at?: string
         }
       }

@@ -41,8 +41,6 @@ export default function Checkout() {
         }
     }, [bookingData, resourceData, navigate]);
 
-    if (!bookingData && !resourceData) return null;
-
     // Parse price string (e.g. "$150") to number
     const parsePrice = useCallback((priceStr?: string | number) => {
         if (!priceStr) return 0;
@@ -266,6 +264,8 @@ export default function Checkout() {
             setFormData(prev => ({ ...prev, [id]: value }));
         }
     }, []);
+
+    if (!bookingData && !resourceData) return null;
 
     if (isSuccess && bookingData) {
         return (

@@ -288,27 +288,39 @@ export function AIChatCompanion() {
 
   return (
     <>
-      {/* Floating Button */}
+      {/* Premium Floating Button */}
       <AnimatePresence>
         {!isOpen && (
           <motion.div
-            initial={{ scale: 0, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0, opacity: 0 }}
-            className="fixed bottom-20 right-4 sm:bottom-24 sm:right-6 z-50"
+            initial={{ scale: 0, opacity: 0, y: 20 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            exit={{ scale: 0, opacity: 0, y: 20 }}
+            className="fixed bottom-6 right-4 sm:bottom-8 sm:right-8 z-50 group"
           >
+            {/* Outer glow ring */}
+            <div className="absolute inset-0 bg-primary/20 rounded-full blur-xl group-hover:bg-primary/40 transition-colors duration-500 animate-pulse" />
+            
             <Button
               size="lg"
               onClick={() => setIsOpen(true)}
-              className="rounded-full w-14 h-14 sm:w-16 sm:h-16 shadow-2xl hover:shadow-primary/50 bg-gradient-to-br from-primary to-primary/80 relative group text-xl sm:text-2xl"
+              className="relative rounded-full w-14 h-14 sm:w-16 sm:h-16 shadow-[0_0_40px_-10px_rgba(0,0,0,0.3)] hover:shadow-primary/50 bg-background/80 dark:bg-zinc-900/80 backdrop-blur-xl border border-primary/20 hover:border-primary/50 text-xl sm:text-2xl transition-all duration-300 hover:scale-110 overflow-hidden"
             >
-              {currentAvatar.emoji}
-              <span className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-background animate-pulse" />
+              {/* Inner glowing orb effect */}
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-primary/10 opacity-50 group-hover:opacity-100 transition-opacity" />
+              <div className="absolute -inset-1 bg-gradient-to-r from-transparent via-white/10 to-transparent rotate-45 group-hover:translate-x-full transition-transform duration-1000" />
+              
+              <span className="relative z-10 flex items-center justify-center">
+                {currentAvatar.emoji}
+              </span>
+
+              {/* Status Dot */}
+              <span className="absolute top-2 right-2 w-3 h-3 bg-green-500 rounded-full border-2 border-background shadow-[0_0_10px_rgba(34,197,94,0.5)]" />
+              
               {hasProactiveMessage && (
                 <motion.span
                   animate={{ scale: [1, 1.2, 1] }}
                   transition={{ repeat: Infinity, duration: 2 }}
-                  className="absolute -top-2 -left-2 w-6 h-6 bg-red-500 rounded-full flex items-center justify-center text-xs font-bold text-white"
+                  className="absolute -top-1 -left-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-[10px] font-bold text-white shadow-lg"
                 >
                   !
                 </motion.span>

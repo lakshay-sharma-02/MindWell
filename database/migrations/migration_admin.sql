@@ -15,9 +15,6 @@ begin
   if not exists (
     select 1 from public.user_roles ur
     where ur.user_id = auth.uid() and ur.role = 'admin'
-  ) and not exists (
-    select 1 from auth.users u
-    where u.id = auth.uid() and lower(u.email) = 'sharmalakshay0208@gmail.com'
   ) then
     raise exception 'Access denied';
   end if;
@@ -57,9 +54,6 @@ begin
   if not exists (
     select 1 from public.user_roles ur
     where ur.user_id = auth.uid() and ur.role = 'admin'
-  ) and not exists (
-    select 1 from auth.users u
-    where u.id = auth.uid() and lower(u.email) = 'sharmalakshay0208@gmail.com'
   ) then
     raise exception 'Access denied';
   end if;
@@ -89,9 +83,6 @@ begin
   if not exists (
     select 1 from public.user_roles ur
     where ur.user_id = auth.uid() and ur.role = 'admin'
-  ) and not exists (
-    select 1 from auth.users u
-    where u.id = auth.uid() and lower(u.email) = 'sharmalakshay0208@gmail.com'
   ) then
     raise exception 'Access denied';
   end if;
@@ -120,9 +111,6 @@ begin
   if not exists (
     select 1 from public.user_roles ur
     where ur.user_id = auth.uid() and ur.role = 'admin'
-  ) and not exists (
-    select 1 from auth.users u
-    where u.id = auth.uid() and lower(u.email) = 'sharmalakshay0208@gmail.com'
   ) then
     raise exception 'Access denied';
   end if;
