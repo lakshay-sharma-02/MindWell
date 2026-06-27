@@ -357,7 +357,7 @@ export function MoodTracker() {
             </div>
 
             {/* AI Mood Insights */}
-            <AIMoodInsights />
+            <AIMoodInsights moodEntries={history} />
 
             {/* Recent History */}
             <div className="glass-card p-6 rounded-3xl">

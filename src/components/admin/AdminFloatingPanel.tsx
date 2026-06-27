@@ -262,7 +262,7 @@ export function AdminFloatingPanel() {
         animate={{ scale: 1, opacity: 1 }}
         transition={{ delay: 0.5, type: "spring" }}
         className="fixed z-[100]"
-        style={{ position: 'fixed', bottom: '24px', right: '24px', zIndex: 99999 }}
+        style={{ position: 'fixed', bottom: '24px', left: '24px', zIndex: 99999 }}
       >
         <AnimatePresence>
           {isExpanded && (
@@ -271,7 +271,7 @@ export function AdminFloatingPanel() {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 20, scale: 0.95 }}
               transition={{ duration: 0.2 }}
-              className="absolute bottom-16 right-0 w-80 bg-card border border-border rounded-2xl shadow-2xl overflow-hidden"
+              className="absolute bottom-16 left-0 w-80 bg-card border border-border rounded-2xl shadow-2xl overflow-hidden"
             >
               {/* Header */}
               <div className="p-4 bg-primary/5 border-b border-border">

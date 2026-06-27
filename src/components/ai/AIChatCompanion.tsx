@@ -5,11 +5,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Bot, Send, User, Loader2, AlertCircle, Sparkles, X, Settings, Heart } from "lucide-react";
+import { Send, Loader2, AlertCircle, Sparkles, X, Settings, Heart, Mic } from "lucide-react";
 import { aiService } from "@/lib/ai-services";
 import { motion, AnimatePresence } from "framer-motion";
 import { OpenRouterMessage } from "@/lib/openrouter";
-import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import {
@@ -19,6 +18,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { cn } from "@/lib/utils";
 
 interface Message {
   role: 'user' | 'assistant';
@@ -27,13 +27,13 @@ interface Message {
 }
 
 const COMPANION_AVATARS = [
-  { id: 'default', emoji: '🤖', name: 'Bot' },
-  { id: 'luna', emoji: '🌙', name: 'Luna' },
-  { id: 'sunny', emoji: '☀️', name: 'Sunny' },
-  { id: 'sage', emoji: '🧘', name: 'Sage' },
-  { id: 'hope', emoji: '✨', name: 'Hope' },
-  { id: 'buddy', emoji: '🐶', name: 'Buddy' },
-  { id: 'zen', emoji: '🍃', name: 'Zen' },
+  { id: 'default', emoji: '🤖', name: 'Bot', color: 'from-blue-500/20 to-cyan-500/20' },
+  { id: 'luna', emoji: '🌙', name: 'Luna', color: 'from-indigo-500/20 to-purple-500/20' },
+  { id: 'sunny', emoji: '☀️', name: 'Sunny', color: 'from-amber-500/20 to-orange-500/20' },
+  { id: 'sage', emoji: '🧘', name: 'Sage', color: 'from-emerald-500/20 to-teal-500/20' },
+  { id: 'hope', emoji: '✨', name: 'Hope', color: 'from-pink-500/20 to-rose-500/20' },
+  { id: 'buddy', emoji: '🐶', name: 'Buddy', color: 'from-amber-700/20 to-yellow-600/20' },
+  { id: 'zen', emoji: '🍃', name: 'Zen', color: 'from-green-500/20 to-emerald-500/20' },
 ];
 
 export function AIChatCompanion() {
@@ -72,7 +72,6 @@ export function AIChatCompanion() {
 
   const loadCompanionSettings = async () => {
     if (!user) return;
-
     try {
       const { data, error } = await supabase
         .from('profiles')
@@ -80,15 +79,9 @@ export function AIChatCompanion() {
         .eq('id', user.id)
         .single();
 
-      if (error) {
-        // Columns might not exist yet - use defaults
-        console.warn('Companion settings not loaded, using defaults:', error);
-        return;
-      }
-
-      if (data) {
-        setCompanionName(data.companion_name || 'Luna');
-        setCompanionAvatar(data.companion_avatar || 'luna');
+      if (!error && data) {
+        if (data.companion_name) setCompanionName(data.companion_name);
+        if (data.companion_avatar) setCompanionAvatar(data.companion_avatar);
       }
     } catch (error) {
       console.warn('Error loading companion settings:', error);
@@ -97,7 +90,6 @@ export function AIChatCompanion() {
 
   const saveCompanionSettings = async (name: string, avatar: string) => {
     if (!user) return;
-
     await supabase
       .from('profiles')
       .update({
@@ -112,22 +104,17 @@ export function AIChatCompanion() {
 
   const loadMemories = async () => {
     if (!user) return;
-
     const { data } = await supabase
       .from('companion_memory')
       .select('*')
       .eq('user_id', user.id)
       .order('updated_at', { ascending: false })
       .limit(10);
-
-    if (data) {
-      setMemories(data);
-    }
+    if (data) setMemories(data);
   };
 
   const checkProactiveMessages = async () => {
     if (!user) return;
-
     const { data } = await supabase
       .from('proactive_messages')
       .select('*')
@@ -138,8 +125,6 @@ export function AIChatCompanion() {
 
     if (data && data.length > 0) {
       setHasProactiveMessage(true);
-
-      // Add proactive message to chat if opening for first time
       if (messages.length === 0) {
         const proactiveMsg: Message = {
           role: 'assistant',
@@ -147,8 +132,6 @@ export function AIChatCompanion() {
           timestamp: new Date(),
         };
         setMessages([proactiveMsg]);
-
-        // Mark as delivered
         await supabase
           .from('proactive_messages')
           .update({ delivered: true, delivered_at: new Date().toISOString() })
@@ -158,7 +141,6 @@ export function AIChatCompanion() {
   };
 
   const loadChatHistory = () => {
-    // Load last conversation from localStorage (keeps context between sessions)
     const storedHistory = localStorage.getItem(`chat_history_${user?.id}`);
     if (storedHistory && messages.length === 0) {
       try {
@@ -169,7 +151,6 @@ export function AIChatCompanion() {
       }
     }
 
-    // If no history and no proactive message, show personalized greeting
     if (messages.length === 0 && !hasProactiveMessage) {
       const greeting = generatePersonalizedGreeting();
       setMessages([{
@@ -186,32 +167,22 @@ export function AIChatCompanion() {
       `Hey there! ${companionName} here. I'm always here to listen. What's on your mind?`,
       `Welcome back! It's ${companionName}. Ready to check in with yourself today?`,
     ];
-
-    // Check for memories to personalize
     const recentMemory = memories.find(m => m.memory_type === 'concern');
     if (recentMemory) {
       return `Hi! I remember you mentioned ${recentMemory.memory_key} last time. How's that going? I'm here if you want to talk about it. 💙`;
     }
-
     return greetings[Math.floor(Math.random() * greetings.length)];
   };
 
   const sendMessage = async () => {
     if (!input.trim() || loading || !user) return;
-
-    const userMessage: Message = {
-      role: 'user',
-      content: input,
-      timestamp: new Date(),
-    };
-
+    const userMessage: Message = { role: 'user', content: input, timestamp: new Date() };
     const updatedMessages = [...messages, userMessage];
     setMessages(updatedMessages);
     setInput("");
     setLoading(true);
 
     try {
-      // Build context with memories
       const memoryContext = memories
         .slice(0, 3)
         .map(m => `[Memory: ${m.memory_key} - ${m.memory_value}]`)
@@ -225,21 +196,11 @@ export function AIChatCompanion() {
 
       const response = await aiService.chatWithSupport(chatHistory, systemPrompt);
 
-      const assistantMessage: Message = {
-        role: 'assistant',
-        content: response,
-        timestamp: new Date(),
-      };
-
+      const assistantMessage: Message = { role: 'assistant', content: response, timestamp: new Date() };
       const finalMessages = [...updatedMessages, assistantMessage];
       setMessages(finalMessages);
-
-      // Save to localStorage for persistence
       localStorage.setItem(`chat_history_${user.id}`, JSON.stringify(finalMessages.slice(-20)));
-
-      // Extract and store insights as memories
       await extractAndStoreMemory(input, response);
-
     } catch (error) {
       console.error('Chat failed:', error);
       setMessages(prev => [
@@ -257,11 +218,8 @@ export function AIChatCompanion() {
 
   const extractAndStoreMemory = async (userInput: string, aiResponse: string) => {
     if (!user) return;
-
-    // Simple keyword extraction for memory
     const concerns = ['stress', 'anxiety', 'work', 'sleep', 'relationship', 'family', 'health'];
     const lowercaseInput = userInput.toLowerCase();
-
     for (const concern of concerns) {
       if (lowercaseInput.includes(concern)) {
         await supabase.from('companion_memory').upsert({
@@ -270,9 +228,7 @@ export function AIChatCompanion() {
           memory_key: concern,
           memory_value: userInput.slice(0, 200),
           last_referenced_at: new Date().toISOString(),
-        }, {
-          onConflict: 'user_id,memory_key'
-        });
+        }, { onConflict: 'user_id,memory_key' });
       }
     }
   };
@@ -288,7 +244,6 @@ export function AIChatCompanion() {
 
   return (
     <>
-      {/* Premium Floating Button */}
       <AnimatePresence>
         {!isOpen && (
           <motion.div
@@ -297,25 +252,16 @@ export function AIChatCompanion() {
             exit={{ scale: 0, opacity: 0, y: 20 }}
             className="fixed bottom-6 right-4 sm:bottom-8 sm:right-8 z-50 group"
           >
-            {/* Outer glow ring */}
             <div className="absolute inset-0 bg-primary/20 rounded-full blur-xl group-hover:bg-primary/40 transition-colors duration-500 animate-pulse" />
-            
             <Button
               size="lg"
               onClick={() => setIsOpen(true)}
-              className="relative rounded-full w-14 h-14 sm:w-16 sm:h-16 shadow-[0_0_40px_-10px_rgba(0,0,0,0.3)] hover:shadow-primary/50 bg-background/80 dark:bg-zinc-900/80 backdrop-blur-xl border border-primary/20 hover:border-primary/50 text-xl sm:text-2xl transition-all duration-300 hover:scale-110 overflow-hidden"
+              className="relative rounded-full w-14 h-14 sm:w-16 sm:h-16 shadow-[0_0_40px_-10px_rgba(0,0,0,0.3)] hover:shadow-primary/50 bg-background/80 dark:bg-zinc-900/80 backdrop-blur-xl border border-primary/20 hover:border-primary/50 text-2xl sm:text-3xl transition-all duration-300 hover:scale-110 overflow-hidden"
             >
-              {/* Inner glowing orb effect */}
               <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-primary/10 opacity-50 group-hover:opacity-100 transition-opacity" />
               <div className="absolute -inset-1 bg-gradient-to-r from-transparent via-white/10 to-transparent rotate-45 group-hover:translate-x-full transition-transform duration-1000" />
-              
-              <span className="relative z-10 flex items-center justify-center">
-                {currentAvatar.emoji}
-              </span>
-
-              {/* Status Dot */}
+              <span className="relative z-10 flex items-center justify-center filter drop-shadow-md">{currentAvatar.emoji}</span>
               <span className="absolute top-2 right-2 w-3 h-3 bg-green-500 rounded-full border-2 border-background shadow-[0_0_10px_rgba(34,197,94,0.5)]" />
-              
               {hasProactiveMessage && (
                 <motion.span
                   animate={{ scale: [1, 1.2, 1] }}
@@ -330,145 +276,126 @@ export function AIChatCompanion() {
         )}
       </AnimatePresence>
 
-      {/* Chat Window */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            className="fixed bottom-4 right-4 sm:top-20 sm:right-6 sm:bottom-auto z-40 w-[calc(100vw-2rem)] sm:w-[400px] max-w-[calc(100vw-2rem)]"
+            className="fixed bottom-4 right-4 sm:top-24 sm:right-8 sm:bottom-auto z-40 w-[calc(100vw-2rem)] sm:w-[420px] max-w-[calc(100vw-2rem)] shadow-2xl rounded-3xl"
           >
-            <Card className="flex flex-col h-[calc(100vh-2rem)] sm:h-[calc(100vh-6rem)] max-h-[700px] sm:max-h-[600px] shadow-2xl border-primary/20 overflow-hidden">
-              {/* Header */}
-              <div className="flex items-center justify-between p-3 sm:p-4 border-b bg-gradient-to-r from-primary/10 to-primary/5">
-                <div className="flex items-center gap-2 sm:gap-3">
-                  <div className="text-2xl sm:text-3xl">{currentAvatar.emoji}</div>
-                  <div>
-                    <h3 className="text-sm sm:text-base font-semibold flex items-center gap-2">
-                      {companionName}
-                      <Heart className="w-3 h-3 text-pink-500 fill-pink-500" />
-                    </h3>
-                    <div className="flex items-center gap-1.5">
-                      <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                      <p className="text-xs text-muted-foreground">Always here for you</p>
+            <Card className="flex flex-col h-[calc(100vh-2rem)] sm:h-[calc(100vh-8rem)] max-h-[750px] sm:max-h-[650px] shadow-2xl border border-white/20 dark:border-white/10 overflow-hidden bg-background/80 dark:bg-zinc-950/80 backdrop-blur-3xl rounded-3xl">
+              
+              {/* Premium Header */}
+              <div className={cn("relative flex items-center justify-between p-4 sm:p-5 border-b border-border/50 bg-gradient-to-br", currentAvatar.color)}>
+                <div className="absolute inset-0 bg-background/60 backdrop-blur-md" />
+                <div className="relative z-10 flex items-center gap-3 sm:gap-4">
+                  <div className="relative">
+                    <div className="text-3xl sm:text-4xl bg-background/50 backdrop-blur-sm w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center rounded-2xl shadow-inner border border-white/20">
+                      {currentAvatar.emoji}
                     </div>
+                    <span className="absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-green-500 border-2 border-background rounded-full shadow-[0_0_10px_rgba(34,197,94,0.6)]" />
+                  </div>
+                  <div>
+                    <h3 className="text-base sm:text-lg font-display font-semibold flex items-center gap-2 tracking-wide text-foreground">
+                      {companionName}
+                      <Sparkles className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
+                    </h3>
+                    <p className="text-xs font-medium text-muted-foreground">Always here for you</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-1 sm:gap-2">
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    onClick={() => setShowSettings(true)}
-                    className="rounded-full"
-                  >
-                    <Settings className="w-4 h-4" />
+                <div className="relative z-10 flex items-center gap-1">
+                  <Button size="icon" variant="ghost" onClick={() => setShowSettings(true)} className="rounded-full hover:bg-background/40">
+                    <Settings className="w-4 h-4 text-foreground/70" />
                   </Button>
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    onClick={() => setIsOpen(false)}
-                    className="rounded-full"
-                  >
-                    <X className="w-4 h-4" />
+                  <Button size="icon" variant="ghost" onClick={() => setIsOpen(false)} className="rounded-full hover:bg-background/40">
+                    <X className="w-5 h-5 text-foreground/70" />
                   </Button>
                 </div>
               </div>
 
               {/* Disclaimer */}
-              <div className="px-4 py-2 bg-amber-500/10 border-b border-amber-500/20">
-                <div className="flex items-start gap-2">
-                  <AlertCircle className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
-                  <p className="text-xs text-amber-600">
-                    This is not therapy. For emergencies, call 988 or local services.
+              <div className="px-4 py-1.5 bg-amber-500/10 border-b border-amber-500/20 backdrop-blur-sm">
+                <div className="flex items-center justify-center gap-2">
+                  <AlertCircle className="w-3 h-3 text-amber-600" />
+                  <p className="text-[10px] uppercase tracking-wider font-semibold text-amber-600/80">
+                    Not a crisis service. Call 988 for emergencies.
                   </p>
                 </div>
               </div>
 
-              {/* Messages */}
-              <ScrollArea className="flex-1 p-4" ref={scrollRef}>
-                <div className="space-y-4">
+              {/* Chat Area */}
+              <ScrollArea className="flex-1 p-5" ref={scrollRef}>
+                <div className="space-y-6 pb-2">
                   {messages.map((message, index) => (
                     <motion.div
                       key={index}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className={`flex gap-3 ${
-                        message.role === 'user' ? 'flex-row-reverse' : 'flex-row'
-                      }`}
+                      initial={{ opacity: 0, y: 10, scale: 0.98 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      className={`flex gap-3 ${message.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}
                     >
-                      <div
-                        className={`text-xl flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full ${
-                          message.role === 'user'
-                            ? 'bg-primary text-primary-foreground'
-                            : 'bg-secondary'
-                        }`}
-                      >
+                      <div className={`text-xl flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-2xl shadow-sm border ${
+                        message.role === 'user' ? 'bg-primary text-primary-foreground border-primary/20' : 'bg-secondary border-border/50'
+                      }`}>
                         {message.role === 'user' ? '👤' : currentAvatar.emoji}
                       </div>
-                      <div
-                        className={`flex-1 ${
-                          message.role === 'user' ? 'text-right' : 'text-left'
-                        }`}
-                      >
-                        <div
-                          className={`inline-block p-3 rounded-2xl max-w-[85%] ${
-                            message.role === 'user'
-                              ? 'bg-primary text-primary-foreground rounded-br-none'
-                              : 'bg-secondary rounded-bl-none'
-                          }`}
-                        >
-                          <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                      
+                      <div className={`flex flex-col ${message.role === 'user' ? 'items-end' : 'items-start'} max-w-[80%]`}>
+                        <div className={`inline-block p-3.5 sm:p-4 rounded-3xl shadow-sm ${
+                          message.role === 'user'
+                            ? 'bg-primary text-primary-foreground rounded-tr-sm border border-primary/20'
+                            : 'bg-card border border-border/50 rounded-tl-sm shadow-[0_4px_20px_-10px_rgba(0,0,0,0.1)]'
+                        }`}>
+                          <p className={`text-sm sm:text-[15px] leading-relaxed whitespace-pre-wrap font-medium ${message.role === 'user' ? 'text-white' : 'text-foreground/90'}`}>
+                            {message.content}
+                          </p>
                         </div>
-                        <p className="text-xs text-muted-foreground mt-1 px-2">
-                          {message.timestamp.toLocaleTimeString([], {
-                            hour: '2-digit',
-                            minute: '2-digit',
-                          })}
-                        </p>
+                        <span className="text-[10px] font-medium text-muted-foreground/60 mt-1.5 px-2 uppercase tracking-wider">
+                          {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </span>
                       </div>
                     </motion.div>
                   ))}
+                  
                   {loading && (
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      className="flex gap-3"
-                    >
-                      <div className="text-xl w-8 h-8 flex items-center justify-center bg-secondary rounded-full">
+                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex gap-3 flex-row">
+                      <div className="text-xl flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-2xl bg-secondary border border-border/50">
                         {currentAvatar.emoji}
                       </div>
-                      <div className="bg-secondary p-3 rounded-2xl rounded-bl-none">
-                        <Loader2 className="w-4 h-4 animate-spin text-primary" />
+                      <div className="bg-card border border-border/50 p-4 rounded-3xl rounded-tl-sm shadow-sm flex items-center gap-1.5">
+                        <motion.div animate={{ scale: [1, 1.2, 1], opacity: [0.4, 1, 0.4] }} transition={{ repeat: Infinity, duration: 1, delay: 0 }} className="w-1.5 h-1.5 bg-primary rounded-full" />
+                        <motion.div animate={{ scale: [1, 1.2, 1], opacity: [0.4, 1, 0.4] }} transition={{ repeat: Infinity, duration: 1, delay: 0.2 }} className="w-1.5 h-1.5 bg-primary rounded-full" />
+                        <motion.div animate={{ scale: [1, 1.2, 1], opacity: [0.4, 1, 0.4] }} transition={{ repeat: Infinity, duration: 1, delay: 0.4 }} className="w-1.5 h-1.5 bg-primary rounded-full" />
                       </div>
                     </motion.div>
                   )}
                 </div>
               </ScrollArea>
 
-              {/* Input */}
-              <div className="p-4 border-t bg-muted/30">
-                <div className="flex gap-2">
+              {/* Input Area */}
+              <div className="p-4 bg-background/50 backdrop-blur-xl border-t border-border/50">
+                <div className="relative flex items-end gap-2 bg-card border border-border/80 focus-within:border-primary/50 focus-within:shadow-[0_0_20px_-10px_rgbavar(--primary),0.3] transition-all rounded-3xl p-1.5">
                   <Textarea
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     onKeyDown={handleKeyPress}
                     placeholder={`Talk to ${companionName}...`}
-                    className="min-h-[60px] max-h-[120px] resize-none"
+                    className="min-h-[50px] max-h-[120px] resize-none border-none shadow-none focus-visible:ring-0 bg-transparent text-sm sm:text-[15px] py-3 px-3 font-medium placeholder:text-muted-foreground/60"
                     disabled={loading}
                   />
-                  <Button
-                    onClick={sendMessage}
-                    disabled={!input.trim() || loading}
-                    size="icon"
-                    className="h-[60px] w-[60px] flex-shrink-0"
-                  >
-                    {loading ? (
-                      <Loader2 className="w-5 h-5 animate-spin" />
-                    ) : (
-                      <Send className="w-5 h-5" />
-                    )}
-                  </Button>
+                  <div className="flex gap-1 mb-1 mr-1">
+                    <Button type="button" variant="ghost" size="icon" className="rounded-full w-10 h-10 text-muted-foreground hover:text-primary">
+                      <Mic className="w-5 h-5" />
+                    </Button>
+                    <Button
+                      onClick={sendMessage}
+                      disabled={!input.trim() || loading}
+                      size="icon"
+                      className="rounded-full w-10 h-10 bg-primary hover:bg-primary/90 text-primary-foreground shadow-md transition-transform active:scale-95"
+                    >
+                      {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4 -ml-0.5" />}
+                    </Button>
+                  </div>
                 </div>
               </div>
             </Card>
@@ -476,20 +403,18 @@ export function AIChatCompanion() {
         )}
       </AnimatePresence>
 
-      {/* Settings Dialog */}
       <Dialog open={showSettings} onOpenChange={setShowSettings}>
-        <DialogContent>
+        <DialogContent className="sm:max-w-md rounded-3xl border-white/10 shadow-2xl bg-card/95 backdrop-blur-2xl">
           <DialogHeader>
-            <DialogTitle>Companion Settings</DialogTitle>
+            <DialogTitle className="font-display text-2xl">Companion Settings</DialogTitle>
             <DialogDescription>
-              Customize your AI companion's name and appearance
+              Customize your AI companion's personality and appearance.
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-6 py-4">
-            {/* Name */}
-            <div className="space-y-2">
-              <Label>Companion Name</Label>
+            <div className="space-y-3">
+              <Label className="uppercase text-[11px] font-bold tracking-wider text-muted-foreground">Companion Name</Label>
               <div className="flex gap-2">
                 <Input
                   value={editingName ? tempName : companionName}
@@ -498,39 +423,34 @@ export function AIChatCompanion() {
                     setEditingName(true);
                     setTempName(companionName);
                   }}
-                  placeholder="Give your companion a name"
+                  className="rounded-xl bg-muted/50 border-border/50 focus-visible:ring-primary/50"
                 />
                 {editingName && (
-                  <Button
-                    onClick={() => {
+                  <Button onClick={() => {
                       if (tempName.trim()) {
                         saveCompanionSettings(tempName, companionAvatar);
                         setEditingName(false);
                       }
-                    }}
-                  >
-                    Save
-                  </Button>
+                    }} className="rounded-xl font-medium">Save</Button>
                 )}
               </div>
             </div>
 
-            {/* Avatar */}
-            <div className="space-y-2">
-              <Label>Choose Avatar</Label>
-              <div className="grid grid-cols-4 gap-3">
+            <div className="space-y-3">
+              <Label className="uppercase text-[11px] font-bold tracking-wider text-muted-foreground">Choose Avatar</Label>
+              <div className="grid grid-cols-4 sm:grid-cols-4 gap-3">
                 {COMPANION_AVATARS.map((avatar) => (
                   <button
                     key={avatar.id}
                     onClick={() => saveCompanionSettings(companionName, avatar.id)}
-                    className={`p-4 rounded-lg border-2 transition-all hover:scale-105 ${
+                    className={`flex flex-col items-center justify-center p-3 rounded-2xl border-2 transition-all hover:scale-105 ${
                       companionAvatar === avatar.id
-                        ? 'border-primary bg-primary/10'
-                        : 'border-border hover:border-primary/50'
+                        ? 'border-primary bg-primary/10 shadow-sm'
+                        : 'border-border/50 bg-card hover:border-primary/40'
                     }`}
                   >
-                    <div className="text-3xl mb-1">{avatar.emoji}</div>
-                    <p className="text-xs font-medium">{avatar.name}</p>
+                    <div className="text-3xl mb-2 filter drop-shadow-sm">{avatar.emoji}</div>
+                    <p className={`text-[11px] font-bold tracking-wide ${companionAvatar === avatar.id ? 'text-primary' : 'text-muted-foreground'}`}>{avatar.name}</p>
                   </button>
                 ))}
               </div>
